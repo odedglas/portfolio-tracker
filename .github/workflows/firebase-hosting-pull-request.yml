@@ -5,11 +5,7 @@ name: Deploy to Firebase Hosting on PR
 on:
   pull_request:
     branches:
-      - 'preview-*'
-  push:
-    branches:
-      - main
-      - 'preview-*'
+      - 'preview-**'
 
 jobs:
   build_and_preview:
