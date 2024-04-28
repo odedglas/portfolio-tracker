@@ -9,7 +9,7 @@ on:
       - init
   push:
     branches:
-      - releases/**-rc
+      - releases/**
       - init
       - main
 
