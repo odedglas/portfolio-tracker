@@ -3,14 +3,8 @@
 
 name: Deploy to Firebase Hosting on PR
 on:
-  pull_request:
-    branches:
-      - releases/**-rc
-      - init
   push:
     branches:
-      - releases/**-rc
-      - init
       - main
 
 jobs:
@@ -26,7 +20,7 @@ jobs:
               echo "FIREBASE_CHANNEL_ID=preview-$GITHUB_REF_NAME" >> "$GITHUB_ENV"
           fi
       - name: "Print Firebase Publish ChannelId"
-        run: echo " Channel $FIREBASE_CHANNEL_ID"
+        run: echo "Firebase Channel $FIREBASE_CHANNEL_ID"
       - uses: actions/checkout@v2
       - run: npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
