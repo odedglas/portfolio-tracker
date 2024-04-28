@@ -1,5 +1,11 @@
 <template>
-  <router-view />
+  <router-view v-slot="{ Component }">
+    <transition
+      mode="out-in"
+      name="page">
+      <component :is="Component" />
+    </transition>
+  </router-view>
 </template>
 
 <script lang="ts">
