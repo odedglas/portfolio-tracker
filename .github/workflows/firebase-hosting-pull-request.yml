@@ -6,9 +6,7 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - 'preview-*'
+
 jobs:
   build_and_preview:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
