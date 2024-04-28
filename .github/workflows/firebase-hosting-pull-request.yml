@@ -5,7 +5,7 @@ name: Deploy to Firebase Hosting on PR
 on:
   pull_request:
     branches:
-      - releases/**-rc
+      - releases/**
       - init
   push:
     branches:
