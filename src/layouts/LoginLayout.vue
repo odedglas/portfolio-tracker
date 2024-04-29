@@ -10,23 +10,12 @@
 </template>
 
 <script lang="ts">
-import { useRouter } from 'vue-router';
 import LoginPage from 'src/pages/Login.vue';
 
 export default {
   name: 'LoginLayout',
   components: {
     LoginPage,
-  },
-  setup() {
-    const router = useRouter();
-    const handleClick = () => {
-      router.push('/dashboard');
-    };
-
-    return {
-      handleClick,
-    };
-  },
+  }
 };
 </script>
