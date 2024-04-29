@@ -1,8 +1,8 @@
 export const firebaseConfig = {
-  apiKey: 'AIzaSyCceWnYrbo2ilDAHH1axXt41yyWRW8XpNk',
-  authDomain: 'portfolio-tracker-73341.firebaseapp.com',
-  projectId: 'portfolio-tracker-73341',
-  storageBucket: 'portfolio-tracker-73341.appspot.com',
-  messagingSenderId: '536377237793',
-  appId: '1:536377237793:web:ca17aa5991de1df3205e60',
+  apiKey: process.env.API_KEY,
+  authDomain: process.env.AUTH_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSANGING_SENDER_ID,
+  appId: process.env.APP_ID,
 };

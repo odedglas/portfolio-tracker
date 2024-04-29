@@ -1,9 +1,9 @@
 import { boot } from 'quasar/wrappers';
-import { initializeFirebaseApp } from '../service/firebase';
+import { loadIcons } from '../service/icons';
 
 /**
  * Initialize Firebase application.
  */
 export default boot(async () => {
-  await initializeFirebaseApp();
+  await loadIcons();
 });

@@ -1,19 +1,24 @@
 <template>
   <div>
+    <router-link to="/login">Back</router-link>
     <p>{{ title }}</p>
     <ul>
       <li v-for="todo in todos" :key="todo.id" @click="increment">
         {{ todo.id }} - {{ todo.content }}
       </li>
     </ul>
+    <DynamicImage icon="gmail" />
     <p>Count: {{ todoCount }} / {{ meta.totalCount }}</p>
     <p>Active: {{ active ? 'yes' : 'no' }}</p>
+    <q-btn @click="logOut">Log Out!</q-btn>
     <p>Clicks on todos: {{ clickCount }}</p>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
+import { authentication } from 'src/service/firebase';
+import DynamicImage from './common/DynamicImage.vue';
 import { Todo, Meta } from './models';
 
 function useClickCount() {
@@ -33,7 +38,9 @@ function useDisplayTodo(todos: Ref<Todo[]>) {
 
 export default defineComponent({
   name: 'ExampleComponent',
-
+  components: {
+    DynamicImage,
+  },
   props: {
     title: {
       type: String,
@@ -53,7 +60,12 @@ export default defineComponent({
   },
 
   setup(props) {
-    return { ...useClickCount(), ...useDisplayTodo(toRef(props, 'todos')) };
+    const logOut = () => authentication.signOut();
+    return {
+      ...useClickCount(),
+      ...useDisplayTodo(toRef(props, 'todos')),
+      logOut,
+    };
   },
 });
 </script>
