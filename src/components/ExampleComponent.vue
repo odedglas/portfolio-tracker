@@ -10,12 +10,14 @@
     <DynamicImage icon="gmail" />
     <p>Count: {{ todoCount }} / {{ meta.totalCount }}</p>
     <p>Active: {{ active ? 'yes' : 'no' }}</p>
+    <q-btn @click="logOut">Log Out!</q-btn>
     <p>Clicks on todos: {{ clickCount }}</p>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
+import { authentication } from 'src/service/firebase';
 import DynamicImage from './common/DynamicImage.vue';
 import { Todo, Meta } from './models';
 
@@ -58,7 +60,12 @@ export default defineComponent({
   },
 
   setup(props) {
-    return { ...useClickCount(), ...useDisplayTodo(toRef(props, 'todos')) };
+    const logOut = () => authentication.signOut();
+    return {
+      ...useClickCount(),
+      ...useDisplayTodo(toRef(props, 'todos')),
+      logOut,
+    };
   },
 });
 </script>

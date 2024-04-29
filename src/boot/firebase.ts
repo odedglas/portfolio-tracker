@@ -4,6 +4,6 @@ import { initializeFirebaseApp } from '../service/firebase';
 /**
  * Initialize Firebase application.
  */
-export default boot(() => {
-  initializeFirebaseApp();
+export default boot(async () => {
+  await initializeFirebaseApp();
 });

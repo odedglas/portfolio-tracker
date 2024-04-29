@@ -50,6 +50,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, PropType } from 'vue';
+import { useQuasar } from 'quasar';
+import { authentication } from 'src/service/firebase';
 import { LOGIN_META } from 'src/constants';
 
 export default defineComponent({
@@ -60,21 +62,28 @@ export default defineComponent({
       type: Object as PropType<(typeof LOGIN_META)[keyof typeof LOGIN_META]>,
     },
   },
-  setup() {
+  setup(props) {
+    const $q = useQuasar();
     const email = ref('');
     const password = ref('');
     const displayName = ref('');
 
-    const loginWithPassword = () => {
-      // Authenticate with Passowrd.
+    const loginWithPassword = async () => {
+      const isSignUp = props.loginMeta?.isSignUp;
 
-      // Display error on failures.
-      /*      $q.notify({
-        message: !isSignUp.value ? 'Wrong email or password' : 'Provider Error',
-        color: 'negative',
-        actions: [{ label: 'Dismiss', color: 'white' }],
-      })*/
-      console.log('Login submit!!', { email, password, displayName });
+      try {
+        const authenticationMethod = isSignUp
+          ? authentication.signUp
+          : authentication.signInWithPassword;
+
+        await authenticationMethod(email.value, password.value);
+      } catch (error) {
+        $q.notify({
+          message: !isSignUp ? 'Wrong email or password' : 'Provider Error',
+          color: 'negative',
+          actions: [{ label: 'Dismiss', color: 'white' }],
+        });
+      }
     };
 
     return {
