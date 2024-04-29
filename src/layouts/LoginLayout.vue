@@ -2,16 +2,8 @@
   <q-layout>
     <q-page-container>
       <q-page class="q-pa-md q-my-md">
-        <div class="column">
-          <div
-            class="col-3 text-center"
-            v-bind:style="{ ['min-height']: '110px' }"
-          ></div>
-          <div class="col-9 row">
-            <router-link to="/dashboard"> Login </router-link>
-            <button @click="handleClick">Login</button>
-          </div>
-        </div>
+        Logo Goes Here
+        <login-page />
       </q-page>
     </q-page-container>
   </q-layout>
@@ -19,10 +11,13 @@
 
 <script lang="ts">
 import { useRouter } from 'vue-router';
+import LoginPage from 'src/pages/Login.vue';
 
 export default {
   name: 'LoginLayout',
-  components: {},
+  components: {
+    LoginPage,
+  },
   setup() {
     const router = useRouter();
     const handleClick = () => {
@@ -35,4 +30,3 @@ export default {
   },
 };
 </script>
-

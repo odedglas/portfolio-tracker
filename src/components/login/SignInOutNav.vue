@@ -1,43 +1,31 @@
 <template>
   <div class="col-12 q-mt-md">
     <div class="row justify-center">
-      <p>{{ $t(mode.sectionText) }}</p>
-      <span :class="`q-mx-sm text-${mode.color}`" @click="click">{{ $t(mode.text) }}</span>
+      <p>{{ $t(loginMeta.switchModeText) }}</p>
+      <span
+        :class="`q-mx-sm text-${loginMeta?.color}`"
+        @click="switchLoginModes"
+        >{{ $t(loginMeta.switchModeActionText) }}</span
+      >
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from 'vue';
+import { LOGIN_META } from 'src/constants';
 
-const MODES = {
-  LOGIN: {
-    text: 'login.login',
-    color: 'primary',
-    sectionText: 'login.have_an_account',
-  },
-  SIGNUP: {
-    text: 'login.signup',
-    color: 'secondary',
-    sectionText: 'login.dont_have_account',
-  },
-};
-
-export default {
+export default defineComponent({
   name: 'SignInOutLink',
   props: {
-    signup: Boolean,
-    sectionText: String,
-    color: String,
-  },
-  computed: {
-    mode() {
-      return this.signup ? MODES.SIGNUP : MODES.LOGIN;
+    loginMeta: {
+      type: Object as PropType<(typeof LOGIN_META)[keyof typeof LOGIN_META]>,
+      require: true,
+    },
+    switchLoginModes: {
+      type: Function,
+      required: true,
     },
   },
-  methods: {
-    click() {
-      this.$router.push(this.mode.redirect);
-    },
-  },
-};
+});
 </script>

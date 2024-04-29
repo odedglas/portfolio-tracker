@@ -1,5 +1,12 @@
 <template>
-    <img v-if="iconSrc" :style="iconStyle" :class=classes :src="iconSrc" @click="imageClick" :alt="icon"/>
+  <img
+    v-if="iconSrc"
+    :style="iconStyle"
+    :class="classes"
+    :src="iconSrc"
+    @click="imageClick"
+    :alt="icon"
+  />
 </template>
 
 <script lang="ts">
@@ -12,19 +19,22 @@ export default defineComponent({
     icon: { type: String, required: true },
     click: Function,
     fullWidth: {
-      type: Boolean, default: false,
+      type: Boolean,
+      default: false,
     },
     classes: {
-      type: String, default: '',
+      type: String,
+      default: '',
     },
     size: {
-      type: Number, default: 24,
+      type: Number,
+      default: 24,
     },
   },
 
   setup(props) {
     const { icon } = props;
-    const iconSrc = ref(getIcon(icon))
+    const iconSrc = ref(getIcon(icon));
 
     const iconStyle = computed(() => {
       if (props.fullWidth) {
@@ -37,7 +47,7 @@ export default defineComponent({
 
     const imageClick = () => {
       props.click?.();
-    }
+    };
 
     return {
       iconSrc,
@@ -46,5 +56,4 @@ export default defineComponent({
     };
   },
 });
-
 </script>

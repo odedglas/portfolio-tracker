@@ -1,8 +1,6 @@
 <template>
   <router-view v-slot="{ Component }">
-    <transition
-      mode="out-in"
-      name="page">
+    <transition mode="out-in" name="page">
       <component :is="Component" />
     </transition>
   </router-view>

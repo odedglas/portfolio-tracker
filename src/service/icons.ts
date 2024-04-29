@@ -1,14 +1,14 @@
 const resources = import.meta.globEager('../assets/dynamic/*.svg');
 
-export const iconsMap: Record<string, unknown> = {}
+export const iconsMap: Record<string, unknown> = {};
 
 /**
  * Loads dynamic icons located under "assets/dynamic" under memory iconsMap to be available for application usage.
  */
-export const loadIcons = async() => {
+export const loadIcons = async () => {
   for (const path in resources) {
     const iconName = path.split('/').slice(-1)[0];
-    iconsMap[iconName] = (await import(path)).default;
+    iconsMap[iconName] = (await import(/* @vite-ignore */ path)).default;
   }
 };
 
@@ -25,4 +25,4 @@ export const getIcon = (name: string, extension = 'svg'): string => {
   }
 
   return icon as string;
-}
+};

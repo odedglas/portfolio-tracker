@@ -1,8 +1,9 @@
-.page-enter-active, .page-leave-active {
+.page-enter-active,
+.page-leave-active {
   transition: opacity 0.4s, transform 0.4s;
 }
-.page-enter-from, .page-leave-to {
+.page-enter-from,
+.page-leave-to {
   opacity: 0;
   transform: translateX(-30%);
 }
-
