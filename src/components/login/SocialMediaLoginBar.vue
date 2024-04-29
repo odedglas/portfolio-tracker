@@ -15,8 +15,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import { authentication } from 'src/service/firebase';
 import { FIREBASE_LOGIN_PROVIDERS } from 'src/constants';
 import DynamicImage from '../common/DynamicImage.vue';
 
@@ -33,14 +33,11 @@ export default defineComponent({
 
   setup() {
     const $q = useQuasar();
-    const router = useRouter();
 
     const providerLogin = async (provider: { id: string }) => {
-      const { error } = { error: true }; //await auth.loginWithProvider(provider.id);
-
-      if (!error) {
-        await router.push({ path: '/dashboard' });
-      } else {
+      try {
+        await authentication.signInWithProvider(provider.id);
+      } catch (error) {
         $q.notify({
           message: `Login with : ${provider.id} has failed :(`,
           color: 'negative',

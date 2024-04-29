@@ -3,7 +3,7 @@
     <div class="row justify-center">
       <p>{{ $t(loginMeta.switchModeText) }}</p>
       <span
-        :class="`q-mx-sm text-${loginMeta?.color}`"
+        :class="`q-mx-sm cursor-pointer text-${loginMeta?.color}`"
         @click="switchLoginModes"
         >{{ $t(loginMeta.switchModeActionText) }}</span
       >

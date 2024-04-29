@@ -3,9 +3,11 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
+  updateProfile,
   GoogleAuthProvider,
   TwitterAuthProvider,
   FacebookAuthProvider,
+  User,
 } from 'firebase/auth';
 import { auth } from './core';
 import { FIREBASE_LOGIN_PROVIDERS } from 'src/constants';
@@ -17,6 +19,10 @@ const AuthenticationProviders = {
 };
 
 export const authentication = {
+  onAuthStateChanged: (callback: (user: User | null) => void) => {
+    return auth.onAuthStateChanged(callback);
+  },
+
   signInWithPassword: (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
   },
@@ -26,8 +32,16 @@ export const authentication = {
     return signInWithPopup(auth, provider);
   },
 
-  signUp(email: string, password: string) {
-    return createUserWithEmailAndPassword(auth, email, password);
+  async signUp(email: string, password: string, displayName: string) {
+    const { user } = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    await updateProfile(user, {
+      displayName,
+    });
   },
 
   signOut: () => {

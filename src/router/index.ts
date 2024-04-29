@@ -10,8 +10,8 @@ import { authentication } from 'src/service/firebase';
 
 import routes, { ROUTE_PATHS } from './routes';
 
-const authenticationGuard = () => (to: RouteLocationNormalized) => {
-  switch (to.meta.authState) {
+export const getAuthenticationRedirectRoute = (authState: unknown) => {
+  switch (authState) {
     case 'required':
       if (!authentication.currentUser) {
         return ROUTE_PATHS.LOGIN;
@@ -24,6 +24,9 @@ const authenticationGuard = () => (to: RouteLocationNormalized) => {
       break;
   }
 };
+
+const authenticationGuard = (to: RouteLocationNormalized) =>
+  getAuthenticationRedirectRoute(to.meta.authState);
 
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
@@ -38,7 +41,7 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
-  router.beforeEach(authenticationGuard());
+  router.beforeEach(authenticationGuard);
 
   return router;
 });

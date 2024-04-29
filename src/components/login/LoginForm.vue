@@ -76,10 +76,16 @@ export default defineComponent({
           ? authentication.signUp
           : authentication.signInWithPassword;
 
-        await authenticationMethod(email.value, password.value);
+        await authenticationMethod(
+          email.value,
+          password.value,
+          displayName.value
+        );
       } catch (error) {
         $q.notify({
-          message: !isSignUp ? 'Wrong email or password' : 'Provider Error',
+          message: !isSignUp
+            ? 'Wrong email or password'
+            : `Cannot Signup: ${(error as Error).message}`,
           color: 'negative',
           actions: [{ label: 'Dismiss', color: 'white' }],
         });
