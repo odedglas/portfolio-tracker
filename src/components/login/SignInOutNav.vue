@@ -3,7 +3,7 @@
     <div class="row justify-center">
       <p>{{ $t(loginMeta.switchModeText) }}</p>
       <span
-        :class="`q-mx-sm cursor-pointer text-${loginMeta?.color}`"
+        :class="`q-mx-sm cursor-pointer text-${loginMeta.color}`"
         @click="switchLoginModes"
         >{{ $t(loginMeta.switchModeActionText) }}</span
       >
@@ -20,10 +20,10 @@ export default defineComponent({
   props: {
     loginMeta: {
       type: Object as PropType<(typeof LOGIN_META)[keyof typeof LOGIN_META]>,
-      require: true,
+      required: true,
     },
     switchLoginModes: {
-      type: Function,
+      type: Function as PropType<(payload: MouseEvent) => void>,
       required: true,
     },
   },

@@ -40,10 +40,10 @@
     />
 
     <q-btn
-      :label="$t(loginMeta?.text ?? 'Login')"
+      :label="$t(loginMeta.text ?? 'Login')"
       type="submit"
       class="full-width"
-      :color="loginMeta?.color"
+      :color="loginMeta.color"
     />
   </q-form>
 </template>
@@ -58,7 +58,7 @@ export default defineComponent({
   name: 'LoginForm',
   props: {
     loginMeta: {
-      require: true,
+      required: true,
       type: Object as PropType<(typeof LOGIN_META)[keyof typeof LOGIN_META]>,
     },
   },
