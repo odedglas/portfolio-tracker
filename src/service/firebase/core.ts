@@ -11,8 +11,6 @@ export const initializeFirebaseApp = async () => {
   auth = getAuth(firebaseApp);
 
   await auth.authStateReady();
-
-  console.log(auth.currentUser);
 };
 
 export { firebaseApp, auth };
