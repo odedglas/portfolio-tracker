@@ -16,6 +16,6 @@ export default {
   name: 'LoginLayout',
   components: {
     LoginPage,
-  }
+  },
 };
 </script>
