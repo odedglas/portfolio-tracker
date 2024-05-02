@@ -1,10 +1,9 @@
 <template>
   <q-header elevated>
     <q-toolbar>
-      <q-btn flat dense round icon="menu_book" aria-label="Icon" />
+      <img class="header-logo q-mr-md" src="~assets/logo.svg" alt="app-logo"/>
 
       <q-toolbar-title class="row justify-between">
-        Portfolio Tracker
         <app-navigation class="desktop-only" />
       </q-toolbar-title>
 
@@ -49,6 +48,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.header-logo {
+  width: 225px;
+}
+
 .navigation-buttons-container {
   .nav-btn:hover,
   .nav-btn.active {

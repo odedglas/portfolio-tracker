@@ -1,8 +1,7 @@
 <template>
   <q-layout>
     <q-page-container>
-      <q-page class="q-pa-md q-my-md">
-        Logo Goes Here
+      <q-page class="flex flex-center bg-grey-2">
         <login-page />
       </q-page>
     </q-page-container>
@@ -15,7 +14,7 @@ import LoginPage from 'src/pages/Login.vue';
 export default {
   name: 'LoginLayout',
   components: {
-    LoginPage,
+    LoginPage
   },
 };
 </script>
