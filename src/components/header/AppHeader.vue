@@ -3,7 +3,10 @@
     <q-toolbar>
       <q-btn flat dense round icon="menu_book" aria-label="Icon" />
 
-      <q-toolbar-title> Portfolio Tracker </q-toolbar-title>
+      <q-toolbar-title class="row justify-between">
+        Portfolio Tracker
+        <app-navigation class="desktop-only" />
+      </q-toolbar-title>
 
       <q-btn-dropdown
         color="white"
@@ -35,8 +38,28 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import AppNavigation from './Navigation.vue';
 
 export default defineComponent({
   name: 'AppHeader',
+  components: {
+    AppNavigation,
+  },
 });
 </script>
+
+<style lang="scss">
+.navigation-buttons-container {
+  .nav-btn:hover,
+  .nav-btn.active {
+    color: white !important;
+  }
+
+  .nav-btn.active {
+    .q-focus-helper {
+      background: currentColor;
+      opacity: 0.15;
+    }
+  }
+}
+</style>

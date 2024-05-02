@@ -15,7 +15,7 @@ import { Todo, Meta } from 'components/models';
 import ExampleComponent from 'components/ExampleComponent.vue';
 
 export default defineComponent({
-  name: 'IndexPage',
+  name: 'DashboardPage',
 
   components: {
     ExampleComponent,

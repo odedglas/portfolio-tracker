@@ -2,7 +2,11 @@
   <q-layout view="lHh Lpr lFf">
     <app-header />
     <q-page-container>
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <transition mode="out-in" name="sub-page">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </q-page-container>
   </q-layout>
 </template>
