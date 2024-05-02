@@ -7,3 +7,13 @@
   opacity: 0;
   transform: translateX(-30%);
 }
+
+.sub-page-enter-active,
+.sub-page-leave-active {
+  transition: opacity 0.4s, transform 0.4s;
+}
+.sub-page-enter-from,
+.sub-page-leave-to {
+  opacity: 0;
+  transform: translatey(50%);
+}

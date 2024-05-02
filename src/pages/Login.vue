@@ -1,11 +1,14 @@
 <template>
-  <div class="col-12">
-    <login-form :login-meta="loginMeta" />
-    <social-media-login-bar />
-    <sign-in-out-nav
-      :login-meta="loginMeta"
-      :switch-login-modes="switchLoginModes"
-    />
+  <div class="login-container column q-gutter-md">
+    <img class="app-logo" src="~assets/logo.svg" alt="app-logo"/>
+    <q-card class="q-pa-md shadow-2 login-card" bordered>
+      <login-form :login-meta="loginMeta" />
+      <social-media-login-bar />
+      <sign-in-out-nav
+        :login-meta="loginMeta"
+        :switch-login-modes="switchLoginModes"
+      />
+    </q-card>
   </div>
 </template>
 
@@ -41,3 +44,15 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss">
+.login-container {
+  .app-logo {
+    filter: contrast(0.35);
+  }
+
+  .login-card {
+    min-width: 550px;
+  }
+}
+</style>

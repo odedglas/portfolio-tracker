@@ -24,7 +24,13 @@ const routes: RouteRecordRaw[] = [
       authState: 'required',
     },
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
+    children: [
+      { path: '', component: () => import('pages/Dashboard.vue') },
+      {
+        path: '/manage-portfolios',
+        component: () => import('pages/Portfolios.vue'),
+      },
+    ],
   },
   {
     path: '/:catchAll(.*)*',
