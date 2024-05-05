@@ -3,10 +3,12 @@ import { LOGIN_META } from './constants';
 export type LoginMode = keyof typeof LOGIN_META;
 
 export interface Portfolio {
-  name: string;
-  currencyCode: string; // TODO - Create a CurrencyCode type
+  id: string;
+  owner: string;
+  title: string;
+  createdAt: number;
   currentValue: number;
-  totalVested: number;
-  taxRate: number;
-  yearlyTarget?: number;
+  target: number;
+  invested: number;
+  profit: number;
 }

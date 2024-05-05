@@ -7,4 +7,7 @@ export default {
     dont_have_account: "Don't have an account yet ?",
     have_an_account: 'Already got an account ?',
   },
+  portfolios: {
+    title: "Manage your Portfolio's",
+  },
 };

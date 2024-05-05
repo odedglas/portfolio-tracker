@@ -31,6 +31,7 @@ export default defineComponent({
         route: '/manage-portfolios',
       },
       { id: 'analytics', text: 'Analytics', route: '/' },
+      { id: 'stock-plants', text: 'Stock Plans', route: '/' },
     ];
 
     const isActiveRoute = (id: string) =>

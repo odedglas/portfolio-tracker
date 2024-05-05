@@ -1,7 +1,7 @@
 <template>
   <q-header elevated>
     <q-toolbar>
-      <img class="header-logo q-mr-md" src="~assets/logo.svg" alt="app-logo"/>
+      <img class="header-logo q-mr-md" src="~assets/logo.svg" alt="app-logo" />
 
       <q-toolbar-title class="row justify-between">
         <app-navigation class="desktop-only" />
@@ -11,6 +11,7 @@
         color="white"
         flat
         no-caps
+        class="q-mx-sm"
         icon="business_center"
         label="My Portfolio"
       >
