@@ -1,13 +1,13 @@
 <template>
-  <q-list bordered class="rounded-borders q-pa-lg">
-    <q-item v-for="(portfolio, index) in portfolios" :key="portfolio.id">
-      <portfolio-item
-        :portfolio="portfolio"
-        @edit-portfolio="editPortfolio"
-        @delete-portfolio="deletePortfolio"
-      />
-      <q-separator spaced v-if="index <= portfolios.length - 1" />
-    </q-item>
+  <q-list bordered class="rounded-borders">
+    <portfolio-item
+      v-for="(portfolio, index) in portfolios"
+      :key="portfolio.id"
+      :portfolio="portfolio"
+      :withSpacer="index < portfolios.length - 1"
+      @edit-portfolio="editPortfolio"
+      @delete-portfolio="deletePortfolio"
+    />
   </q-list>
 </template>
 

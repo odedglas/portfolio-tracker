@@ -44,8 +44,17 @@ export default defineComponent({
       console.log({ portfolios });
     });
 
-    const createOrEditPortfolio = (portfolio?: Portfolio) => {
+    const createOrEditPortfolio = async (portfolio?: Portfolio) => {
       console.log('Add Portfolio', portfolio);
+
+      await collections.portfolio.update('123', {
+        title: 'Other Portfolio',
+        target: 10000,
+        invested: 5000,
+        currentValue: 7000,
+        createdAt: Date.now(),
+      });
+
       // TODO - Show Portfolio create/edit dialog
     };
 
