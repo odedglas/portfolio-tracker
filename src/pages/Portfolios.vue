@@ -27,6 +27,8 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref, Ref } from 'vue';
+import { useQuasar } from 'quasar';
+import { useLoadingStore } from 'stores/loading';
 import collections from 'src/service/firebase/collections';
 import PortfolioList from 'src/components/portfolio/PortfolioList.vue';
 import { Portfolio } from 'src/types';
@@ -37,15 +39,20 @@ export default defineComponent({
     PortfolioList,
   },
   setup() {
+    const $q = useQuasar();
     const portfolios: Ref<Portfolio[]> = ref([]);
+    const { emitLoadingTask } = useLoadingStore();
 
     onMounted(async () => {
-      portfolios.value = await collections.portfolio.all();
-      console.log({ portfolios });
+      portfolios.value = await emitLoadingTask(() =>
+        collections.portfolio.all()
+      );
     });
 
     const createOrEditPortfolio = async (portfolio?: Portfolio) => {
-      console.log('Add Portfolio', portfolio);
+      const isEdit = !!portfolio?.id;
+
+      console.log('Add Portfolio', portfolio, isEdit);
 
       await collections.portfolio.update('123', {
         title: 'Other Portfolio',
@@ -59,8 +66,20 @@ export default defineComponent({
     };
 
     const deletePortfolio = (portfolio: Portfolio) => {
-      console.log('Delete Portfolio', portfolio);
-      // TODO - Are you sure display
+      $q.dialog({
+        title: 'Delete Portfolio',
+        message: `Are you sure you want to delete "${portfolio.title}"?`,
+        ok: {
+          label: 'Yes',
+          color: 'primary',
+        },
+        cancel: {
+          label: 'No',
+          color: 'negative',
+        },
+      }).onOk(async () => {
+        await emitLoadingTask(() => collections.portfolio.delete(portfolio.id));
+      });
     };
 
     return { portfolios, createOrEditPortfolio, deletePortfolio };

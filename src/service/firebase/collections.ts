@@ -5,6 +5,7 @@ import {
   getDocs,
   getDoc,
   setDoc,
+  deleteDoc,
 } from 'firebase/firestore';
 import { firestore } from './core';
 import { Portfolio, AppCollections, AppCollectionsNames } from './types';
@@ -49,6 +50,14 @@ const firestoreAPI = {
 
     await setDoc(docReference, { ...data }, { merge: true });
   },
+  deleteDocument: async <T>(
+    identifier: string,
+    collection: CollectionReference<T>
+  ) => {
+    const docReference = doc(collection, identifier);
+
+    await deleteDoc(docReference);
+  },
 };
 
 export default {
@@ -58,5 +67,7 @@ export default {
       firestoreAPI.getDocument(collections.portfolio, portfolioId),
     update: async (portfolioId: string, data: Partial<Portfolio>) =>
       firestoreAPI.updateDocument(portfolioId, collections.portfolio, data),
+    delete: async (portfolioId: string) =>
+      firestoreAPI.deleteDocument(portfolioId, collections.portfolio),
   },
 };

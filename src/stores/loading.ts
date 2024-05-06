@@ -8,11 +8,11 @@ export const useLoadingStore = defineStore('loading', {
     setLoading(isLoading: boolean) {
       this.loading = isLoading;
     },
-    async emitLoadingTask(task: () => Promise<unknown>) {
+    async emitLoadingTask<T>(task: () => Promise<T>) {
       this.setLoading(true);
 
       try {
-        await task();
+        return await task();
       } finally {
         this.setLoading(false);
       }
