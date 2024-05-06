@@ -1,6 +1,6 @@
 <template>
   <q-item-section avatar center class="text-grey-8">
-    <q-icon name="business_center" size="28px" />
+    <q-icon name="business_center" size="24px" />
   </q-item-section>
 
   <q-item-section center class="col-2">
@@ -42,7 +42,7 @@
 
       <q-separator spaced vertical />
 
-      <q-item class="col-3">
+      <q-item class="col-4">
         <q-item-section top class="justify-between">
           <q-item-label class="text-grey-6 self-center">Target</q-item-label>
           <q-linear-progress
@@ -61,19 +61,37 @@
 
   <q-item-section center side>
     <div class="text-grey-8 q-gutter-xs">
-      <q-btn class="gt-xs" size="12px" flat dense round icon="edit" />
+      <q-btn
+        class="gt-xs"
+        size="12px"
+        flat
+        dense
+        round
+        icon="edit"
+        @click="$emit('editPortfolio', portfolio)"
+      />
       <q-btn size="12px" flat dense round icon="more_vert">
         <q-menu>
           <q-list style="min-width: 200px">
-            <q-item clickable v-close-popup>
-              <div class="col-12 text-grey-7">
+            <q-item
+              clickable
+              v-close-popup
+              @click="$emit('deletePortfolio', portfolio)"
+            >
+              <div
+                class="col-12 row items-center gap-md text-grey-7"
+                style="gap: 12px"
+              >
                 <q-icon name="delete" size="18px" />
                 Delete
               </div>
             </q-item>
             <q-item v-close-popup>
-              <div class="col-12 text-grey-7">
-                <q-icon name="delete" size="18px" />
+              <div
+                class="col-12 row items-center gap-md text-grey-7"
+                style="gap: 12px"
+              >
+                <q-icon name="content_copy" size="18px" />
                 Clone
               </div>
             </q-item>

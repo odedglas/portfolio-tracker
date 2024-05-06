@@ -1,14 +1,13 @@
 <template>
-  <q-list bordered class="rounded-borders">
-    <q-item-label header class="flex justify-end">
-      <q-btn flat round dense icon="add" class="q-mr-md text-primary" />
-    </q-item-label>
-
-    <q-item v-for="portfolio in portfolios" :key="portfolio.id">
-      <portfolio-item :portfolio="portfolio" />
+  <q-list bordered class="rounded-borders q-pa-lg">
+    <q-item v-for="(portfolio, index) in portfolios" :key="portfolio.id">
+      <portfolio-item
+        :portfolio="portfolio"
+        @edit-portfolio="editPortfolio"
+        @delete-portfolio="deletePortfolio"
+      />
+      <q-separator spaced v-if="index <= portfolios.length - 1" />
     </q-item>
-
-    <q-separator spaced />
   </q-list>
 </template>
 
@@ -26,6 +25,14 @@ export default defineComponent({
     portfolios: {
       type: Array as PropType<Portfolio[]>,
       required: true,
+    },
+    editPortfolio: {
+      type: Function as PropType<(portfolio: Portfolio) => void>,
+      required: false,
+    },
+    deletePortfolio: {
+      type: Function as PropType<(portfolio: Portfolio) => void>,
+      required: false,
     },
   },
 });

@@ -9,5 +9,6 @@ export default {
   },
   portfolios: {
     title: "Manage your Portfolio's",
+    create: 'New Portfolio',
   },
 };
