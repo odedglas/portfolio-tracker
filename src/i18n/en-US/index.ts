@@ -10,5 +10,8 @@ export default {
   portfolios: {
     title: "Manage your Portfolio's",
     create: 'New Portfolio',
+    edit: 'Edit Portfolio',
   },
+  cancel: 'Cancel',
+  save: 'Save',
 };
