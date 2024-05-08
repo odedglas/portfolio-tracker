@@ -13,12 +13,12 @@ export default {
     edit: 'Edit Portfolio',
     profit: 'Profit',
     target: 'Target',
+    target_explainer: 'You are {percentage}% from reaching your target 🎉',
     invested: 'Invested',
     kpis: {
       cash_flow: 'Cash Flow',
       current_value: 'Current Value'
-
-    }
+    },
   },
   cancel: 'Cancel',
   save: 'Save',

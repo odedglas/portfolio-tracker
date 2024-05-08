@@ -55,7 +55,11 @@
                 size="8px"
                 :value="showTargets ? target.percentage : 0"
                 class="q-my-xs"
-              />
+              >
+                <q-tooltip>
+                  {{ $t('portfolios.target_explainer', { percentage: target.percentage * 100 }) }}
+                </q-tooltip>
+              </q-linear-progress>
               <div class="text-grey-6 text-caption row justify-between">
                 <span>{{ portfolio.invested }}$</span>
                 <span>{{ target.value }}$</span>
@@ -158,7 +162,7 @@ export default defineComponent({
     const profit = {
       value: profitValue,
       percentage: profitValue / portfolio.invested,
-      ...(profitValue > 0 ? positiveProfit : negativeProfit),
+      ...(profitValue >= 0 ? positiveProfit : negativeProfit),
     };
 
     return { showTargets, target, profit, cashFlow };
