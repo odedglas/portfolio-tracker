@@ -17,7 +17,7 @@ export default {
     invested: 'Invested',
     kpis: {
       cash_flow: 'Cash Flow',
-      current_value: 'Current Value'
+      current_value: 'Current Value',
     },
   },
   cancel: 'Cancel',
@@ -26,5 +26,4 @@ export default {
   delete: 'Delete',
   yes: 'Yes',
   no: 'No',
-
 };

@@ -14,7 +14,9 @@
       <q-list class="row kpi-list">
         <q-item class="col-2">
           <q-item-section top class="items-center">
-            <q-item-label class="text-grey-6 label">{{$t('portfolios.invested')}}</q-item-label>
+            <q-item-label class="text-grey-6 label">{{
+              $t('portfolios.invested')
+            }}</q-item-label>
             <q-item-label class="q-mt-md"
               >{{ portfolio.invested }}$</q-item-label
             >
@@ -23,14 +25,18 @@
 
         <q-item class="col-2">
           <q-item-section top class="items-center">
-            <q-item-label class="text-grey-6 label">{{$t('portfolios.kpis.current_value')}}</q-item-label>
+            <q-item-label class="text-grey-6 label">{{
+              $t('portfolios.kpis.current_value')
+            }}</q-item-label>
             <q-item-label>{{ portfolio.currentValue }}$</q-item-label>
           </q-item-section>
         </q-item>
 
         <q-item class="col-2">
           <q-item-section top class="items-center">
-            <q-item-label class="text-grey-6 label">{{$t('portfolios.profit')}}</q-item-label>
+            <q-item-label class="text-grey-6 label">{{
+              $t('portfolios.profit')
+            }}</q-item-label>
             <q-item-label :class="profit.textClass">
               <q-icon :name="profit.percentageIcon" size="14px" />
               {{ profit.percentage }}%
@@ -40,16 +46,18 @@
 
         <q-item class="col-2">
           <q-item-section top class="items-center">
-            <q-item-label class="text-grey-6 label">{{$t('portfolios.kpis.cash_flow')}}</q-item-label>
+            <q-item-label class="text-grey-6 label">{{
+              $t('portfolios.kpis.cash_flow')
+            }}</q-item-label>
             <q-item-label class="q-mt-md">{{ cashFlow }}$</q-item-label>
           </q-item-section>
         </q-item>
 
         <q-item class="col-4">
           <q-item-section top>
-            <q-item-label class="text-grey-6 self-center label"
-              >{{$t('portfolios.target')}}</q-item-label
-            >
+            <q-item-label class="text-grey-6 self-center label">{{
+              $t('portfolios.target')
+            }}</q-item-label>
             <div>
               <q-linear-progress
                 size="8px"
@@ -57,7 +65,11 @@
                 class="q-my-xs"
               >
                 <q-tooltip>
-                  {{ $t('portfolios.target_explainer', { percentage: target.percentage * 100 }) }}
+                  {{
+                    $t('portfolios.target_explainer', {
+                      percentage: target.percentage * 100,
+                    })
+                  }}
                 </q-tooltip>
               </q-linear-progress>
               <div class="text-grey-6 text-caption row justify-between">
@@ -103,7 +115,7 @@
                   style="gap: 12px"
                 >
                   <q-icon name="content_copy" size="18px" />
-                  {{$t('clone')}}
+                  {{ $t('clone') }}
                 </div>
               </q-item>
             </q-list>
