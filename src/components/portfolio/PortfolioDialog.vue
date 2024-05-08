@@ -102,8 +102,8 @@ export default defineComponent({
       localPortfolio.value = { ...props.portfolio };
     };
 
-    const submitForm = () => {
-      if (formRef.value?.validate()) {
+    const submitForm = async() => {
+      if (await formRef.value?.validate()) {
         emit('savePortfolio', localPortfolio.value);
       }
     };
