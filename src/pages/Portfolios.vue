@@ -22,7 +22,11 @@
         </q-btn>
       </div>
     </div>
-    <portfolio-dialog :portfolio="portfolioToEdit" @close-portfolio="() => portfolioToEdit = undefined"/>
+    <portfolio-dialog
+      :portfolio="portfolioToEdit"
+      @close-portfolio="() => (portfolioToEdit = undefined)"
+      @save-portfolio="savePortfolio"
+    />
   </q-page>
 </template>
 
@@ -30,16 +34,28 @@
 import { defineComponent, onMounted, ref, Ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { useLoadingStore } from 'stores/loading';
+import { authentication } from 'src/service/firebase';
 import collections from 'src/service/firebase/collections';
 import PortfolioList from 'src/components/portfolio/PortfolioList.vue';
 import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
 import { Portfolio } from 'src/types';
 
+const emptyPortfolioTemplate = (): Portfolio => ({
+  id: 'new',
+  title: '',
+  currentValue: 0,
+  invested: 0,
+  target: 0,
+  profit: 0,
+  owner: 'none',
+  createdAt: Date.now(),
+});
+
 export default defineComponent({
   name: 'PortfoliosPage',
   components: {
     PortfolioList,
-    PortfolioDialog
+    PortfolioDialog,
   },
   setup() {
     const $q = useQuasar();
@@ -55,8 +71,34 @@ export default defineComponent({
 
     const showCreateOrEditPortfolio = async (portfolio?: Portfolio) => {
       const isEdit = !!portfolio?.id;
-      portfolioToEdit.value = isEdit ? { ...portfolio } : { id: 'new-portfolio' };
-      console.log('Create Or Edit Portfolio', portfolio, isEdit);
+      portfolioToEdit.value = isEdit
+        ? { ...portfolio }
+        : emptyPortfolioTemplate();
+    };
+
+    const savePortfolio = async (portfolio: Portfolio) => {
+      let isNewPortfolio = portfolio.id === 'new';
+
+      const portfolioId = isNewPortfolio
+        ? portfolio.title.toLowerCase().split(' ').join('-')
+        : portfolio.id;
+
+      if (isNewPortfolio) {
+        portfolio.currentValue = portfolio.invested;
+        portfolio.createdAt = Date.now();
+        portfolio.owner = authentication.currentUser.uid;
+
+        portfolios.value.push(portfolio);
+      } else {
+        const index = portfolios.value.findIndex((p) => p.id === portfolio.id);
+        portfolios.value[index] = portfolio;
+      }
+
+      await emitLoadingTask(() =>
+        collections.portfolio.update(portfolioId, portfolio)
+      );
+
+      portfolioToEdit.value = undefined;
     };
 
     const deletePortfolio = (portfolio: Portfolio) => {
@@ -73,10 +115,20 @@ export default defineComponent({
         },
       }).onOk(async () => {
         await emitLoadingTask(() => collections.portfolio.delete(portfolio.id));
+
+        portfolios.value = portfolios.value.filter(
+          (p) => p.id !== portfolio.id
+        );
       });
     };
 
-    return { portfolios, portfolioToEdit, showCreateOrEditPortfolio, deletePortfolio };
+    return {
+      portfolios,
+      portfolioToEdit,
+      showCreateOrEditPortfolio,
+      deletePortfolio,
+      savePortfolio,
+    };
   },
 });
 </script>

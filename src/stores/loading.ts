@@ -1,5 +1,12 @@
 import { defineStore } from 'pinia';
 
+const wait = (ms = 500) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('done');
+    }, ms);
+  });
+
 export const useLoadingStore = defineStore('loading', {
   state: () => ({
     loading: false,
@@ -12,7 +19,9 @@ export const useLoadingStore = defineStore('loading', {
       this.setLoading(true);
 
       try {
-        return await task();
+        const [taskResult] = await Promise.all([task(), wait(500)]);
+
+        return taskResult;
       } finally {
         this.setLoading(false);
       }

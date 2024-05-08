@@ -64,6 +64,10 @@ export const authentication = {
   },
 
   get currentUser() {
+    if (!auth.currentUser) {
+      throw new Error('Cannot access authentication user');
+    }
+
     return auth.currentUser;
   },
 };
