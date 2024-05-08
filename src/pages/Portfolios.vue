@@ -32,11 +32,11 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref, Ref } from 'vue';
-import { useQuasar } from 'quasar';
-import { useI18n } from 'vue-i18n';
+
 import { useLoadingStore } from 'stores/loading';
 import { authentication } from 'src/service/firebase';
 import collections from 'src/service/firebase/collections';
+import { useAreYouSure } from 'src/components/composables/useAreYouSureDialog';
 import PortfolioList from 'src/components/portfolio/PortfolioList.vue';
 import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
 import { Portfolio } from 'src/types';
@@ -59,8 +59,8 @@ export default defineComponent({
     PortfolioDialog,
   },
   setup() {
-    const $q = useQuasar();
-    const $t = useI18n().t;
+    const { show: showAreYouSure } = useAreYouSure();
+
     const portfolioToEdit = ref<Partial<Portfolio> | undefined>(undefined);
     const portfolios: Ref<Portfolio[]> = ref([]);
     const { emitLoadingTask } = useLoadingStore();
@@ -104,23 +104,18 @@ export default defineComponent({
     };
 
     const deletePortfolio = (portfolio: Portfolio) => {
-      $q.dialog({
+      showAreYouSure({
         title: 'Delete Portfolio',
         message: `Are you sure you want to delete "${portfolio.title}"?`,
-        ok: {
-          label: $t('yes'),
-          color: 'primary',
-        },
-        cancel: {
-          label: $t('no'),
-          color: 'negative',
-        },
-      }).onOk(async () => {
-        await emitLoadingTask(() => collections.portfolio.delete(portfolio.id));
+        callback: async () => {
+          await emitLoadingTask(() =>
+            collections.portfolio.delete(portfolio.id)
+          );
 
-        portfolios.value = portfolios.value.filter(
-          (p) => p.id !== portfolio.id
-        );
+          portfolios.value = portfolios.value.filter(
+            (p) => p.id !== portfolio.id
+          );
+        },
       });
     };
 

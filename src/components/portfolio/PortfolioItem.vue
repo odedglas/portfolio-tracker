@@ -82,7 +82,7 @@
       </q-list>
     </q-item-section>
 
-    <q-item-section center side class="col-1">
+    <q-item-section center side class="col">
       <div class="text-grey-8 q-gutter-xs">
         <q-btn
           class="gt-xs"

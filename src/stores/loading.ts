@@ -1,5 +1,9 @@
 import { defineStore } from 'pinia';
 
+/**
+ * Waits a given milliseconds until resolved.
+ * @param ms
+ */
 const wait = (ms = 500) =>
   new Promise((resolve) => {
     setTimeout(() => {
