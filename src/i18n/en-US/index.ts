@@ -11,7 +11,20 @@ export default {
     title: "Manage your Portfolio's",
     create: 'New Portfolio',
     edit: 'Edit Portfolio',
+    profit: 'Profit',
+    target: 'Target',
+    invested: 'Invested',
+    kpis: {
+      cash_flow: 'Cash Flow',
+      current_value: 'Current Value'
+
+    }
   },
   cancel: 'Cancel',
   save: 'Save',
+  clone: 'Clone',
+  delete: 'Delete',
+  yes: 'Yes',
+  no: 'No',
+
 };

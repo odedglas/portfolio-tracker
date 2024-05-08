@@ -14,7 +14,7 @@
       <q-list class="row kpi-list">
         <q-item class="col-2">
           <q-item-section top class="items-center">
-            <q-item-label class="text-grey-6 label">Invested</q-item-label>
+            <q-item-label class="text-grey-6 label">{{$t('portfolios.invested')}}</q-item-label>
             <q-item-label class="q-mt-md"
               >{{ portfolio.invested }}$</q-item-label
             >
@@ -23,14 +23,14 @@
 
         <q-item class="col-2">
           <q-item-section top class="items-center">
-            <q-item-label class="text-grey-6 label">Current Value</q-item-label>
+            <q-item-label class="text-grey-6 label">{{$t('portfolios.kpis.current_value')}}</q-item-label>
             <q-item-label>{{ portfolio.currentValue }}$</q-item-label>
           </q-item-section>
         </q-item>
 
         <q-item class="col-2">
           <q-item-section top class="items-center">
-            <q-item-label class="text-grey-6 label">Profit</q-item-label>
+            <q-item-label class="text-grey-6 label">{{$t('portfolios.profit')}}</q-item-label>
             <q-item-label :class="profit.textClass">
               <q-icon :name="profit.percentageIcon" size="14px" />
               {{ profit.percentage }}%
@@ -40,7 +40,7 @@
 
         <q-item class="col-2">
           <q-item-section top class="items-center">
-            <q-item-label class="text-grey-6 label">Cash Flow</q-item-label>
+            <q-item-label class="text-grey-6 label">{{$t('portfolios.kpis.cash_flow')}}</q-item-label>
             <q-item-label class="q-mt-md">{{ cashFlow }}$</q-item-label>
           </q-item-section>
         </q-item>
@@ -48,7 +48,7 @@
         <q-item class="col-4">
           <q-item-section top>
             <q-item-label class="text-grey-6 self-center label"
-              >Target</q-item-label
+              >{{$t('portfolios.target')}}</q-item-label
             >
             <div>
               <q-linear-progress
@@ -90,7 +90,7 @@
                   style="gap: 12px"
                 >
                   <q-icon name="delete" size="18px" />
-                  Delete
+                  {{ $t('delete') }}
                 </div>
               </q-item>
               <q-item v-close-popup>
@@ -99,7 +99,7 @@
                   style="gap: 12px"
                 >
                   <q-icon name="content_copy" size="18px" />
-                  Clone
+                  {{$t('clone')}}
                 </div>
               </q-item>
             </q-list>
@@ -114,6 +114,18 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, onMounted } from 'vue';
 import { Portfolio } from 'src/types';
+
+const positiveProfit = {
+  icon: 'add',
+  textClass: 'text-green-7',
+  percentageIcon: 'arrow_upward',
+};
+
+const negativeProfit = {
+  icon: 'minus',
+  textClass: 'text-red-7',
+  percentageIcon: 'arrow_downward',
+};
 
 export default defineComponent({
   name: 'PortfolioItem',
@@ -145,10 +157,8 @@ export default defineComponent({
     const cashFlow = profitValue;
     const profit = {
       value: profitValue,
-      icon: profitValue > 0 ? 'add' : 'minus',
-      textClass: profitValue > 0 ? 'text-green-7' : 'text-red-7',
       percentage: profitValue / portfolio.invested,
-      percentageIcon: profitValue > 0 ? 'arrow_upward' : 'arrow_downward',
+      ...(profitValue > 0 ? positiveProfit : negativeProfit),
     };
 
     return { showTargets, target, profit, cashFlow };
