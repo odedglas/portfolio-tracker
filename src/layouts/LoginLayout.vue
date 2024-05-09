@@ -14,7 +14,7 @@ import LoginPage from 'src/pages/Login.vue';
 export default {
   name: 'LoginLayout',
   components: {
-    LoginPage
+    LoginPage,
   },
 };
 </script>

@@ -13,12 +13,12 @@ import routes, { ROUTE_PATHS } from './routes';
 export const getAuthenticationRedirectRoute = (authState: unknown) => {
   switch (authState) {
     case 'required':
-      if (!authentication.currentUser) {
+      if (!authentication.authenticationUser) {
         return ROUTE_PATHS.LOGIN;
       }
       break;
     case 'none':
-      if (authentication.currentUser) {
+      if (authentication.authenticationUser) {
         return ROUTE_PATHS.DASHBOARD;
       }
       break;

@@ -1,5 +1,5 @@
 <template>
-  <loading-layout v-if="loadingStore.loading" />
+  <loading-layout />
   <router-view v-slot="{ Component }">
     <transition mode="out-in" name="page">
       <component :is="Component" />
@@ -13,7 +13,6 @@ import { useRouter } from 'vue-router';
 import LoadingLayout from './layouts/LoadingLayout.vue';
 import { getAuthenticationRedirectRoute } from 'src/router';
 import { authentication } from 'src/service/firebase';
-import { useLoadingStore } from 'stores/loading';
 
 export default defineComponent({
   name: 'App',
@@ -22,7 +21,6 @@ export default defineComponent({
   },
   setup() {
     const router = useRouter();
-    const loadingStore = useLoadingStore();
 
     onMounted(() => {
       authentication.onAuthStateChanged(() => {
@@ -35,10 +33,6 @@ export default defineComponent({
         }
       });
     });
-
-    return {
-      loadingStore,
-    };
   },
 });
 </script>

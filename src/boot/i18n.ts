@@ -1,9 +1,7 @@
 import { boot } from 'quasar/wrappers';
 import { createI18n } from 'vue-i18n';
 
-import messages from 'src/i18n';
-
-export type MessageLanguages = keyof typeof messages;
+import { messages, currencies } from 'src/i18n';
 
 // Type-define 'en-US' as the master schema for the resource
 export type MessageSchema = (typeof messages)['en-US'];
@@ -25,6 +23,7 @@ export default boot(({ app }) => {
     locale: 'en-US',
     legacy: false,
     messages,
+    numberFormats: currencies,
   });
 
   app.use(i18n);

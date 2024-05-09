@@ -63,7 +63,15 @@ export const authentication = {
     return signOut(auth);
   },
 
-  get currentUser() {
+  get authenticationUser() {
     return auth.currentUser;
+  },
+
+  get currentUser() {
+    if (!this.authenticationUser) {
+      throw new Error('Cannot access authentication user');
+    }
+
+    return this.authenticationUser;
   },
 };

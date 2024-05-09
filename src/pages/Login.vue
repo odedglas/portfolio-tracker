@@ -1,6 +1,6 @@
 <template>
   <div class="login-container column q-gutter-md">
-    <img class="app-logo" src="~assets/logo.svg" alt="app-logo"/>
+    <img class="app-logo" src="~assets/logo.svg" alt="app-logo" />
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <login-form :login-meta="loginMeta" />
       <social-media-login-bar />
