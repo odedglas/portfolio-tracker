@@ -5,6 +5,7 @@ export type LoginMode = keyof typeof LOGIN_META;
 interface Deposit {
   date: number;
   value: number;
+  initial?: boolean;
 }
 
 export interface Portfolio {

@@ -49,8 +49,7 @@
 import { defineComponent, onMounted, ref, Ref } from 'vue';
 
 import { useLoadingStore } from 'stores/loading';
-import { authentication } from 'src/service/firebase';
-import collections from 'src/service/firebase/collections';
+import portfolioAPI from 'src/service/portfolio';
 import { useAreYouSure } from 'src/components/composables/useAreYouSureDialog';
 import PortfolioList from 'src/components/portfolio/PortfolioList.vue';
 import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
@@ -83,9 +82,7 @@ export default defineComponent({
     const { emitLoadingTask } = useLoadingStore();
 
     onMounted(async () => {
-      portfolios.value = await emitLoadingTask(() =>
-        collections.portfolio.all()
-      );
+      portfolios.value = await emitLoadingTask(() => portfolioAPI.all());
 
       loading.value = false;
     });
@@ -111,26 +108,13 @@ export default defineComponent({
         }
       };
 
-      const portfolioId = isNewPortfolio
-        ? portfolio.title.toLowerCase().split(' ').join('-')
-        : portfolio.id;
-
-      if (isNewPortfolio) {
-        portfolio.createdAt = Date.now();
-        portfolio.owner = authentication.currentUser.uid;
-        portfolio.deposits = [
-          { date: Date.now(), value: portfolio.currentValue },
-        ];
-        portfolio.id = portfolioId;
-      }
-
-      await emitLoadingTask(() =>
-        collections.portfolio.update(portfolioId, portfolio)
+      const persisted = await emitLoadingTask(() =>
+        portfolioAPI.update(portfolio, portfolio.id)
       );
 
       portfolioToEdit.value = undefined;
 
-      syncState(portfolio);
+      syncState(persisted);
     };
 
     const deletePortfolio = (portfolio: Portfolio) => {
@@ -138,9 +122,7 @@ export default defineComponent({
         title: 'Delete Portfolio',
         message: `Are you sure you want to delete "${portfolio.title}"?`,
         callback: async () => {
-          await emitLoadingTask(() =>
-            collections.portfolio.delete(portfolio.id)
-          );
+          await emitLoadingTask(() => portfolioAPI.delete(portfolio.id));
 
           portfolios.value = portfolios.value.filter(
             (p) => p.id !== portfolio.id

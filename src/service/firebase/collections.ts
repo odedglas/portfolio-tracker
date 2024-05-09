@@ -8,7 +8,7 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { firestore } from './core';
-import { Portfolio, AppCollections, AppCollectionsNames } from './types';
+import { AppCollections, AppCollectionsNames } from './types';
 
 const createCollection = <CollectionName extends AppCollectionsNames>(
   collectionName: CollectionName
@@ -21,7 +21,7 @@ export const collections = {
   portfolio: createCollection('portfolios'),
 } as const;
 
-const firestoreAPI = {
+export const firestoreAPI = {
   getAll: async <T>(collection: CollectionReference<T>) => {
     const { docs } = await getDocs(collection);
 
@@ -57,17 +57,5 @@ const firestoreAPI = {
     const docReference = doc(collection, identifier);
 
     await deleteDoc(docReference);
-  },
-};
-
-export default {
-  portfolio: {
-    all: () => firestoreAPI.getAll(collections.portfolio),
-    get: async (portfolioId: string) =>
-      firestoreAPI.getDocument(collections.portfolio, portfolioId),
-    update: async (portfolioId: string, data: Partial<Portfolio>) =>
-      firestoreAPI.updateDocument(portfolioId, collections.portfolio, data),
-    delete: async (portfolioId: string) =>
-      firestoreAPI.deleteDocument(portfolioId, collections.portfolio),
   },
 };

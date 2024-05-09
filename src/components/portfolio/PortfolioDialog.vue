@@ -37,6 +37,8 @@
             type="number"
             lazy-rules
             label="Initial Investment"
+            :disable="!isNew"
+            :hint="$t('portfolios.initial_value_explain')"
             :rules="[
               (val) =>
                 (val && val > 0) || 'Please enter your initial investment',
@@ -48,6 +50,7 @@
             type="number"
             lazy-rules
             label="Target"
+            :hint="$t('portfolios.target_explain')"
             suffix="$"
             :rules="[
               (val) =>
@@ -95,7 +98,7 @@ export default defineComponent({
       },
     });
 
-    const isNew = computed(() => localPortfolio?.value?.id === 'new');
+    const isNew = computed(() => localPortfolio?.value?.id === '');
 
     const setLocalPortfolio = () => {
       localPortfolio.value = { ...props.portfolio };

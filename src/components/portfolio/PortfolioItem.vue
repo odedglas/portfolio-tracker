@@ -39,8 +39,8 @@
             <q-item-label class="text-grey-6 label">{{
               $t('portfolios.profit')
             }}</q-item-label>
-            <q-item-label :class="`flex items-center ${profit.textClass}`">
-              <q-icon :name="profit.percentageIcon" size="14px" />
+            <q-item-label :class="`flex items-center ${profitMeta.textClass}`">
+              <q-icon :name="profitMeta.percentageIcon" size="14px" />
               {{ $n(profit.percentage, 'percent') }}
             </q-item-label>
           </q-item-section>
@@ -133,6 +133,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref, onMounted } from 'vue';
+import { viewTransformer } from 'src/service/portfolio';
 import { Portfolio } from 'src/types';
 
 const positiveProfit = {
@@ -163,32 +164,18 @@ export default defineComponent({
   setup(props) {
     const showTargets = ref(false);
     const { portfolio } = props;
-    const profitValue = portfolio.currentValue - portfolio.invested;
+    const { target, profit } = viewTransformer.portfolioKPIS(portfolio);
 
     onMounted(() => {
       requestAnimationFrame(() => (showTargets.value = true));
     });
 
-    const target = {
-      value: portfolio.target,
-      percentage: portfolio.currentValue / portfolio.target,
-    };
 
-    const cashFlow =
-      portfolio.deposits.reduce(
-        (amount, deposit) => amount + deposit.value,
-        0
-      ) - portfolio.invested;
+    const cashFlow = viewTransformer.cashFlow(portfolio);
 
-    const profit = {
-      value: profitValue,
-      percentage: portfolio.invested
-        ? profitValue / portfolio.invested
-        : portfolio.invested,
-      ...(profitValue >= 0 ? positiveProfit : negativeProfit),
-    };
+    const profitMeta = profit.profitable ? positiveProfit : negativeProfit;
 
-    return { showTargets, target, profit, cashFlow };
+    return { showTargets, target, profit, cashFlow, profitMeta };
   },
 });
 </script>
