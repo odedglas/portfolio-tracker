@@ -36,13 +36,14 @@ const api = {
 };
 
 export const viewTransformer = {
-  cashFlow(portfolio: Portfolio) {
-    return (
-      portfolio.deposits.reduce(
-        (amount, deposit) => amount + deposit.value,
-        0
-      ) - portfolio.invested
+  depositsValue(portfolio: Portfolio) {
+    return portfolio.deposits.reduce(
+      (amount, deposit) => amount + deposit.value,
+      0
     );
+  },
+  cashFlow(portfolio: Portfolio) {
+    return viewTransformer.depositsValue(portfolio) - portfolio.invested;
   },
   portfolioKPIS(portfolio: Portfolio) {
     const profitValue = portfolio.currentValue - portfolio.invested;
