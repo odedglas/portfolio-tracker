@@ -6,7 +6,7 @@
       </h3>
       <portfolio-list
         v-if="!loading"
-        :portfolios="portfolios"
+        :portfolios="portfolioStore.portfolios"
         class="col-12"
         :edit-portfolio="showCreateOrEditPortfolio"
         :delete-portfolio="deletePortfolio"
@@ -46,9 +46,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, Ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 
 import { useLoadingStore } from 'stores/loading';
+import { usePortfolioStore } from 'src/stores/portfolios';
 import portfolioAPI from 'src/service/portfolio';
 import { useAreYouSure } from 'src/components/composables/useAreYouSureDialog';
 import PortfolioList from 'src/components/portfolio/PortfolioList.vue';
@@ -74,15 +75,15 @@ export default defineComponent({
     PortfolioDialog,
   },
   setup() {
+    const portfolioStore = usePortfolioStore();
+    const { emitLoadingTask } = useLoadingStore();
     const { showAreYouSure } = useAreYouSure();
 
     const loading = ref(true);
     const portfolioToEdit = ref<Partial<Portfolio> | undefined>(undefined);
-    const portfolios: Ref<Portfolio[]> = ref([]);
-    const { emitLoadingTask } = useLoadingStore();
 
     onMounted(async () => {
-      portfolios.value = await emitLoadingTask(() => portfolioAPI.all());
+      await portfolioStore.list();
 
       loading.value = false;
     });
@@ -97,24 +98,17 @@ export default defineComponent({
     const savePortfolio = async (portfolio: Portfolio) => {
       let isNewPortfolio = !portfolio.id;
 
-      const syncState = (portfolio: Portfolio) => {
-        if (isNewPortfolio) {
-          portfolios.value.push(portfolio);
-        } else {
-          const index = portfolios.value.findIndex(
-            (p) => p.id === portfolio.id
-          );
-          portfolios.value[index] = portfolio;
-        }
-      };
-
       const persisted = await emitLoadingTask(() =>
         portfolioAPI.update(portfolio, portfolio.id)
       );
 
       portfolioToEdit.value = undefined;
 
-      syncState(persisted);
+      if (isNewPortfolio) {
+        portfolioStore.add(persisted);
+      } else {
+        portfolioStore.update(persisted);
+      }
     };
 
     const deletePortfolio = (portfolio: Portfolio) => {
@@ -124,16 +118,14 @@ export default defineComponent({
         callback: async () => {
           await emitLoadingTask(() => portfolioAPI.delete(portfolio.id));
 
-          portfolios.value = portfolios.value.filter(
-            (p) => p.id !== portfolio.id
-          );
+          portfolioStore.remove(portfolio.id);
         },
       });
     };
 
     return {
       loading,
-      portfolios,
+      portfolioStore,
       portfolioToEdit,
       showCreateOrEditPortfolio,
       deletePortfolio,

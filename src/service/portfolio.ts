@@ -3,14 +3,14 @@ import { collections, firestoreAPI } from 'src/service/firebase/collections';
 import { authentication } from 'src/service/firebase/authentication';
 
 const api = {
-  all: () => firestoreAPI.getAll(collections.portfolio),
+  list: () => firestoreAPI.getAll(collections.portfolio),
   get: async (portfolioId: string) =>
     firestoreAPI.getDocument(collections.portfolio, portfolioId),
   update: async (
     data: Partial<Portfolio>,
     portfolioId?: string
   ): Promise<Portfolio> => {
-    const isNew = !!portfolioId;
+    const isNew = !portfolioId;
     if (!data.title) {
       throw new Error('Cannot update/create a portfolio without a valid title');
     }
@@ -20,6 +20,7 @@ const api = {
     if (isNew) {
       data.createdAt = Date.now();
       data.owner = authentication.currentUser.uid;
+
       data.deposits = [
         { date: Date.now(), value: data.currentValue || 0, initial: true },
       ];

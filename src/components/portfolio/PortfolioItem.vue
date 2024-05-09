@@ -171,7 +171,6 @@ export default defineComponent({
       requestAnimationFrame(() => (showTargets.value = true));
     });
 
-
     const cashFlow = viewTransformer.cashFlow(portfolio);
 
     const profitMeta = profit.profitable ? positiveProfit : negativeProfit;
