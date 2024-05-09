@@ -174,10 +174,11 @@ export default defineComponent({
       percentage: portfolio.currentValue / portfolio.target,
     };
 
-    const cashFlow = portfolio.deposits.reduce(
-      (amount, deposit) => amount + deposit.value,
-      0
-    ) - portfolio.invested;
+    const cashFlow =
+      portfolio.deposits.reduce(
+        (amount, deposit) => amount + deposit.value,
+        0
+      ) - portfolio.invested;
 
     const profit = {
       value: profitValue,

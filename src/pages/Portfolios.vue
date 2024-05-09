@@ -5,12 +5,13 @@
         {{ $t('portfolios.title') }}
       </h3>
       <portfolio-list
+        v-if="!loading"
         :portfolios="portfolios"
         class="col-12"
         :edit-portfolio="showCreateOrEditPortfolio"
         :delete-portfolio="deletePortfolio"
       />
-      <div class="row justify-end q-my-md">
+      <div v-if="!loading" class="row justify-end q-my-md">
         <q-btn
           size="md"
           outline
@@ -20,6 +21,20 @@
         >
           {{ $t('portfolios.create') }}
         </q-btn>
+      </div>
+
+      <div v-if="loading">
+        <q-skeleton
+          class="q-my-md"
+          v-for="index in [1, 2]"
+          :key="index"
+          bordered
+          square
+          height="120px"
+        />
+        <div class="flex justify-end">
+          <q-skeleton width="150px" height="32px" />
+        </div>
       </div>
     </div>
     <portfolio-dialog
@@ -62,6 +77,7 @@ export default defineComponent({
   setup() {
     const { showAreYouSure } = useAreYouSure();
 
+    const loading = ref(true);
     const portfolioToEdit = ref<Partial<Portfolio> | undefined>(undefined);
     const portfolios: Ref<Portfolio[]> = ref([]);
     const { emitLoadingTask } = useLoadingStore();
@@ -70,6 +86,8 @@ export default defineComponent({
       portfolios.value = await emitLoadingTask(() =>
         collections.portfolio.all()
       );
+
+      loading.value = false;
     });
 
     const showCreateOrEditPortfolio = async (portfolio?: Portfolio) => {
@@ -132,6 +150,7 @@ export default defineComponent({
     };
 
     return {
+      loading,
       portfolios,
       portfolioToEdit,
       showCreateOrEditPortfolio,
