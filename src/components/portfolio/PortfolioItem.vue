@@ -18,7 +18,7 @@
               $t('portfolios.invested')
             }}</q-item-label>
             <q-item-label class="q-mt-md"
-              >{{ portfolio.invested }}$</q-item-label
+              >{{ $n(portfolio.invested, 'currency') }}</q-item-label
             >
           </q-item-section>
         </q-item>
@@ -28,7 +28,7 @@
             <q-item-label class="text-grey-6 label">{{
               $t('portfolios.kpis.current_value')
             }}</q-item-label>
-            <q-item-label>{{ portfolio.currentValue }}$</q-item-label>
+            <q-item-label>{{ $n(portfolio.currentValue, 'currency')}}$</q-item-label>
           </q-item-section>
         </q-item>
 
@@ -37,9 +37,9 @@
             <q-item-label class="text-grey-6 label">{{
               $t('portfolios.profit')
             }}</q-item-label>
-            <q-item-label :class="profit.textClass">
+            <q-item-label :class="`flex items-center ${profit.textClass}`">
               <q-icon :name="profit.percentageIcon" size="14px" />
-              {{ profit.percentage }}%
+              {{ $n(profit.percentage , 'percent') }}
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -49,7 +49,7 @@
             <q-item-label class="text-grey-6 label">{{
               $t('portfolios.kpis.cash_flow')
             }}</q-item-label>
-            <q-item-label class="q-mt-md">{{ cashFlow }}$</q-item-label>
+            <q-item-label class="q-mt-md">{{ $n(cashFlow , 'currency') }}</q-item-label>
           </q-item-section>
         </q-item>
 
@@ -67,14 +67,14 @@
                 <q-tooltip>
                   {{
                     $t('portfolios.target_explainer', {
-                      percentage: target.percentage * 100,
+                      percentage: $n(target.percentage , 'percent'),
                     })
                   }}
                 </q-tooltip>
               </q-linear-progress>
               <div class="text-grey-6 text-caption row justify-between">
-                <span>{{ portfolio.invested }}$</span>
-                <span>{{ target.value }}$</span>
+                <span>{{ $n(portfolio.invested  , 'currency') }}$</span>
+                <span>{{ $n(target.value  , 'currency')}}$</span>
               </div>
             </div>
           </q-item-section>
@@ -170,7 +170,9 @@ export default defineComponent({
       percentage: portfolio.currentValue / portfolio.target,
     };
 
-    const cashFlow = profitValue;
+    const cashFlow = profitValue; // TODO - Not really correct, rather should be derived from current
+    // portfolio free cash flow
+
     const profit = {
       value: profitValue,
       percentage: profitValue / portfolio.invested,

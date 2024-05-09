@@ -33,11 +33,10 @@
           />
 
           <q-input
-            v-model="localPortfolio.invested"
+            v-model.number="localPortfolio.invested"
             type="number"
             lazy-rules
             label="Initial Investment"
-            suffix="$"
             :rules="[
               (val) =>
                 (val && val > 0) || 'Please enter your initial investment',
@@ -45,7 +44,7 @@
           />
 
           <q-input
-            v-model="localPortfolio.target"
+            v-model.number="localPortfolio.target"
             type="number"
             lazy-rules
             label="Target"
@@ -104,6 +103,7 @@ export default defineComponent({
 
     const submitForm = async () => {
       if (await formRef.value?.validate()) {
+        console.log(localPortfolio.value);
         emit('savePortfolio', localPortfolio.value);
       }
     };

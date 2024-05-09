@@ -1,4 +1,4 @@
-export default {
+export const enUsMessages = {
   failed: 'Action failed',
   success: 'Action was successful',
   login: {
@@ -13,7 +13,7 @@ export default {
     edit: 'Edit Portfolio',
     profit: 'Profit',
     target: 'Target',
-    target_explainer: 'You are {percentage}% from reaching your target 🎉',
+    target_explainer: 'You are {percentage} from reaching your target 🎉',
     invested: 'Invested',
     kpis: {
       cash_flow: 'Cash Flow',
@@ -26,4 +26,23 @@ export default {
   delete: 'Delete',
   yes: 'Yes',
   no: 'No',
+};
+
+export const enUsCurrency = {
+  currency: {
+    style: 'currency',
+    currency: 'USD',
+    currencyDisplay: 'symbol',
+    minimumFractionDigits: 0, // set fraction digits to 0 to remove cents
+    maximumFractionDigits: 0,
+  },
+  decimal: {
+    style: 'decimal',
+    maximumFractionDigits: 2,
+  },
+  percent: {
+    style: 'percent',
+    useGrouping: false,
+    maximumFractionDigits: 2,
+  },
 };

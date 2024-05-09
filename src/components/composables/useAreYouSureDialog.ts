@@ -11,7 +11,11 @@ export function useAreYouSure() {
   const $t = useI18n().t;
   const $q = useQuasar();
 
-  const show = ({ title, message, callback }: AreYouSureDialogProps) => {
+  const showAreYouSure = ({
+    title,
+    message,
+    callback,
+  }: AreYouSureDialogProps) => {
     $q.dialog({
       title,
       message,
@@ -28,5 +32,5 @@ export function useAreYouSure() {
     });
   };
 
-  return { show };
+  return { showAreYouSure };
 }

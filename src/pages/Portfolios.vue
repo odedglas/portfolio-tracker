@@ -59,7 +59,7 @@ export default defineComponent({
     PortfolioDialog,
   },
   setup() {
-    const { show: showAreYouSure } = useAreYouSure();
+    const { showAreYouSure } = useAreYouSure();
 
     const portfolioToEdit = ref<Partial<Portfolio> | undefined>(undefined);
     const portfolios: Ref<Portfolio[]> = ref([]);
@@ -85,6 +85,14 @@ export default defineComponent({
         ? portfolio.title.toLowerCase().split(' ').join('-')
         : portfolio.id;
 
+      console.log('Saving portfolio', portfolio);
+
+      await emitLoadingTask(() =>
+        collections.portfolio.update(portfolioId, portfolio)
+      );
+
+      portfolioToEdit.value = undefined;
+
       if (isNewPortfolio) {
         portfolio.currentValue = portfolio.invested;
         portfolio.createdAt = Date.now();
@@ -95,12 +103,6 @@ export default defineComponent({
         const index = portfolios.value.findIndex((p) => p.id === portfolio.id);
         portfolios.value[index] = portfolio;
       }
-
-      await emitLoadingTask(() =>
-        collections.portfolio.update(portfolioId, portfolio)
-      );
-
-      portfolioToEdit.value = undefined;
     };
 
     const deletePortfolio = (portfolio: Portfolio) => {
