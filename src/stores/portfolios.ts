@@ -2,15 +2,33 @@ import { defineStore } from 'pinia';
 import portfolioAPI from 'src/service/portfolio';
 import { Portfolio } from 'src/types';
 
+let loadedOnce = false;
+
 export const usePortfolioStore = defineStore('portfolios', {
-  state: (): { portfolios: Portfolio[] } => ({
+  state: (): { portfolios: Portfolio[], selectedPortfolioId: string | undefined } => ({
     portfolios: [],
+    selectedPortfolioId: undefined
   }),
+  getters: {
+    selectedPortfolio(state) {
+      return state.portfolios.find((portfolio) => portfolio.id === state.selectedPortfolioId)
+    }
+  },
   actions: {
     async list() {
+      if (loadedOnce) {
+        return;
+      }
+
       this.portfolios = (await portfolioAPI.list()).sort((p1, p2) =>
         p1.createdAt < p2.createdAt ? -1 : 1
       );
+
+      this.selectedPortfolioId = this.portfolios[0]?.id; // TODO - Add localStorage persistence layer
+
+      loadedOnce = true;
+
+      return this.portfolios;
     },
     remove(portfolioId: string) {
       this.portfolios = this.portfolios.filter(

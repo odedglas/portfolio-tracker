@@ -13,19 +13,20 @@
         no-caps
         class="q-mx-sm"
         icon="business_center"
-        label="My Portfolio"
+        :label="portfolioStore.selectedPortfolio?.title || 'No Portfolios'"
       >
         <q-list style="min-width: 100px">
-          <q-item clickable>
-            <q-item-section>Having fun</q-item-section>
+          <q-item clickable v-for="portfolio in portfolioStore.portfolios"
+            :key="portfolio.id"
+            :active="portfolio.id === portfolioStore.selectedPortfolioId">
+            <q-item-section>{{portfolio.title}}</q-item-section>
           </q-item>
-          <q-item clickable>
-            <q-item-section>Crazy for transitions</q-item-section>
-          </q-item>
-          <q-separator />
-          <q-item clickable>
-            <q-item-section>Mind blown</q-item-section>
-          </q-item>
+          <div class="flex column q-pa-md" v-if="!portfolioStore.portfolios.length">
+              <p class="text-subtitle1">{{$t('header.no_portfolios')}}</p>
+              <q-btn size="md" flat color="primary">
+                {{$t('create')}}
+              </q-btn>
+          </div>
         </q-list>
       </q-btn-dropdown>
 
@@ -38,6 +39,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { usePortfolioStore } from 'stores/portfolios';
 import AppNavigation from './Navigation.vue';
 
 export default defineComponent({
@@ -45,6 +47,13 @@ export default defineComponent({
   components: {
     AppNavigation,
   },
+  setup() {
+    const portfolioStore = usePortfolioStore();
+
+    return {
+      portfolioStore
+    }
+  }
 });
 </script>
 

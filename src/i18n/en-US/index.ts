@@ -7,6 +7,9 @@ export const enUsMessages = {
     dont_have_account: "Don't have an account yet ?",
     have_an_account: 'Already got an account ?',
   },
+  header: {
+    no_portfolios: 'You have no portfolios created just yet!'
+  },
   portfolios: {
     title: "Manage your Portfolio's",
     create: 'New Portfolio',
