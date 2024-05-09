@@ -8,7 +8,7 @@ export const enUsMessages = {
     have_an_account: 'Already got an account ?',
   },
   header: {
-    no_portfolios: 'You have no portfolios created just yet!'
+    no_portfolios: 'You have no portfolios created just yet!',
   },
   portfolios: {
     title: "Manage your Portfolio's",
@@ -25,6 +25,7 @@ export const enUsMessages = {
     initial_value_explain:
       'The initial value will be converted to a "Deposit" item you can later manage',
     target_explain: 'The Target will be used to track your portfolio progress',
+    empty: 'Still quiet here...',
   },
   cancel: 'Cancel',
   save: 'Save',

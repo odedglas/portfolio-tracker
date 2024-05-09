@@ -16,16 +16,22 @@
         :label="portfolioStore.selectedPortfolio?.title || 'No Portfolios'"
       >
         <q-list style="min-width: 100px">
-          <q-item clickable v-for="portfolio in portfolioStore.portfolios"
+          <q-item
+            clickable
+            v-for="portfolio in portfolioStore.portfolios"
             :key="portfolio.id"
-            :active="portfolio.id === portfolioStore.selectedPortfolioId">
-            <q-item-section>{{portfolio.title}}</q-item-section>
+            :active="portfolio.id === portfolioStore.selectedPortfolioId"
+          >
+            <q-item-section>{{ portfolio.title }}</q-item-section>
           </q-item>
-          <div class="flex column q-pa-md" v-if="!portfolioStore.portfolios.length">
-              <p class="text-subtitle1">{{$t('header.no_portfolios')}}</p>
-              <q-btn size="md" flat color="primary">
-                {{$t('create')}}
-              </q-btn>
+          <div
+            class="flex column q-pa-md"
+            v-if="!portfolioStore.portfolios.length"
+          >
+            <p class="text-subtitle1">{{ $t('header.no_portfolios') }}</p>
+            <q-btn size="md" flat color="primary">
+              {{ $t('create') }}
+            </q-btn>
           </div>
         </q-list>
       </q-btn-dropdown>
@@ -51,9 +57,9 @@ export default defineComponent({
     const portfolioStore = usePortfolioStore();
 
     return {
-      portfolioStore
-    }
-  }
+      portfolioStore,
+    };
+  },
 });
 </script>
 

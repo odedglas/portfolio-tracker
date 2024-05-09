@@ -5,14 +5,19 @@ import { Portfolio } from 'src/types';
 let loadedOnce = false;
 
 export const usePortfolioStore = defineStore('portfolios', {
-  state: (): { portfolios: Portfolio[], selectedPortfolioId: string | undefined } => ({
+  state: (): {
+    portfolios: Portfolio[];
+    selectedPortfolioId: string | undefined;
+  } => ({
     portfolios: [],
-    selectedPortfolioId: undefined
+    selectedPortfolioId: undefined,
   }),
   getters: {
     selectedPortfolio(state) {
-      return state.portfolios.find((portfolio) => portfolio.id === state.selectedPortfolioId)
-    }
+      return state.portfolios.find(
+        (portfolio) => portfolio.id === state.selectedPortfolioId
+      );
+    },
   },
   actions: {
     async list() {
@@ -37,6 +42,10 @@ export const usePortfolioStore = defineStore('portfolios', {
     },
     add(portfolio: Portfolio) {
       this.portfolios.push(portfolio);
+
+      if (!this.selectedPortfolioId) {
+        this.selectedPortfolioId = portfolio.id;
+      }
     },
     update(portfolio: Portfolio) {
       const index = this.portfolios.findIndex(

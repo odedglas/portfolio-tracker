@@ -11,6 +11,18 @@
         :edit-portfolio="showCreateOrEditPortfolio"
         :delete-portfolio="deletePortfolio"
       />
+      <div class="flex items-center column" v-if="isEmpty">
+        <p class="text-body1 q-my-md">
+          {{ $t('portfolios.empty') }}
+        </p>
+        <img
+          class="q-mr-md"
+          src="~assets/cactus.svg"
+          alt="empty-state"
+          style="height: 180px"
+        />
+      </div>
+
       <div v-if="!loading" class="row justify-end q-my-md">
         <q-btn
           size="md"
@@ -79,13 +91,15 @@ export default defineComponent({
     const { emitLoadingTask } = useLoadingStore();
     const { showAreYouSure } = useAreYouSure();
 
+    const isEmpty = ref(false);
     const loading = ref(true);
     const portfolioToEdit = ref<Partial<Portfolio> | undefined>(undefined);
 
     onMounted(async () => {
-      await portfolioStore.list();
+      const portfolios = await portfolioStore.list();
 
       loading.value = false;
+      isEmpty.value = portfolios?.length === 0;
     });
 
     const showCreateOrEditPortfolio = async (portfolio?: Portfolio) => {
@@ -103,6 +117,7 @@ export default defineComponent({
       );
 
       portfolioToEdit.value = undefined;
+      isEmpty.value = false;
 
       if (isNewPortfolio) {
         portfolioStore.add(persisted);
@@ -125,6 +140,7 @@ export default defineComponent({
 
     return {
       loading,
+      isEmpty,
       portfolioStore,
       portfolioToEdit,
       showCreateOrEditPortfolio,
