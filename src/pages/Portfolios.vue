@@ -42,7 +42,7 @@ import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
 import { Portfolio } from 'src/types';
 
 const emptyPortfolioTemplate = (): Portfolio => ({
-  id: 'new',
+  id: '',
   title: '',
   currentValue: 0,
   invested: 0,
@@ -50,6 +50,7 @@ const emptyPortfolioTemplate = (): Portfolio => ({
   profit: 0,
   owner: 'none',
   createdAt: Date.now(),
+  deposits: [],
 });
 
 export default defineComponent({
@@ -79,13 +80,31 @@ export default defineComponent({
     };
 
     const savePortfolio = async (portfolio: Portfolio) => {
-      let isNewPortfolio = portfolio.id === 'new';
+      let isNewPortfolio = !portfolio.id;
+
+      const syncState = (portfolio: Portfolio) => {
+        if (isNewPortfolio) {
+          portfolios.value.push(portfolio);
+        } else {
+          const index = portfolios.value.findIndex(
+            (p) => p.id === portfolio.id
+          );
+          portfolios.value[index] = portfolio;
+        }
+      };
 
       const portfolioId = isNewPortfolio
         ? portfolio.title.toLowerCase().split(' ').join('-')
         : portfolio.id;
 
-      console.log('Saving portfolio', portfolio);
+      if (isNewPortfolio) {
+        portfolio.createdAt = Date.now();
+        portfolio.owner = authentication.currentUser.uid;
+        portfolio.deposits = [
+          { date: Date.now(), value: portfolio.currentValue },
+        ];
+        portfolio.id = portfolioId;
+      }
 
       await emitLoadingTask(() =>
         collections.portfolio.update(portfolioId, portfolio)
@@ -93,16 +112,7 @@ export default defineComponent({
 
       portfolioToEdit.value = undefined;
 
-      if (isNewPortfolio) {
-        portfolio.currentValue = portfolio.invested;
-        portfolio.createdAt = Date.now();
-        portfolio.owner = authentication.currentUser.uid;
-
-        portfolios.value.push(portfolio);
-      } else {
-        const index = portfolios.value.findIndex((p) => p.id === portfolio.id);
-        portfolios.value[index] = portfolio;
-      }
+      syncState(portfolio);
     };
 
     const deletePortfolio = (portfolio: Portfolio) => {

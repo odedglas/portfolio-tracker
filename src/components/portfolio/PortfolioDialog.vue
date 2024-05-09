@@ -33,7 +33,7 @@
           />
 
           <q-input
-            v-model.number="localPortfolio.invested"
+            v-model.number="localPortfolio.currentValue"
             type="number"
             lazy-rules
             label="Initial Investment"
