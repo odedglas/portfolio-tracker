@@ -6,7 +6,7 @@
         <q-item>
           <q-item-section side>
             <q-avatar
-              color="pink-1"
+              color="red-4"
               text-color="white"
               class="text-subtitle1"
               size="xl"
