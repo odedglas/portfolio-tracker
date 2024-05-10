@@ -20,6 +20,9 @@ export const usePortfolioStore = defineStore('portfolios', {
     },
   },
   actions: {
+    selectPortfolio(portfolioId: string) {
+      this.selectedPortfolioId = portfolioId;
+    },
     async list() {
       if (loadedOnce) {
         return;
