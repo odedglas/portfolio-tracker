@@ -9,9 +9,7 @@
 
       <portfolio-dropdown />
 
-      <q-avatar text-color="grey" color="white" class="text-subtitle1"
-        >P</q-avatar
-      >
+      <user-profile />
     </q-toolbar>
   </q-header>
 </template>
@@ -20,12 +18,14 @@
 import { defineComponent } from 'vue';
 import PortfolioDropdown from './PortfolioDropdown.vue';
 import AppNavigation from './Navigation.vue';
+import UserProfile from './UserProfile.vue';
 
 export default defineComponent({
   name: 'AppHeader',
   components: {
     AppNavigation,
     PortfolioDropdown,
+    UserProfile,
   },
 });
 </script>

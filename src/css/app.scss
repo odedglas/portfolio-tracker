@@ -10,10 +10,14 @@
 
 .sub-page-enter-active,
 .sub-page-leave-active {
-  transition: opacity 0.4s, transform 0.4s;
+  transition: opacity 0.3s, transform 0.3s;
 }
 .sub-page-enter-from,
 .sub-page-leave-to {
   opacity: 0;
   transform: translateY(50%);
+}
+
+.clickable {
+  cursor: pointer;
 }
