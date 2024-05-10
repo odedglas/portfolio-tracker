@@ -1,11 +1,13 @@
 import { Portfolio } from 'src/types';
-import { collections, firestoreAPI } from 'src/service/firebase/collections';
+import { getCollections, firestoreAPI } from 'src/service/firebase/collections';
 import { authentication } from 'src/service/firebase/authentication';
 
+const portfolioCollection = () => getCollections().portfolio;
+
 const api = {
-  list: () => firestoreAPI.getAll(collections.portfolio),
+  list: () => firestoreAPI.getAll(portfolioCollection()),
   get: async (portfolioId: string) =>
-    firestoreAPI.getDocument(collections.portfolio, portfolioId),
+    firestoreAPI.getDocument(portfolioCollection(), portfolioId),
   update: async (
     data: Partial<Portfolio>,
     portfolioId?: string
@@ -28,12 +30,12 @@ const api = {
       data.id = portfolioId;
     }
 
-    await firestoreAPI.updateDocument(portfolioId, collections.portfolio, data);
+    await firestoreAPI.updateDocument(portfolioId, portfolioCollection(), data);
 
     return await api.get(portfolioId);
   },
   delete: async (portfolioId: string) =>
-    firestoreAPI.deleteDocument(portfolioId, collections.portfolio),
+    firestoreAPI.deleteDocument(portfolioId, portfolioCollection()),
 };
 
 export const viewTransformer = {

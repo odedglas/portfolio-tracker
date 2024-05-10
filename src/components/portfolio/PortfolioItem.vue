@@ -77,7 +77,7 @@
                 </q-tooltip>
               </q-linear-progress>
               <div class="text-grey-6 text-caption row justify-between">
-                <span>{{ $n(depositeValue, 'currency') }}$</span>
+                <span>{{ $n(depositValue, 'currency') }}$</span>
                 <span>{{ $n(target.value, 'currency') }}$</span>
               </div>
             </div>
@@ -164,7 +164,7 @@ export default defineComponent({
   setup(props) {
     const showTargets = ref(false);
     const { portfolio } = props;
-    const depositeValue = viewTransformer.depositsValue(portfolio);
+    const depositValue = viewTransformer.depositsValue(portfolio);
     const { target, profit } = viewTransformer.portfolioKPIS(portfolio);
 
     onMounted(() => {
@@ -175,7 +175,7 @@ export default defineComponent({
 
     const profitMeta = profit.profitable ? positiveProfit : negativeProfit;
 
-    return { showTargets, target, profit, cashFlow, profitMeta, depositeValue };
+    return { showTargets, target, profit, cashFlow, profitMeta, depositValue };
   },
 });
 </script>

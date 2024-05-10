@@ -17,10 +17,24 @@ const createCollection = <CollectionName extends AppCollectionsNames>(
     AppCollections[CollectionName]
   >;
 
-export const collections = {
-  portfolio: createCollection('portfolios'),
-} as const;
+let collections: {
+  portfolio: ReturnType<typeof createCollection>;
+};
 
+/**
+ * Returns available application collections
+ */
+export const getCollections = () => {
+  collections = collections || {
+    portfolio: createCollection('portfolios'),
+  };
+
+  return collections;
+};
+
+/**
+ * The Firestore API for document manipulations.
+ */
 export const firestoreAPI = {
   getAll: async <T>(collection: CollectionReference<T>) => {
     const { docs } = await getDocs(collection);

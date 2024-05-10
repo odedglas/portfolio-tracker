@@ -23,11 +23,7 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form
-          ref="formRef"
-          @submit.prevent.stop="$emit('savePortfolio', localPortfolio)"
-          class="q-gutter-sm"
-        >
+        <q-form ref="formRef" class="q-gutter-sm">
           <q-input
             v-model="localPortfolio.title"
             type="text"

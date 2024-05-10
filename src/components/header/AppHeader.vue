@@ -15,7 +15,7 @@
         icon="business_center"
         :label="portfolioStore.selectedPortfolio?.title || 'No Portfolios'"
       >
-        <q-list style="min-width: 100px">
+        <q-list style="min-width: 100px" bordered>
           <q-item
             clickable
             v-for="portfolio in portfolioStore.portfolios"
@@ -31,10 +31,22 @@
           >
             <p class="text-subtitle1">{{ $t('header.no_portfolios') }}</p>
           </div>
-          <q-item>
+          <q-item class="row" style="gap: 12px">
+            <q-btn
+              size="sm"
+              outline
+              icon="add"
+              color="secondary"
+              @click="showPortfolioDialog = true"
+            >
+              {{ $t('create') }}
+            </q-btn>
+
             <q-btn
               :disable="isManagePortfolios"
-              size="md"
+              size="sm"
+              class="col"
+              icon="settings"
               outline
               color="secondary"
               @click="gotoManagePortfolios"
@@ -49,21 +61,28 @@
         >P</q-avatar
       >
     </q-toolbar>
+    <portfolio-dialog
+      :show="showPortfolioDialog"
+      @close-portfolio="() => (showPortfolioDialog = false)"
+    />
   </q-header>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePortfolioStore } from 'stores/portfolios';
+import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
 import AppNavigation from './Navigation.vue';
 
 export default defineComponent({
   name: 'AppHeader',
   components: {
     AppNavigation,
+    PortfolioDialog,
   },
   setup() {
+    const showPortfolioDialog = ref(false);
     const router = useRouter();
     const portfolioStore = usePortfolioStore();
 
@@ -74,6 +93,7 @@ export default defineComponent({
 
     return {
       portfolioStore,
+      showPortfolioDialog,
       gotoManagePortfolios,
       isManagePortfolios,
     };

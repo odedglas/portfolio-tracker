@@ -39,6 +39,13 @@ export const usePortfolioStore = defineStore('portfolios', {
       this.portfolios = this.portfolios.filter(
         (portfolio) => portfolio.id !== portfolioId
       );
+
+      const selectedPortfolio = this.portfolios.find(
+        (portfolio) => portfolio.id === this.selectedPortfolioId
+      );
+      if (!selectedPortfolio) {
+        this.selectedPortfolioId = this.portfolios[0]?.id;
+      }
     },
     add(portfolio: Portfolio) {
       this.portfolios.push(portfolio);
