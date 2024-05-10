@@ -68,12 +68,6 @@ export default defineComponent({
             icon: 'cases',
             route: '/holdings',
           },
-          {
-            id: 'categories',
-            text: 'Categories',
-            icon: 'category',
-            route: '/categories',
-          },
           { id: 'events', text: 'Events', icon: 'event', route: '/events' },
         ],
       },

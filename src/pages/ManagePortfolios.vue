@@ -69,7 +69,7 @@ import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
 import { Portfolio } from 'src/types';
 
 export default defineComponent({
-  name: 'PortfoliosPage',
+  name: 'ManagePortfoliosPage',
   components: {
     PortfolioList,
     PortfolioDialog,
