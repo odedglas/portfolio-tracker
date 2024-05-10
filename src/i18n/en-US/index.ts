@@ -9,6 +9,7 @@ export const enUsMessages = {
   },
   header: {
     no_portfolios: 'You have no portfolios created just yet!',
+    manage_portfolios: 'Manage Portfolios',
   },
   portfolios: {
     title: "Manage your Portfolio's",
@@ -22,6 +23,7 @@ export const enUsMessages = {
       cash_flow: 'Cash Flow',
       current_value: 'Current Value',
     },
+    initial_investment: 'Initial Investment',
     initial_value_explain:
       'The initial value will be converted to a "Deposit" item you can later manage',
     target_explain: 'The Target will be used to track your portfolio progress',

@@ -51,8 +51,8 @@
     </div>
     <portfolio-dialog
       :portfolio="portfolioToEdit"
-      @close-portfolio="() => (portfolioToEdit = undefined)"
-      @save-portfolio="savePortfolio"
+      :show="showPortfolioDialog"
+      @close-portfolio="onPortfolioDialogClose"
     />
   </q-page>
 </template>
@@ -68,18 +68,6 @@ import PortfolioList from 'src/components/portfolio/PortfolioList.vue';
 import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
 import { Portfolio } from 'src/types';
 
-const emptyPortfolioTemplate = (): Portfolio => ({
-  id: '',
-  title: '',
-  currentValue: 0,
-  invested: 0,
-  target: 0,
-  profit: 0,
-  owner: 'none',
-  createdAt: Date.now(),
-  deposits: [],
-});
-
 export default defineComponent({
   name: 'PortfoliosPage',
   components: {
@@ -92,6 +80,7 @@ export default defineComponent({
     const { showAreYouSure } = useAreYouSure();
 
     const isEmpty = ref(false);
+    const showPortfolioDialog = ref(false);
     const loading = ref(true);
     const portfolioToEdit = ref<Partial<Portfolio> | undefined>(undefined);
 
@@ -104,26 +93,17 @@ export default defineComponent({
 
     const showCreateOrEditPortfolio = async (portfolio?: Portfolio) => {
       const isEdit = !!portfolio?.id;
-      portfolioToEdit.value = isEdit
-        ? { ...portfolio }
-        : emptyPortfolioTemplate();
+      if (isEdit) {
+        portfolioToEdit.value = { ...portfolio };
+      }
+
+      showPortfolioDialog.value = true;
     };
 
-    const savePortfolio = async (portfolio: Portfolio) => {
-      let isNewPortfolio = !portfolio.id;
-
-      const persisted = await emitLoadingTask(() =>
-        portfolioAPI.update(portfolio, portfolio.id)
-      );
-
+    const onPortfolioDialogClose = () => {
       portfolioToEdit.value = undefined;
       isEmpty.value = false;
-
-      if (isNewPortfolio) {
-        portfolioStore.add(persisted);
-      } else {
-        portfolioStore.update(persisted);
-      }
+      showPortfolioDialog.value = false;
     };
 
     const deletePortfolio = (portfolio: Portfolio) => {
@@ -141,11 +121,12 @@ export default defineComponent({
     return {
       loading,
       isEmpty,
+      showPortfolioDialog,
       portfolioStore,
       portfolioToEdit,
       showCreateOrEditPortfolio,
+      onPortfolioDialogClose,
       deletePortfolio,
-      savePortfolio,
     };
   },
 });

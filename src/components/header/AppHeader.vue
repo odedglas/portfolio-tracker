@@ -26,13 +26,22 @@
           </q-item>
           <div
             class="flex column q-pa-md"
+            style="max-width: fit-content"
             v-if="!portfolioStore.portfolios.length"
           >
             <p class="text-subtitle1">{{ $t('header.no_portfolios') }}</p>
-            <q-btn size="md" flat color="primary">
-              {{ $t('create') }}
-            </q-btn>
           </div>
+          <q-item>
+            <q-btn
+              :disable="isManagePortfolios"
+              size="md"
+              outline
+              color="secondary"
+              @click="gotoManagePortfolios"
+            >
+              {{ $t('header.manage_portfolios') }}
+            </q-btn>
+          </q-item>
         </q-list>
       </q-btn-dropdown>
 
@@ -44,7 +53,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { usePortfolioStore } from 'stores/portfolios';
 import AppNavigation from './Navigation.vue';
 
@@ -54,10 +64,18 @@ export default defineComponent({
     AppNavigation,
   },
   setup() {
+    const router = useRouter();
     const portfolioStore = usePortfolioStore();
+
+    const gotoManagePortfolios = () => router.push('/manage-portfolios');
+    const isManagePortfolios = computed(() =>
+      router.currentRoute.value.path.includes('manage-portfolios')
+    );
 
     return {
       portfolioStore,
+      gotoManagePortfolios,
+      isManagePortfolios,
     };
   },
 });
