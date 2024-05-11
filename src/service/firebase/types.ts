@@ -1,9 +1,8 @@
-import { Portfolio } from 'src/types';
+import { Portfolio, Transaction } from 'src/types';
 
 export interface AppCollections {
   portfolios: Portfolio;
+  transactions: Transaction;
 }
 
 export type AppCollectionsNames = keyof AppCollections;
-
-export type { Portfolio };

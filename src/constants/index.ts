@@ -20,3 +20,8 @@ export const FIREBASE_LOGIN_PROVIDERS = {
   FACEBOOK: 'facebook',
   TWITTER: 'twitter',
 };
+
+export const TRANSACTIONS_TYPES = {
+  BUY: 'buy',
+  SELL: 'sell',
+} as const;

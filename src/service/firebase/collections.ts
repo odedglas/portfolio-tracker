@@ -1,13 +1,18 @@
 import {
   collection,
+  query,
+  where,
   CollectionReference,
+  Query,
   doc,
   getDocs,
   getDoc,
+  addDoc,
   setDoc,
   deleteDoc,
 } from 'firebase/firestore';
 import { firestore } from './core';
+import { authentication } from './authentication';
 import { AppCollections, AppCollectionsNames } from './types';
 
 const createCollection = <CollectionName extends AppCollectionsNames>(
@@ -17,26 +22,34 @@ const createCollection = <CollectionName extends AppCollectionsNames>(
     AppCollections[CollectionName]
   >;
 
-let collections: {
-  portfolio: ReturnType<typeof createCollection>;
-};
-
 /**
  * Returns available application collections
  */
-export const getCollections = () => {
-  collections = collections || {
-    portfolio: createCollection('portfolios'),
-  };
+export const getCollections = () => ({
+  portfolio: createCollection('portfolios'),
+  transaction: createCollection('transactions'),
+});
 
-  return collections;
+/**
+ * List of pre-defined queries to fetch upon available applicative collections.
+ */
+export const queries = {
+  listUserPortfolios: async () => {
+    const portfolios = getCollections().portfolio;
+    const portfoliosQuery = query(
+      portfolios,
+      where('owner', '==', authentication.currentUser.uid)
+    );
+
+    return firestoreAPI.getAll(portfoliosQuery);
+  },
 };
 
 /**
  * The Firestore API for document manipulations.
  */
 export const firestoreAPI = {
-  getAll: async <T>(collection: CollectionReference<T>) => {
+  getAll: async <T>(collection: CollectionReference<T> | Query<T>) => {
     const { docs } = await getDocs(collection);
 
     return docs.map((doc) => ({ ...doc.data(), id: doc.id }));
@@ -63,6 +76,9 @@ export const firestoreAPI = {
     const docReference = doc(collection, identifier);
 
     await setDoc(docReference, { ...data }, { merge: true });
+  },
+  addDocument: <T>(collection: CollectionReference<T>, data: T) => {
+    return addDoc(collection, data);
   },
   deleteDocument: async <T>(
     identifier: string,

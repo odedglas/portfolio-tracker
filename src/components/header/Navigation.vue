@@ -4,8 +4,8 @@
       v-for="button in navigationButtons"
       :key="button.id"
       :is="button.component"
-      :class="navigationButtonClass(button.id)"
-      @click="() => button.route && navigate(button.route)"
+      :class="navigationButtonClass(button.route)"
+      @click="() => !button.preventNavigation && navigate(button.route)"
       v-bind="button.props"
       flat
       no-caps
@@ -16,6 +16,7 @@
           v-for="option in button.menuOptions"
           :key="option.id"
           clickable
+          :active="isActiveRoute(option.route)"
           v-close-popup
           @click="() => navigate(option.route)"
         >
@@ -47,14 +48,16 @@ export default defineComponent({
     const navigationButtons = [
       {
         id: 'dashboard',
-        route: '/',
+        route: '/dashboard',
         component: 'q-btn',
         props: { label: 'Dashboard' },
       },
       {
-        id: 'manage-portfolio',
+        id: 'portfolio',
         props: { label: 'Portfolio' },
         component: 'q-btn',
+        preventNavigation: true,
+        route: ['/transactions', '/holdings', '/events'],
         menuOptions: [
           {
             id: 'transactions',
@@ -73,28 +76,36 @@ export default defineComponent({
       },
       {
         id: 'analytics',
-        route: '/',
+        route: '/analytics',
         component: 'q-btn',
         props: { label: 'Analytics' },
       },
       {
-        id: 'stock-plants',
-        route: '/',
+        id: 'stock-plans',
+        route: '/stocks-plans',
         component: 'q-btn',
         props: { label: 'Stocks Plans' },
       },
-    ];
+    ] as const;
 
-    const isActiveRoute = (id: string) =>
-      router.currentRoute.value.path.includes(id);
+    const isActiveRoute = (path: string | string[]) => {
+      if (typeof path === 'string') {
+        return router.currentRoute.value.path == path;
+      }
 
-    const navigationButtonClass = (id: string) =>
-      ['nav-btn', isActiveRoute(id) ? 'active' : ''].filter(Boolean).join(' ');
+      return path.includes(router.currentRoute.value.path);
+    };
+
+    const navigationButtonClass = (path: string | string[]) =>
+      ['nav-btn', isActiveRoute(path) ? 'active' : '']
+        .filter(Boolean)
+        .join(' ');
 
     const navigate = (routeId: string) => router.push(routeId);
 
     return {
       navigationButtons,
+      isActiveRoute,
       navigationButtonClass,
       navigate,
     };

@@ -29,8 +29,12 @@ export const enUsMessages = {
     target_explain: 'The Target will be used to track your portfolio progress',
     empty: 'Still quiet here...',
   },
+  transactions: {
+    header: 'Portfolio Transactions',
+  },
   cancel: 'Cancel',
   save: 'Save',
+  add: 'Add',
   clone: 'Clone',
   delete: 'Delete',
   yes: 'Yes',
