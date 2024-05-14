@@ -1,6 +1,7 @@
 <template>
   <q-table
-    :rows="rows"
+    :rows="transactions"
+    class="transactions-table"
     :columns="columns"
     row-key="name"
     :filter="filter"
@@ -23,187 +24,183 @@
         </q-input>
       </div>
     </template>
+
+    <template v-slot:body="props">
+      <q-tr :props="props">
+        <q-td key="action" :props="props" :class="props.row.actionTextClass">
+          <span class="text-uppercase text-bold">{{ props.row.action }}</span>
+        </q-td>
+        <q-td key="holdings_name" :props="props">
+          <div class="row items-center">
+            <img
+              v-if="props.row.logoImage"
+              width="35"
+              height="35"
+              :src="props.row.logoImage"
+              :alt="props.row.ticker"
+            />
+            <div class="column q-ml-sm">
+              <span class="text-body2">{{ props.row.name }}</span>
+              <span class="text-uppercase text-grey-6">{{
+                props.row.ticker
+              }}</span>
+            </div>
+          </div>
+        </q-td>
+        <q-td key="date" :props="props">
+          {{ props.row.date }}
+        </q-td>
+        <q-td key="shares" :props="props">
+          {{ props.row.shares }}
+        </q-td>
+        <q-td key="price" :props="props">
+          {{ $n(props.row.price, 'decimal') }}
+        </q-td>
+        <q-td key="fees" :props="props">
+          {{ props.row.fees ? $n(props.row.fees, 'decimal') : 'None' }}
+        </q-td>
+        <q-td key="balance" :class="props.row.balance.textClass" :props="props">
+          {{ props.row.balance.sign }}{{ props.row.balance.value }}
+        </q-td>
+        <q-td key="total_profit" :props="props">
+          {{ props.row.profit }}
+        </q-td>
+      </q-tr>
+    </template>
   </q-table>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { date } from 'quasar';
 import type { QTableProps } from 'quasar';
-import { Transaction } from 'src/types';
+import { Transaction, TransactionAction } from 'src/types';
 import { TRANSACTIONS_TYPES } from 'src/constants';
 
 const columns: QTableProps['columns'] = [
   {
-    name: 'name',
+    name: 'action',
+    field: 'action',
+    label: 'Action',
+    sortable: true,
     required: true,
-    label: 'Dessert (100g serving)',
-    field: 'name',
-    sortable: false,
     align: 'left',
   },
   {
-    name: 'calories',
+    name: 'holdings_name',
+    required: true,
+    label: 'Holding Name',
+    field: 'name',
+    sortable: true,
+    align: 'left',
+  },
+  {
+    name: 'date',
     align: 'center',
-    label: 'Calories',
-    field: 'calories',
+    label: 'Date',
+    field: 'date',
     sortable: true,
   },
   {
-    name: 'fat',
+    name: 'shares',
     align: 'center',
-    label: 'Fat (g)',
-    field: 'fat',
+    label: 'Shares',
+    field: 'shares',
     sortable: true,
   },
-  { name: 'carbs', align: 'center', label: 'Carbs (g)', field: 'carbs' },
-  { name: 'protein', align: 'center', label: 'Protein (g)', field: 'protein' },
-  { name: 'sodium', align: 'center', label: 'Sodium (mg)', field: 'sodium' },
+  { name: 'price', align: 'center', label: 'Price', field: 'price' },
+  { name: 'fees', align: 'center', label: 'Fees', field: 'fees' },
+  {
+    name: 'balance',
+    align: 'center',
+    label: 'Balance',
+    field: 'balance',
+  },
+  { name: 'total_profit', align: 'center', label: 'Profit', field: 'profit' },
 ];
 
 const transactions: Transaction[] = [
   {
     id: 'my-portfolio',
     ticker: 'MSTR',
-    balanceChange: 500,
+    name: 'MicroStrategy Incorporated',
     action: TRANSACTIONS_TYPES.SELL,
     shares: 10,
     fees: 7.5,
     price: 300,
     date: Date.now(),
+    logoImage: 'https://eodhd.com/img/logos/US/MSTR.png',
   },
   {
     id: 'my-portfolio',
     ticker: 'FVRR',
-    balanceChange: -250,
+    name: 'Fiverr',
     action: TRANSACTIONS_TYPES.BUY,
     shares: 33,
     fees: 7.5,
     price: 100,
     date: Date.now(),
-  },
-];
-
-const rows = [
-  {
-    name: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6.0,
-    carbs: 24,
-    protein: 4.0,
-    sodium: 87,
-    calcium: '14%',
-    iron: '1%',
-  },
-  {
-    name: 'Ice cream sandwich',
-    calories: 237,
-    fat: 9.0,
-    carbs: 37,
-    protein: 4.3,
-    sodium: 129,
-    calcium: '8%',
-    iron: '1%',
-  },
-  {
-    name: 'Eclair',
-    calories: 262,
-    fat: 16.0,
-    carbs: 23,
-    protein: 6.0,
-    sodium: 337,
-    calcium: '6%',
-    iron: '7%',
-  },
-  {
-    name: 'Cupcake',
-    calories: 305,
-    fat: 3.7,
-    carbs: 67,
-    protein: 4.3,
-    sodium: 413,
-    calcium: '3%',
-    iron: '8%',
-  },
-  {
-    name: 'Gingerbread',
-    calories: 356,
-    fat: 16.0,
-    carbs: 49,
-    protein: 3.9,
-    sodium: 327,
-    calcium: '7%',
-    iron: '16%',
-  },
-  {
-    name: 'Jelly bean',
-    calories: 375,
-    fat: 0.0,
-    carbs: 94,
-    protein: 0.0,
-    sodium: 50,
-    calcium: '0%',
-    iron: '0%',
-  },
-  {
-    name: 'Lollipop',
-    calories: 392,
-    fat: 0.2,
-    carbs: 98,
-    protein: 0,
-    sodium: 38,
-    calcium: '0%',
-    iron: '2%',
-  },
-  {
-    name: 'Honeycomb',
-    calories: 408,
-    fat: 3.2,
-    carbs: 87,
-    protein: 6.5,
-    sodium: 562,
-    calcium: '0%',
-    iron: '45%',
-  },
-  {
-    name: 'Donut',
-    calories: 452,
-    fat: 25.0,
-    carbs: 51,
-    protein: 4.9,
-    sodium: 326,
-    calcium: '2%',
-    iron: '22%',
-  },
-  {
-    name: 'KitKat',
-    calories: 518,
-    fat: 26.0,
-    carbs: 65,
-    protein: 7,
-    sodium: 54,
-    calcium: '12%',
-    iron: '6%',
+    logoImage: 'https://eodhd.com/img/logos/US/FVRR.png',
   },
 ];
 
 export default defineComponent({
   name: 'TransactionsTable',
   setup() {
+    const $n = useI18n().n;
     const filter = ref('');
+
+    const actionTextColor = (action: TransactionAction) =>
+      action == 'buy' ? 'text-green-4' : 'text-red-4';
 
     return {
       filter,
       columns,
-      rows,
+      actionTextColor,
+      transactions: transactions.map((transaction) => {
+        const isBuyAction = transaction.action === 'buy';
+
+        return {
+          ...transaction,
+          actionTextClass: isBuyAction ? 'text-green-4' : 'text-red-4',
+          totalValue: $n(
+            transaction.shares * transaction.price - transaction.fees || 0,
+            'currency'
+          ),
+          balance: {
+            value: $n(
+              transaction.shares * transaction.price - transaction.fees || 0,
+              'currency'
+            ),
+            textClass: isBuyAction ? 'text-red-7' : 'text-green-7',
+            sign: isBuyAction ? '-' : '+',
+          },
+          price: transaction.price,
+          date: date.formatDate(transaction.date, 'MM/DD/YY'),
+          profit: '--Missing--', // TODO - Need to calculate it base on action type and current value.
+        };
+      }),
     };
   },
 });
 </script>
 
 <style lang="scss">
-.add-transaction {
-  .q-icon {
-    margin-right: 6px;
+.transactions-table {
+  .add-transaction {
+    .q-icon {
+      margin-right: 6px;
+    }
+  }
+
+  .q-table th {
+    font-size: 14px;
+    color: $grey-6;
+  }
+
+  .q-table td {
+    font-size: 14px;
   }
 }
 </style>

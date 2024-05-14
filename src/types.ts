@@ -30,6 +30,7 @@ export interface Transaction {
   shares: number;
   price: number;
   fees?: number;
-  balanceChange: number;
   ticker: string;
+  name: string;
+  logoImage?: string;
 }

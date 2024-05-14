@@ -5,7 +5,7 @@
       :key="button.id"
       :is="button.component"
       :class="navigationButtonClass(button.route)"
-      @click="() => !button.preventNavigation && navigate(button.route)"
+      @click="() => !button.preventNavigation && navigate(button.route as string)"
       v-bind="button.props"
       flat
       no-caps
@@ -86,7 +86,7 @@ export default defineComponent({
         component: 'q-btn',
         props: { label: 'Stocks Plans' },
       },
-    ] as const;
+    ];
 
     const isActiveRoute = (path: string | string[]) => {
       if (typeof path === 'string') {

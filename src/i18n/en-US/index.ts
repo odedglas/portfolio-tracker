@@ -50,8 +50,11 @@ export const enUsCurrency = {
     maximumFractionDigits: 0,
   },
   decimal: {
-    style: 'decimal',
+    style: 'currency',
+    currency: 'USD',
+    currencyDisplay: 'symbol',
     maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
   },
   percent: {
     style: 'percent',
