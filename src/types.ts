@@ -33,4 +33,5 @@ export interface Transaction {
   ticker: string;
   name: string;
   logoImage?: string;
+  portfolioId: string;
 }

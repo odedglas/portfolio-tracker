@@ -97,33 +97,14 @@
           icon="edit"
           @click="$emit('editPortfolio', portfolio)"
         />
-        <q-btn size="12px" flat dense round icon="more_vert">
-          <q-menu>
-            <q-list style="min-width: 200px">
-              <q-item
-                clickable
-                v-close-popup
-                @click="$emit('deletePortfolio', portfolio)"
-              >
-                <div
-                  class="col-12 row items-center gap-md text-grey-7"
-                  style="gap: 12px"
-                >
-                  <q-icon name="delete" size="18px" />
-                  {{ $t('delete') }}
-                </div>
-              </q-item>
-              <q-item v-close-popup>
-                <div
-                  class="col-12 row items-center gap-md text-grey-7"
-                  style="gap: 12px"
-                >
-                  <q-icon name="content_copy" size="18px" />
-                  {{ $t('clone') }}
-                </div>
-              </q-item>
-            </q-list>
-          </q-menu>
+        <q-btn
+          size="12px"
+          flat
+          dense
+          round
+          icon="delete"
+          @click="$emit('deletePortfolio', portfolio)"
+        >
         </q-btn>
       </div>
     </q-item-section>

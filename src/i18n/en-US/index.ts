@@ -31,7 +31,9 @@ export const enUsMessages = {
   },
   transactions: {
     header: 'Portfolio Transactions',
+    search_ticker: 'Please enter a ticker symbol to search...',
   },
+  no_results: 'No results',
   cancel: 'Cancel',
   save: 'Save',
   add: 'Add',

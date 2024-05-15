@@ -1,6 +1,6 @@
 <template>
   <q-table
-    :rows="transactions"
+    :rows="viewTransactions"
     class="transactions-table"
     :columns="columns"
     row-key="name"
@@ -13,6 +13,7 @@
           outline
           class="add-transaction"
           icon="add"
+          @click="() => showOrEditTransaction()"
           color="primary"
           :label="$t('add')"
         />
@@ -65,17 +66,37 @@
         <q-td key="total_profit" :props="props">
           {{ props.row.profit }}
         </q-td>
+        <q-td key="item_actions" :props="props" class="text-grey-6">
+          <q-btn
+            class="gt-xs"
+            size="12px"
+            flat
+            dense
+            round
+            icon="edit"
+            @click="$emit('editTransaction', props.row)"
+          />
+          <q-btn
+            size="12px"
+            flat
+            dense
+            round
+            icon="delete"
+            @click="$emit('deleteTransaction', props.row)"
+          >
+          </q-btn>
+        </q-td>
       </q-tr>
     </template>
   </q-table>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, PropType, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { date } from 'quasar';
 import type { QTableProps } from 'quasar';
-import { Transaction, TransactionAction } from 'src/types';
+import { Transaction } from 'src/types';
 import { TRANSACTIONS_TYPES } from 'src/constants';
 
 const columns: QTableProps['columns'] = [
@@ -118,59 +139,36 @@ const columns: QTableProps['columns'] = [
     field: 'balance',
   },
   { name: 'total_profit', align: 'center', label: 'Profit', field: 'profit' },
-];
-
-const transactions: Transaction[] = [
-  {
-    id: 'my-portfolio',
-    ticker: 'MSTR',
-    name: 'MicroStrategy Incorporated',
-    action: TRANSACTIONS_TYPES.SELL,
-    shares: 10,
-    fees: 7.5,
-    price: 300,
-    date: Date.now(),
-    logoImage: 'https://eodhd.com/img/logos/US/MSTR.png',
-  },
-  {
-    id: 'my-portfolio',
-    ticker: 'FVRR',
-    name: 'Fiverr',
-    action: TRANSACTIONS_TYPES.BUY,
-    shares: 33,
-    fees: 7.5,
-    price: 100,
-    date: Date.now(),
-    logoImage: 'https://eodhd.com/img/logos/US/FVRR.png',
-  },
+  { name: 'item_actions', align: 'center', label: '', field: 'none' },
 ];
 
 export default defineComponent({
   name: 'TransactionsTable',
-  setup() {
+  props: {
+    showOrEditTransaction: {
+      required: true,
+      type: Function as PropType<(transaction?: Transaction) => void>,
+    },
+    transactions: {
+      required: true,
+      type: Object as PropType<Transaction[]>,
+    },
+  },
+  emit: ['deleteTransaction', 'editTransaction'],
+  setup(props) {
     const $n = useI18n().n;
     const filter = ref('');
 
-    const actionTextColor = (action: TransactionAction) =>
-      action == 'buy' ? 'text-green-4' : 'text-red-4';
-
-    return {
-      filter,
-      columns,
-      actionTextColor,
-      transactions: transactions.map((transaction) => {
-        const isBuyAction = transaction.action === 'buy';
+    const viewTransactions = computed(() =>
+      props.transactions.map((transaction) => {
+        const isBuyAction = transaction.action === TRANSACTIONS_TYPES.BUY;
 
         return {
           ...transaction,
           actionTextClass: isBuyAction ? 'text-green-4' : 'text-red-4',
-          totalValue: $n(
-            transaction.shares * transaction.price - transaction.fees || 0,
-            'currency'
-          ),
           balance: {
             value: $n(
-              transaction.shares * transaction.price - transaction.fees || 0,
+              transaction.shares * transaction.price - (transaction.fees || 0),
               'currency'
             ),
             textClass: isBuyAction ? 'text-red-7' : 'text-green-7',
@@ -180,7 +178,13 @@ export default defineComponent({
           date: date.formatDate(transaction.date, 'MM/DD/YY'),
           profit: '--Missing--', // TODO - Need to calculate it base on action type and current value.
         };
-      }),
+      })
+    );
+
+    return {
+      filter,
+      columns,
+      viewTransactions,
     };
   },
 });

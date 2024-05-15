@@ -43,6 +43,17 @@ export const queries = {
 
     return firestoreAPI.getAll(portfoliosQuery);
   },
+
+  listPortfolioTransactions: async (portfolioId: string) => {
+    const transactions = getCollections().transaction;
+
+    const transactionsQuery = query(
+      transactions,
+      where('portfolioId', '==', portfolioId)
+    );
+
+    return firestoreAPI.getAll(transactionsQuery);
+  },
 };
 
 /**
