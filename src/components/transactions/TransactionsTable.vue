@@ -40,6 +40,9 @@
               :src="props.row.logoImage"
               :alt="props.row.ticker"
             />
+            <div class="empty-logo-alt flex items-center justify-center" v-else>
+              <span class="ticker">{{ props.row.ticker }}</span>
+            </div>
             <div class="column q-ml-sm">
               <span class="text-body2">{{ props.row.name }}</span>
               <span class="text-uppercase text-grey-6">{{
@@ -74,7 +77,9 @@
             dense
             round
             icon="edit"
-            @click="$emit('editTransaction', props.row)"
+            @click="
+              () => $emit('editTransaction', matchToViewTransaction(props.row))
+            "
           />
           <q-btn
             size="12px"
@@ -82,7 +87,10 @@
             dense
             round
             icon="delete"
-            @click="$emit('deleteTransaction', props.row)"
+            @click="
+              () =>
+                $emit('deleteTransaction', matchToViewTransaction(props.row))
+            "
           >
           </q-btn>
         </q-td>
@@ -95,52 +103,9 @@
 import { defineComponent, ref, PropType, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { date } from 'quasar';
-import type { QTableProps } from 'quasar';
 import { Transaction } from 'src/types';
 import { TRANSACTIONS_TYPES } from 'src/constants';
-
-const columns: QTableProps['columns'] = [
-  {
-    name: 'action',
-    field: 'action',
-    label: 'Action',
-    sortable: true,
-    required: true,
-    align: 'left',
-  },
-  {
-    name: 'holdings_name',
-    required: true,
-    label: 'Holding Name',
-    field: 'name',
-    sortable: true,
-    align: 'left',
-  },
-  {
-    name: 'date',
-    align: 'center',
-    label: 'Date',
-    field: 'date',
-    sortable: true,
-  },
-  {
-    name: 'shares',
-    align: 'center',
-    label: 'Shares',
-    field: 'shares',
-    sortable: true,
-  },
-  { name: 'price', align: 'center', label: 'Price', field: 'price' },
-  { name: 'fees', align: 'center', label: 'Fees', field: 'fees' },
-  {
-    name: 'balance',
-    align: 'center',
-    label: 'Balance',
-    field: 'balance',
-  },
-  { name: 'total_profit', align: 'center', label: 'Profit', field: 'profit' },
-  { name: 'item_actions', align: 'center', label: '', field: 'none' },
-];
+import { columns } from './columns';
 
 export default defineComponent({
   name: 'TransactionsTable',
@@ -181,9 +146,19 @@ export default defineComponent({
       })
     );
 
+    const matchToViewTransaction = <T extends Transaction>(
+      viewTransaction: T
+    ) => {
+      debugger;
+      return props.transactions.find(
+        (transaction) => transaction.id === viewTransaction.id
+      );
+    };
+
     return {
       filter,
       columns,
+      matchToViewTransaction,
       viewTransactions,
     };
   },

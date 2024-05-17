@@ -8,10 +8,9 @@
       <q-card-section class="row items-center q-pa-none">
         <q-toolbar class="bg-primary text-white">
           <q-toolbar-title class="row items-center">
-            <q-icon name="business_center" class="q-mr-md" />
-            {{ isNew ? $t('portfolios.create') : $t('portfolios.edit') }}
+            <q-icon name="transform" class="q-mr-md" />
+            {{ isNew ? $t('transactions.create') : $t('transactions.edit') }}
           </q-toolbar-title>
-          <q-space />
           <q-btn
             flat
             round
@@ -24,16 +23,91 @@
 
       <q-card-section>
         <q-form ref="formRef" class="q-gutter-sm">
+          <ticker-search
+            :ticker="localTransaction.ticker || ''"
+            :ticker-meta="{
+              display: localTransaction.name,
+              logo: localTransaction.logoImage,
+            }"
+            @update:tickerValue="onTickerOptionSelect"
+          />
+
+          <div class="row" style="gap: 12px">
+            <q-select
+              class="col text-capitalize"
+              v-model="localTransaction.action"
+              :options="transactionActions"
+              label="Operation"
+            />
+
+            <q-input
+              class="col"
+              v-model="formattedDate"
+              placeholder="Date"
+              lazy-rules
+              :rules="[
+                (val) =>
+                  (val && typeof new Date(val).getTime === 'function') ||
+                  'Please set a valid transcation date',
+              ]"
+            >
+              <template v-slot:append>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy
+                    cover
+                    transition-show="scale"
+                    transition-hide="scale"
+                  >
+                    <q-date v-model="formattedDate" mask="MM/DD/YYYY">
+                      <div class="row items-center justify-end">
+                        <q-btn
+                          v-close-popup
+                          label="Close"
+                          color="primary"
+                          flat
+                        />
+                      </div>
+                    </q-date>
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+          </div>
+
+          <div class="row" style="gap: 12px">
+            <q-input
+              v-model.number="localTransaction.shares"
+              class="col"
+              type="text"
+              lazy-rules
+              label="Shares"
+              :rules="[
+                (val) =>
+                  (val && val > 0) || 'Please enter a valid amount of shares',
+              ]"
+            />
+
+            <q-input
+              v-model.number="localTransaction.price"
+              class="col"
+              type="text"
+              lazy-rules
+              suffix="$"
+              label="Price"
+              :rules="[
+                (val) =>
+                  (val && val > 0) || 'Please enter a valid holdings price',
+              ]"
+            />
+          </div>
+
           <q-input
-            v-model="localTransaction.price"
+            v-model.number="localTransaction.fees"
+            class="col"
             type="text"
             lazy-rules
-            label="Price"
-            :rules="[
-              (val) =>
-                (val && val.length > 0) ||
-                'Please enter a valid holdings price',
-            ]"
+            suffix="$"
+            label="Fees"
           />
         </q-form>
       </q-card-section>
@@ -53,20 +127,30 @@
 
 <script lang="ts">
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
+import { date as dateUtils } from 'quasar';
+import { useI18n } from 'vue-i18n';
 import { useLoadingStore } from 'stores/loading';
+import { usePortfolioStore } from 'stores/portfolios';
+import transactionsAPI from 'src/service/transactions';
 import { Transaction } from 'src/types';
+import { TRANSACTIONS_TYPES } from 'src/constants';
+import TickerSearch, { TickerOption } from '../common/TickerSearch.vue';
 
-const emptyTransaction = (): Transaction => ({
-  id: '',
-  action: 'buy',
-  date: Date.now(),
-  shares: 1,
-  price: 10,
-  fees: 0,
-  ticker: '',
-  portfolioId: '',
-  name: '',
-});
+const emptyTransaction = (): Transaction => {
+  const selectedPortfolioId = usePortfolioStore().selectedPortfolio?.id;
+
+  return {
+    id: '',
+    action: 'buy',
+    date: Date.now(),
+    shares: 0,
+    price: 0,
+    fees: 0,
+    ticker: '',
+    portfolioId: selectedPortfolioId || '',
+    name: '',
+  };
+};
 
 export default defineComponent({
   name: 'TransactionsDialog',
@@ -79,8 +163,12 @@ export default defineComponent({
       type: Object as PropType<Partial<Transaction> | undefined>,
     },
   },
-  emits: ['closeTransaction'],
+  components: {
+    TickerSearch,
+  },
+  emits: ['saveTransaction', 'closeTransaction'],
   setup(props, { emit }) {
+    const $t = useI18n().t;
     const { emitLoadingTask } = useLoadingStore();
 
     const formRef: Ref<{ validate: () => void } | undefined> = ref(undefined);
@@ -97,6 +185,14 @@ export default defineComponent({
       },
     });
 
+    const formattedDate = computed({
+      get: () =>
+        dateUtils.formatDate(localTransaction.value.date, 'MM/DD/YYYY'),
+      set: (date: string) => {
+        localTransaction.value.date = new Date(date).getTime();
+      },
+    });
+
     const isNew = computed(() => localTransaction?.value?.id === '');
 
     const setLocalTransaction = () => {
@@ -105,19 +201,18 @@ export default defineComponent({
       };
     };
 
-    const saveTransaction = async (transaction: Transaction) => {
-      let isNew = !transaction.id;
+    const onTickerOptionSelect = (tickerOption: TickerOption) => {
+      localTransaction.value.ticker = tickerOption?.value || '';
+      localTransaction.value.name = tickerOption?.label;
+      localTransaction.value.logoImage = tickerOption?.logoImage;
+    };
 
-      console.log('Saving transaction', isNew);
-      /*      const persisted = await emitLoadingTask(() =>
-        portfolioAPI.update(portfolio, portfolio.id)
+    const saveTransaction = async (transaction: Transaction) => {
+      const persisted = await emitLoadingTask(() =>
+        transactionsAPI.update(transaction, transaction.id)
       );
 
-      if (isNewPortfolio) {
-        portfolioStore.add(persisted);
-      } else {
-        portfolioStore.update(persisted);
-      }*/
+      emit('saveTransaction', persisted);
     };
 
     const submitForm = async () => {
@@ -127,13 +222,23 @@ export default defineComponent({
       }
     };
 
+    const transactionActions = Object.values(TRANSACTIONS_TYPES).map(
+      (action) => ({
+        value: action,
+        label: $t(`transactions.action.${action}`),
+      })
+    );
+
     return {
       formRef,
       syntheticShow,
+      formattedDate,
       isNew,
       localTransaction,
       setLocalTransaction,
+      onTickerOptionSelect,
       submitForm,
+      transactionActions,
     };
   },
 });

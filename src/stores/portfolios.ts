@@ -25,14 +25,15 @@ export const usePortfolioStore = defineStore('portfolios', {
     },
     async list() {
       if (loadedOnce) {
-        return;
+        this.selectPortfolio(this.portfolios[0]?.id);
+        return this.portfolios;
       }
 
       this.portfolios = (await portfolioAPI.list()).sort((p1, p2) =>
         p1.createdAt < p2.createdAt ? -1 : 1
       );
 
-      this.selectedPortfolioId = this.portfolios[0]?.id; // TODO - Add localStorage persistence layer
+      this.selectPortfolio(this.portfolios[0]?.id); // TODO - Add localStorage persistence layer
 
       loadedOnce = true;
 

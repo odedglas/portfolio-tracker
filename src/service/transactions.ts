@@ -22,10 +22,13 @@ const api = {
     }
 
     if (!transactionId) {
-      console.log('Handle create transaction');
-      transactionId = 'create';
+      const result = await firestoreAPI.addDocument(
+        transactionsCollection(),
+        data
+      );
+
+      transactionId = result.id;
     } else {
-      console.log('Handle update transaction');
       await firestoreAPI.updateDocument(
         transactionId,
         transactionsCollection(),

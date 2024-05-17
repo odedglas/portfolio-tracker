@@ -32,6 +32,12 @@ export const enUsMessages = {
   transactions: {
     header: 'Portfolio Transactions',
     search_ticker: 'Please enter a ticker symbol to search...',
+    create: 'New Transaction',
+    edit: 'Edit Transaction',
+    action: {
+      buy: 'Buy',
+      sell: 'Sell',
+    },
   },
   no_results: 'No results',
   cancel: 'Cancel',

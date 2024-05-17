@@ -1,7 +1,7 @@
 const LOGO_CDN = 'https://eodhd.com/img/logos/US';
 import { alphavantage } from './alphavantageClient';
 
-export const findTickerImage = (ticker: string) =>
+export const findTickerImage = (ticker: string): Promise<string> =>
   new Promise((resolve) => {
     const logoUrl = `${LOGO_CDN}/${ticker}.png`;
 

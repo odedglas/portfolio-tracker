@@ -13,13 +13,14 @@
     <transaction-dialog
       :show="showTransactionsModal"
       :transaction="transactionToEdit"
+      @save-transaction="syncTransactionState"
       @close-transaction="hideTransactionsModal"
     />
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, watch, onMounted } from 'vue';
 import { usePortfolioStore } from 'src/stores/portfolios';
 import { useLoadingStore } from 'stores/loading';
 import transactionsAPI from 'src/service/transactions';
@@ -40,21 +41,33 @@ export default defineComponent({
     const { emitLoadingTask } = useLoadingStore();
     const { showAreYouSure } = useAreYouSure();
 
+    const currentPortfolioId = ref(portfolioStore.selectedPortfolioId);
     const showTransactionsModal = ref(false);
     const transactions = ref<Transaction[]>([]);
-    const transactionToEdit = ref<Partial<Transaction> | undefined>(undefined);
+    const transactionToEdit = ref<Transaction | undefined>(undefined);
 
     onMounted(async () => {
-      if (portfolioStore.selectedPortfolioId) {
+      currentPortfolioId.value = portfolioStore.selectedPortfolioId;
+      if (currentPortfolioId.value && !transactions.value.length) {
         transactions.value = await transactionsAPI.list(
-          portfolioStore.selectedPortfolioId
+          currentPortfolioId.value
         );
       }
-      // TODO - Loading state
     });
 
+    watch(
+      () => portfolioStore.selectedPortfolioId,
+      async (portfolioId: string | undefined) => {
+        if (!portfolioId) {
+          return;
+        }
+
+        currentPortfolioId.value = portfolioId;
+        transactions.value = await transactionsAPI.list(portfolioId);
+      }
+    );
+
     const showCreateOrEditTransaction = async (transaction?: Transaction) => {
-      debugger;
       const isEdit = !!transaction?.id;
       if (isEdit) {
         transactionToEdit.value = { ...transaction };
@@ -68,6 +81,25 @@ export default defineComponent({
       showTransactionsModal.value = false;
     };
 
+    const syncTransactionState = (transaction: Transaction, remove = false) => {
+      if (remove) {
+        transactions.value = transactions.value.filter(
+          (t) => t.id !== transaction.id
+        );
+        return;
+      }
+
+      const updateIndex = transactions.value.findIndex(
+        (t) => t.id === transaction.id
+      );
+      if (updateIndex < 0) {
+        transactions.value.push(transaction);
+        return;
+      }
+
+      transactions.value[updateIndex] = transaction;
+    };
+
     const deleteTransaction = (transaction: Transaction) => {
       showAreYouSure({
         title: 'Delete Transaction',
@@ -75,7 +107,7 @@ export default defineComponent({
         callback: async () => {
           await emitLoadingTask(() => transactionsAPI.delete(transaction.id));
 
-          // TODO - Handle sync UI
+          syncTransactionState(transaction, true);
         },
       });
     };
@@ -86,6 +118,7 @@ export default defineComponent({
       showCreateOrEditTransaction,
       showTransactionsModal,
       transactionToEdit,
+      syncTransactionState,
       deleteTransaction,
     };
   },
