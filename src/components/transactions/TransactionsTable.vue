@@ -148,12 +148,10 @@ export default defineComponent({
 
     const matchToViewTransaction = <T extends Transaction>(
       viewTransaction: T
-    ) => {
-      debugger;
-      return props.transactions.find(
+    ) =>
+      props.transactions.find(
         (transaction) => transaction.id === viewTransaction.id
       );
-    };
 
     return {
       filter,

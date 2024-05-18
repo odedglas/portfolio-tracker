@@ -112,6 +112,15 @@
         </q-form>
       </q-card-section>
 
+      <q-card-section>
+        <span class="text-body-2 text-grey-6"
+          >{{ $t('transactions.summary') }} -</span
+        >
+        <span class="text-grey-8 font-bold">{{
+          $n(totalTransaction, 'currency')
+        }}</span>
+      </q-card-section>
+
       <q-card-actions align="right">
         <q-btn flat :label="$t('cancel')" @click="$emit('closeTransaction')" />
         <q-btn
@@ -229,6 +238,13 @@ export default defineComponent({
       })
     );
 
+    const totalTransaction = computed(() => {
+      return (
+        localTransaction.value.price * localTransaction.value.shares -
+        localTransaction.value.fees
+      );
+    });
+
     return {
       formRef,
       syntheticShow,
@@ -239,6 +255,7 @@ export default defineComponent({
       onTickerOptionSelect,
       submitForm,
       transactionActions,
+      totalTransaction,
     };
   },
 });

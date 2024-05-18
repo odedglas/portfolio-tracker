@@ -38,6 +38,7 @@ export const enUsMessages = {
       buy: 'Buy',
       sell: 'Sell',
     },
+    summary: 'Total transaction value',
   },
   no_results: 'No results',
   cancel: 'Cancel',

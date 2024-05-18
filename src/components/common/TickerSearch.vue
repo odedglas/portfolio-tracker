@@ -31,7 +31,7 @@
         <q-item-section side>
           <q-item-label>
             <q-item-label caption class="text-grey-5">{{
-              opt.symbol
+              opt.value
             }}</q-item-label>
             <q-item-label>{{ opt.label }}</q-item-label>
           </q-item-label>
@@ -97,7 +97,7 @@ export default defineComponent({
         noResults.value = search.length === 0;
         options.value = search.map((result) => ({
           ...result,
-          label: `${result.name} - ${result.symbol}`,
+          label: result.name,
           value: result.symbol,
         }));
       });
