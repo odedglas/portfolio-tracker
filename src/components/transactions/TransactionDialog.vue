@@ -116,7 +116,7 @@
         <span class="text-body-2 text-grey-6"
           >{{ $t('transactions.summary') }} -</span
         >
-        <span class="text-grey-8 font-bold">{{
+        <span class="text-grey-8 font-bold q-mx-sm">{{
           $n(totalTransaction, 'currency')
         }}</span>
       </q-card-section>
@@ -152,6 +152,7 @@ const emptyTransaction = (): Transaction => {
     id: '',
     action: 'buy',
     date: Date.now(),
+    createdAt: Date.now(),
     shares: 0,
     price: 0,
     fees: 0,
@@ -169,7 +170,7 @@ export default defineComponent({
       required: true,
     },
     transaction: {
-      type: Object as PropType<Partial<Transaction> | undefined>,
+      type: Object as PropType<Transaction | undefined>,
     },
   },
   components: {
@@ -181,9 +182,7 @@ export default defineComponent({
     const { emitLoadingTask } = useLoadingStore();
 
     const formRef: Ref<{ validate: () => void } | undefined> = ref(undefined);
-    const localTransaction = toRef(props.transaction) as Ref<
-      Partial<Transaction>
-    >;
+    const localTransaction = toRef(props.transaction) as Ref<Transaction>;
 
     const syntheticShow = computed({
       get: () => !!props.show,
@@ -240,8 +239,8 @@ export default defineComponent({
 
     const totalTransaction = computed(() => {
       return (
-        localTransaction.value.price * localTransaction.value.shares -
-        localTransaction.value.fees
+        localTransaction.value.price * localTransaction.value.shares +
+        (localTransaction.value.fees || 0)
       );
     });
 

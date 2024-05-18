@@ -25,6 +25,7 @@ export type TransactionAction =
 
 export interface Transaction {
   id: string;
+  createdAt: number;
   action?: TransactionAction;
   date: number;
   shares: number;

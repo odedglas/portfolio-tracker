@@ -35,24 +35,28 @@ export const getCollections = () => ({
  */
 export const queries = {
   listUserPortfolios: async () => {
-    const portfolios = getCollections().portfolio;
+    const portfoliosCollection = getCollections().portfolio;
     const portfoliosQuery = query(
-      portfolios,
+      portfoliosCollection,
       where('owner', '==', authentication.currentUser.uid)
     );
 
-    return firestoreAPI.getAll(portfoliosQuery);
+    const portfolios = await firestoreAPI.getAll(portfoliosQuery);
+
+    return portfolios.sort((p1, p2) => (p1.createdAt < p2.createdAt ? -1 : 1));
   },
 
   listPortfolioTransactions: async (portfolioId: string) => {
-    const transactions = getCollections().transaction;
+    const transactionsCollection = getCollections().transaction;
 
     const transactionsQuery = query(
-      transactions,
+      transactionsCollection,
       where('portfolioId', '==', portfolioId)
     );
 
-    return firestoreAPI.getAll(transactionsQuery);
+    const transactions = await firestoreAPI.getAll(transactionsQuery);
+
+    return transactions.sort((t1, t2) => (t1.date < t2.date ? 1 : -1));
   },
 };
 
