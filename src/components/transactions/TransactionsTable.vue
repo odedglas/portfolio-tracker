@@ -17,7 +17,46 @@
           color="primary"
           :label="$t('add')"
         />
-        <span>Transactions Summary goes here</span>
+        <div class="transactions-summary q-px-md q-py-sm rounded-borders">
+          <div class="row" style="gap: 24px">
+            <div class="col column flex justify-center">
+              <span class="flex items-center text-grey-8">
+                <span
+                  class="summary-indicator text-green-6 text-weight-bold q-mr-sm"
+                  >•</span
+                >
+                Buy
+              </span>
+              <span class="text-center"> {{ $n(summary.buy, 'decimal') }}</span>
+            </div>
+
+            <div class="col column flex justify-center">
+              <span class="flex items-center text-grey-8">
+                <span
+                  class="summary-indicator text-red-6 text-weight-bold q-mr-sm"
+                  >•</span
+                >
+                Sell
+              </span>
+              <span class="text-center">
+                {{ $n(summary.sell, 'decimal') }}</span
+              >
+            </div>
+
+            <div class="col column flex justify-center">
+              <span class="flex items-center text-grey-8">
+                <span
+                  class="summary-indicator text-purple-6 text-weight-bold q-mr-sm"
+                  >•</span
+                >
+                Fees
+              </span>
+              <span class="text-center">
+                {{ $n(summary.fees, 'decimal') }}</span
+              >
+            </div>
+          </div>
+        </div>
         <q-input dense debounce="300" v-model="filter" placeholder="Search">
           <template v-slot:append>
             <q-icon name="search" />
@@ -63,7 +102,11 @@
         <q-td key="fees" :props="props">
           {{ props.row.fees ? $n(props.row.fees, 'decimal') : 'None' }}
         </q-td>
-        <q-td key="balance" :class="props.row.balance.textClass" :props="props">
+        <q-td
+          key="balance"
+          :class="`${props.row.balance.textClass} text-bold`"
+          :props="props"
+        >
           {{ props.row.balance.sign }}{{ props.row.balance.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
@@ -133,10 +176,10 @@ export default defineComponent({
           actionTextClass: isBuyAction ? 'text-green-4' : 'text-red-4',
           balance: {
             value: $n(
-              transaction.shares * transaction.price - (transaction.fees || 0),
-              'currency'
+              transaction.shares * transaction.price + (transaction.fees || 0),
+              'decimal'
             ),
-            textClass: isBuyAction ? 'text-red-7' : 'text-green-7',
+            textClass: isBuyAction ? 'text-red-6' : 'text-green-6',
             sign: isBuyAction ? '-' : '+',
           },
           price: transaction.price,
@@ -144,6 +187,20 @@ export default defineComponent({
           profit: '--Missing--', // TODO - Need to calculate it base on action type and current value.
         };
       })
+    );
+
+    const summary = computed(() =>
+      props.transactions.reduce(
+        (summary, transaction) => {
+          const transactionValue = transaction.shares * transaction.price;
+
+          summary[transaction.action] += transactionValue;
+          summary.fees += transaction.fees || 0;
+
+          return summary;
+        },
+        { buy: 0, sell: 0, fees: 0 }
+      )
     );
 
     const matchToViewTransaction = <T extends Transaction>(
@@ -158,6 +215,7 @@ export default defineComponent({
       columns,
       matchToViewTransaction,
       viewTransactions,
+      summary,
     };
   },
 });
@@ -178,6 +236,14 @@ export default defineComponent({
 
   .q-table td {
     font-size: 14px;
+  }
+
+  .transactions-summary {
+    border: 1px solid $grey-4;
+
+    .summary-indicator {
+      font-size: 1.25em;
+    }
   }
 }
 </style>

@@ -34,10 +34,9 @@ export const enUsMessages = {
     search_ticker: 'Please enter a ticker symbol to search...',
     create: 'New Transaction',
     edit: 'Edit Transaction',
-    action: {
-      buy: 'Buy',
-      sell: 'Sell',
-    },
+    buy: 'Buy',
+    sell: 'Sell',
+    fees: 'Fees',
     summary: 'Total transaction value',
   },
   no_results: 'No results',

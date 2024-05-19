@@ -117,7 +117,7 @@
           >{{ $t('transactions.summary') }} -</span
         >
         <span class="text-grey-8 font-bold q-mx-sm">{{
-          $n(totalTransaction, 'currency')
+          $n(totalTransaction, 'decimal')
         }}</span>
       </q-card-section>
 
@@ -233,7 +233,7 @@ export default defineComponent({
     const transactionActions = Object.values(TRANSACTIONS_TYPES).map(
       (action) => ({
         value: action,
-        label: $t(`transactions.action.${action}`),
+        label: $t(`transactions.${action}`),
       })
     );
 
