@@ -17,47 +17,34 @@
           color="primary"
           :label="$t('add')"
         />
-        <div class="transactions-summary q-px-md q-py-sm rounded-borders">
+        <div
+          class="transactions-summary q-px-md q-py-xs rounded-borders"
+          v-if="!isEmpty"
+        >
           <div class="row" style="gap: 24px">
-            <div class="col column flex justify-center">
+            <div
+              class="col column flex justify-center"
+              v-for="[keyName, value] in Object.entries(summary)"
+              :key="keyName"
+            >
               <span class="flex items-center text-grey-8">
                 <span
-                  class="summary-indicator text-green-6 text-weight-bold q-mr-sm"
+                  :class="`summary-indicator text-weight-bold q-mr-sm ${summaryToClassMap[keyName]}`"
                   >•</span
                 >
-                Buy
+                {{ $t(`transactions.${keyName}`) }}
               </span>
-              <span class="text-center"> {{ $n(summary.buy, 'decimal') }}</span>
-            </div>
-
-            <div class="col column flex justify-center">
-              <span class="flex items-center text-grey-8">
-                <span
-                  class="summary-indicator text-red-6 text-weight-bold q-mr-sm"
-                  >•</span
-                >
-                Sell
-              </span>
-              <span class="text-center">
-                {{ $n(summary.sell, 'decimal') }}</span
-              >
-            </div>
-
-            <div class="col column flex justify-center">
-              <span class="flex items-center text-grey-8">
-                <span
-                  class="summary-indicator text-purple-6 text-weight-bold q-mr-sm"
-                  >•</span
-                >
-                Fees
-              </span>
-              <span class="text-center">
-                {{ $n(summary.fees, 'decimal') }}</span
-              >
+              <span class="text-center"> {{ $n(value, 'decimal') }}</span>
             </div>
           </div>
         </div>
-        <q-input dense debounce="300" v-model="filter" placeholder="Search">
+        <q-input
+          dense
+          debounce="300"
+          v-model="filter"
+          placeholder="Search"
+          v-if="!isEmpty"
+        >
           <template v-slot:append>
             <q-icon name="search" />
           </template>
@@ -139,6 +126,23 @@
         </q-td>
       </q-tr>
     </template>
+
+    <template v-slot:no-data>
+      <div class="full-width column flex-center text-grey-7 q-gutter-sm">
+        <img src="~assets/no-results.png" alt="no-results" height="200" />
+        <span>
+          {{ $t('transactions.no_transactions_found') }}
+        </span>
+        <q-btn
+          flat
+          class="add-transaction"
+          icon="add"
+          @click="() => showOrEditTransaction()"
+          color="secondary"
+          :label="$t('transactions.add_your_first')"
+        />
+      </div>
+    </template>
   </q-table>
 </template>
 
@@ -189,6 +193,8 @@ export default defineComponent({
       })
     );
 
+    const isEmpty = computed(() => props.transactions.length === 0);
+
     const summary = computed(() =>
       props.transactions.reduce(
         (summary, transaction) => {
@@ -203,6 +209,12 @@ export default defineComponent({
       )
     );
 
+    const summaryToClassMap = {
+      buy: 'text-green-6',
+      sell: 'text-red-6',
+      fees: 'text-purple-6',
+    } as Record<string, string>;
+
     const matchToViewTransaction = <T extends Transaction>(
       viewTransaction: T
     ) =>
@@ -211,11 +223,13 @@ export default defineComponent({
       );
 
     return {
+      isEmpty,
       filter,
       columns,
       matchToViewTransaction,
       viewTransactions,
       summary,
+      summaryToClassMap,
     };
   },
 });

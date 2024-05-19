@@ -38,6 +38,9 @@ export const enUsMessages = {
     sell: 'Sell',
     fees: 'Fees',
     summary: 'Total transaction value',
+    add_your_first: 'Add your first transaction',
+    no_transactions_found:
+      "There aren't any transactions yet found within your portfolio.",
   },
   no_results: 'No results',
   cancel: 'Cancel',
