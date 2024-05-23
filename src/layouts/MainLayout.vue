@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import AppHeader from 'components/header/AppHeader.vue';
 
 export default defineComponent({
@@ -22,17 +22,6 @@ export default defineComponent({
 
   components: {
     AppHeader,
-  },
-
-  setup() {
-    const leftDrawerOpen = ref(false);
-
-    return {
-      leftDrawerOpen,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value;
-      },
-    };
   },
 });
 </script>

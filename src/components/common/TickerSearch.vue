@@ -3,7 +3,7 @@
     use-input
     :modelValue="ticker"
     @update:model-value="(value) => $emit('update:tickerValue', value)"
-    input-debounce="300"
+    input-debounce="500"
     clearable
     lazy-rules
     label="Search Ticker"
@@ -97,7 +97,7 @@ export default defineComponent({
         noResults.value = search.length === 0;
         options.value = search.map((result) => ({
           ...result,
-          label: result.name,
+          label: result.shortname,
           value: result.symbol,
         }));
       });

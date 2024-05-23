@@ -181,11 +181,12 @@ export default defineComponent({
     const $t = useI18n().t;
     const { emitLoadingTask } = useLoadingStore();
 
-    const formRef: Ref<{ validate: () => void } | undefined> = ref(undefined);
+    const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
+      ref(undefined);
     const localTransaction = toRef(props.transaction) as Ref<Transaction>;
 
     const syntheticShow = computed({
-      get: () => !!props.show,
+      get: () => props.show,
       set: (value: boolean) => {
         if (!value) {
           emit('closeTransaction', undefined);
@@ -210,6 +211,8 @@ export default defineComponent({
     };
 
     const onTickerOptionSelect = (tickerOption: TickerOption) => {
+      debugger;
+
       localTransaction.value.ticker = tickerOption?.value || '';
       localTransaction.value.name = tickerOption?.label;
       localTransaction.value.logoImage = tickerOption?.logoImage;
