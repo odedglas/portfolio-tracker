@@ -42,8 +42,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted } from 'vue';
-import { usePortfolioStore } from 'src/stores/portfolios';
+import { defineComponent, ref, watch } from 'vue';
 import { useTransactionsStore } from 'src/stores/transactions';
 import { useLoadingStore } from 'stores/loading';
 import transactionsAPI from 'src/service/transactions';
@@ -60,7 +59,6 @@ export default defineComponent({
   },
 
   setup() {
-    const portfolioStore = usePortfolioStore();
     const transactionsStore = useTransactionsStore();
     const { emitLoadingTask } = useLoadingStore();
     const { showAreYouSure } = useAreYouSure();
@@ -69,23 +67,9 @@ export default defineComponent({
     const showTransactionsModal = ref(false);
     const transactionToEdit = ref<Transaction | undefined>(undefined);
 
-    onMounted(async () => {
-      const selectedPortfolioId = portfolioStore.selectedPortfolioId;
-      if (selectedPortfolioId) {
-        await transactionsAPI.list(selectedPortfolioId);
-
-        isLoading.value = false;
-      }
-    });
-
     watch(
-      () => portfolioStore.selectedPortfolioId,
-      async (portfolioId: string | undefined) => {
-        if (!portfolioId) {
-          return;
-        }
-
-        await transactionsStore.list();
+      () => transactionsStore.transactions,
+      () => {
         isLoading.value = false;
       }
     );

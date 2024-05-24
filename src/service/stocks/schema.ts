@@ -32,7 +32,7 @@ type QuoteSummary = {
   };
 };
 
-type Quote = {
+export type Quote = {
   language: string;
   region: string;
   quoteType: string;

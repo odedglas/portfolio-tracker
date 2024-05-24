@@ -150,6 +150,7 @@
 import { defineComponent, ref, PropType, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { date } from 'quasar';
+import { storeToRefs } from 'pinia';
 import { useTransactionsStore } from 'src/stores/transactions';
 import { Transaction } from 'src/types';
 import { TRANSACTIONS_TYPES } from 'src/constants';
@@ -169,8 +170,11 @@ export default defineComponent({
     const filter = ref('');
     const transactionsStore = useTransactionsStore();
 
+    const { transactions, summary, balanceMap } =
+      storeToRefs(transactionsStore);
+
     const viewTransactions = computed(() =>
-      transactionsStore.transactions.map((transaction) => {
+      transactions.value.map((transaction) => {
         const isBuyAction = transaction.action === TRANSACTIONS_TYPES.BUY;
 
         return {
@@ -186,26 +190,12 @@ export default defineComponent({
           },
           price: transaction.price,
           date: date.formatDate(transaction.date, 'MM/DD/YY'),
-          profit: '--Missing--', // TODO - Need to calculate it base on action type and current value.
+          profit: $n(balanceMap.value[transaction.id] ?? 0, 'decimal'),
         };
       })
     );
 
-    const isEmpty = computed(() => transactionsStore.transactions.length === 0);
-
-    const summary = computed(() =>
-      transactionsStore.transactions.reduce(
-        (summary, transaction) => {
-          const transactionValue = transaction.shares * transaction.price;
-
-          summary[transaction.action] += transactionValue;
-          summary.fees += transaction.fees || 0;
-
-          return summary;
-        },
-        { buy: 0, sell: 0, fees: 0 }
-      )
-    );
+    const isEmpty = computed(() => transactions.value.length === 0);
 
     const summaryToClassMap = {
       buy: 'text-green-6',
@@ -216,7 +206,7 @@ export default defineComponent({
     const matchToViewTransaction = <T extends Transaction>(
       viewTransaction: T
     ) =>
-      transactionsStore.transactions.find(
+      transactions.value.find(
         (transaction) => transaction.id === viewTransaction.id
       );
 

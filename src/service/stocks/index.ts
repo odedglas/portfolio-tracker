@@ -26,3 +26,6 @@ export const getTickerData = async (ticker: string) => {
     )?.regularMarketPrice,
   }));
 };
+
+export * from './schema';
+export { getQuotes };
