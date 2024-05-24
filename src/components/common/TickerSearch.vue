@@ -59,6 +59,7 @@ export interface TickerOption {
   value: string;
   label: string;
   logoImage?: string;
+  lastPrice?: number;
 }
 
 interface TickerMeta {

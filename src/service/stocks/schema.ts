@@ -198,3 +198,72 @@ interface Resolution {
   height: number;
   tag: string;
 }
+
+export interface StockChartResponse {
+  chart: {
+    result: ChartResult[];
+    error: unknown;
+  };
+}
+
+interface ChartResult {
+  meta: Meta;
+  timestamp: number[];
+  indicators: Indicators;
+}
+
+interface Meta {
+  currency: string;
+  symbol: string;
+  exchangeName: string;
+  fullExchangeName: string;
+  instrumentType: string;
+  firstTradeDate: number;
+  regularMarketTime: number;
+  hasPrePostMarketData: boolean;
+  gmtoffset: number;
+  timezone: string;
+  exchangeTimezoneName: string;
+  regularMarketPrice: number;
+  fiftyTwoWeekHigh: number;
+  fiftyTwoWeekLow: number;
+  regularMarketDayHigh: number;
+  regularMarketDayLow: number;
+  regularMarketVolume: number;
+  chartPreviousClose: number;
+  priceHint: number;
+  currentTradingPeriod: TradingPeriod;
+  dataGranularity: string;
+  range: string;
+  validRanges: string[];
+}
+
+interface TradingPeriod {
+  pre: Period;
+  regular: Period;
+  post: Period;
+}
+
+interface Period {
+  timezone: string;
+  start: number;
+  end: number;
+  gmtoffset: number;
+}
+
+interface Indicators {
+  quote: QuoteIndicator[];
+  adjclose: AdjCloseIndicator[];
+}
+
+interface QuoteIndicator {
+  close: number[];
+  volume: number[];
+  open: number[];
+  low: number[];
+  high: number[];
+}
+
+interface AdjCloseIndicator {
+  adjclose: number[];
+}

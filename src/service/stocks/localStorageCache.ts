@@ -41,3 +41,32 @@ export const localStorageCache = {
     localStorage.setItem(key, JSON.stringify(cacheItem));
   },
 };
+
+type CacheKeyFunction<
+  T extends (...args: never) => Promise<Awaited<ReturnType<T>>>
+> = (...args: Parameters<T>) => string;
+type CacheKey<T extends (...args: never) => Promise<Awaited<ReturnType<T>>>> =
+  | string
+  | CacheKeyFunction<T>;
+
+export const cachedOperation = <
+  T extends (...args: never[]) => Promise<Awaited<ReturnType<T>>>
+>(
+  fn: T,
+  key: CacheKey<T>,
+  expiration?: number
+): ((...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>>) => {
+  return async (...args: Parameters<T>): Promise<Awaited<ReturnType<T>>> => {
+    const keyValue = typeof key === 'string' ? key : key(...args);
+
+    if (localStorageCache.exists(keyValue)) {
+      return Promise.resolve(localStorageCache.get<ReturnType<T>>(keyValue));
+    }
+
+    const result = await fn(...args);
+
+    localStorageCache.set(keyValue, result, expiration);
+
+    return result;
+  };
+};

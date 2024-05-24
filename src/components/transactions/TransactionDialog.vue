@@ -211,11 +211,10 @@ export default defineComponent({
     };
 
     const onTickerOptionSelect = (tickerOption: TickerOption) => {
-      debugger;
-
       localTransaction.value.ticker = tickerOption?.value || '';
       localTransaction.value.name = tickerOption?.label;
       localTransaction.value.logoImage = tickerOption?.logoImage;
+      localTransaction.value.price = tickerOption?.lastPrice ?? 0;
     };
 
     const saveTransaction = async (transaction: Transaction) => {

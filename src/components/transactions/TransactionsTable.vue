@@ -150,6 +150,7 @@
 import { defineComponent, ref, PropType, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { date } from 'quasar';
+import { useTransactionsStore } from 'src/stores/transactions';
 import { Transaction } from 'src/types';
 import { TRANSACTIONS_TYPES } from 'src/constants';
 import { columns } from './columns';
@@ -161,18 +162,15 @@ export default defineComponent({
       required: true,
       type: Function as PropType<(transaction?: Transaction) => void>,
     },
-    transactions: {
-      required: true,
-      type: Object as PropType<Transaction[]>,
-    },
   },
   emit: ['deleteTransaction', 'editTransaction'],
-  setup(props) {
+  setup() {
     const $n = useI18n().n;
     const filter = ref('');
+    const transactionsStore = useTransactionsStore();
 
     const viewTransactions = computed(() =>
-      props.transactions.map((transaction) => {
+      transactionsStore.transactions.map((transaction) => {
         const isBuyAction = transaction.action === TRANSACTIONS_TYPES.BUY;
 
         return {
@@ -193,10 +191,10 @@ export default defineComponent({
       })
     );
 
-    const isEmpty = computed(() => props.transactions.length === 0);
+    const isEmpty = computed(() => transactionsStore.transactions.length === 0);
 
     const summary = computed(() =>
-      props.transactions.reduce(
+      transactionsStore.transactions.reduce(
         (summary, transaction) => {
           const transactionValue = transaction.shares * transaction.price;
 
@@ -218,7 +216,7 @@ export default defineComponent({
     const matchToViewTransaction = <T extends Transaction>(
       viewTransaction: T
     ) =>
-      props.transactions.find(
+      transactionsStore.transactions.find(
         (transaction) => transaction.id === viewTransaction.id
       );
 

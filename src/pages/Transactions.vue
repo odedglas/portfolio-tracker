@@ -4,7 +4,6 @@
       <p class="text-h5 text-grey-7 q-my-md">{{ $t('transactions.header') }}</p>
       <transactions-table
         v-if="!isLoading"
-        :transactions="transactions"
         @delete-transaction="deleteTransaction"
         @edit-transaction="showCreateOrEditTransaction"
         :show-or-edit-transaction="showCreateOrEditTransaction"
@@ -45,6 +44,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch, onMounted } from 'vue';
 import { usePortfolioStore } from 'src/stores/portfolios';
+import { useTransactionsStore } from 'src/stores/transactions';
 import { useLoadingStore } from 'stores/loading';
 import transactionsAPI from 'src/service/transactions';
 import { useAreYouSure } from 'src/components/composables/useAreYouSureDialog';
@@ -61,21 +61,18 @@ export default defineComponent({
 
   setup() {
     const portfolioStore = usePortfolioStore();
+    const transactionsStore = useTransactionsStore();
     const { emitLoadingTask } = useLoadingStore();
     const { showAreYouSure } = useAreYouSure();
 
-    const currentPortfolioId = ref(portfolioStore.selectedPortfolioId);
     const isLoading = ref(true);
     const showTransactionsModal = ref(false);
-    const transactions = ref<Transaction[]>([]);
     const transactionToEdit = ref<Transaction | undefined>(undefined);
 
     onMounted(async () => {
-      currentPortfolioId.value = portfolioStore.selectedPortfolioId;
-      if (currentPortfolioId.value && !transactions.value.length) {
-        transactions.value = await transactionsAPI.list(
-          currentPortfolioId.value
-        );
+      const selectedPortfolioId = portfolioStore.selectedPortfolioId;
+      if (selectedPortfolioId) {
+        await transactionsAPI.list(selectedPortfolioId);
 
         isLoading.value = false;
       }
@@ -88,9 +85,7 @@ export default defineComponent({
           return;
         }
 
-        currentPortfolioId.value = portfolioId;
-        transactions.value = await transactionsAPI.list(portfolioId);
-
+        await transactionsStore.list();
         isLoading.value = false;
       }
     );
@@ -109,23 +104,16 @@ export default defineComponent({
       showTransactionsModal.value = false;
     };
 
-    const syncTransactionState = (transaction: Transaction, remove = false) => {
-      if (remove) {
-        transactions.value = transactions.value.filter(
-          (t) => t.id !== transaction.id
-        );
-        return;
-      }
+    const syncTransactionState = (transaction: Transaction) => {
+      const existing =
+        transactionsStore.transactions.find((t) => t.id === transaction.id) !==
+        undefined;
 
-      const updateIndex = transactions.value.findIndex(
-        (t) => t.id === transaction.id
-      );
-      if (updateIndex < 0) {
-        transactions.value.push(transaction);
-        return;
+      if (!existing) {
+        transactionsStore.add(transaction);
+      } else {
+        transactionsStore.update(transaction);
       }
-
-      transactions.value[updateIndex] = transaction;
     };
 
     const deleteTransaction = (transaction: Transaction) => {
@@ -135,14 +123,13 @@ export default defineComponent({
         callback: async () => {
           await emitLoadingTask(() => transactionsAPI.delete(transaction.id));
 
-          syncTransactionState(transaction, true);
+          transactionsStore.remove(transaction.id);
         },
       });
     };
 
     return {
       isLoading,
-      transactions,
       hideTransactionsModal,
       showCreateOrEditTransaction,
       showTransactionsModal,

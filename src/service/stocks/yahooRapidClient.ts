@@ -1,6 +1,11 @@
 import axios from 'axios';
-import { GetQuotesResponse, GetSearchResponse } from './schema';
-
+import {
+  GetQuotesResponse,
+  GetSearchResponse,
+  StockChartResponse,
+} from './schema';
+import { startOfDay, tomorrow, toEpocNumeric, fromEpocNumeric } from './dates';
+import { cachedOperation } from 'src/service/stocks/localStorageCache';
 const axiosInstance = axios.create({
   baseURL: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com',
   headers: {
@@ -25,14 +30,46 @@ const getRequest = async <Resolved>(url: string, params: object) => {
   }
 };
 
-export const search = async (query: string) =>
-  getRequest<GetSearchResponse>('/auto-complete', {
-    q: query,
-    region: 'US',
-  });
+export const search = cachedOperation(
+  (query: string) =>
+    getRequest<GetSearchResponse>('/auto-complete', {
+      q: query,
+      region: 'US',
+    }),
+  (query: string) => `ticker-search-${query}`
+);
 
-export const getQuotes = (tickers: string[]) =>
-  getRequest<GetQuotesResponse>('market/v2/get-quotes', {
-    region: 'US',
-    symbols: tickers.join(','),
-  });
+export const getQuotes = cachedOperation(
+  (tickers: string[]) =>
+    getRequest<GetQuotesResponse>('market/v2/get-quotes', {
+      region: 'US',
+      symbols: tickers.join(','),
+    }),
+  (tickers: string[]) => `ticker-quotes-${tickers.join('-')}`
+);
+
+export const getDailyPrice = async (ticker: string, date = new Date()) => {
+  const start = startOfDay(date);
+  const end = tomorrow(start);
+
+  const chartResult = await getRequest<StockChartResponse>(
+    'stock/v3/get-chart',
+    {
+      interval: '1d',
+      symbol: ticker,
+      region: 'US',
+      includePrePost: false,
+      useYfid: false,
+      includeAdjustedClose: false,
+      period1: toEpocNumeric(start),
+      period2: toEpocNumeric(end),
+    }
+  );
+
+  const [dailyResult] = chartResult.chart.result;
+
+  return {
+    ...dailyResult,
+    timestamp: dailyResult.timestamp.map((t) => fromEpocNumeric(t)),
+  };
+};
