@@ -1,4 +1,4 @@
-import { LOGIN_META } from './constants';
+import { LOGIN_META, TRANSACTIONS_TYPES } from './constants';
 
 export type LoginMode = keyof typeof LOGIN_META;
 
@@ -18,4 +18,21 @@ export interface Portfolio {
   invested: number;
   profit: number;
   deposits: Deposit[];
+}
+
+export type TransactionAction =
+  (typeof TRANSACTIONS_TYPES)[keyof typeof TRANSACTIONS_TYPES];
+
+export interface Transaction {
+  id: string;
+  createdAt: number;
+  action: TransactionAction;
+  date: number;
+  shares: number;
+  price: number;
+  fees?: number;
+  ticker: string;
+  name: string;
+  logoImage?: string;
+  portfolioId: string;
 }

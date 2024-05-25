@@ -6,11 +6,23 @@
       </h3>
       <portfolio-list
         v-if="!loading"
-        :portfolios="portfolios"
+        :portfolios="portfolioStore.portfolios"
         class="col-12"
         :edit-portfolio="showCreateOrEditPortfolio"
         :delete-portfolio="deletePortfolio"
       />
+      <div class="flex items-center column" v-if="isEmpty">
+        <p class="text-body1 q-my-md">
+          {{ $t('portfolios.empty') }}
+        </p>
+        <img
+          class="q-mr-md"
+          src="~assets/cactus.svg"
+          alt="empty-state"
+          style="height: 180px"
+        />
+      </div>
+
       <div v-if="!loading" class="row justify-end q-my-md">
         <q-btn
           size="md"
@@ -39,82 +51,59 @@
     </div>
     <portfolio-dialog
       :portfolio="portfolioToEdit"
-      @close-portfolio="() => (portfolioToEdit = undefined)"
-      @save-portfolio="savePortfolio"
+      :show="showPortfolioDialog"
+      @close-portfolio="onPortfolioDialogClose"
     />
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, Ref } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 
 import { useLoadingStore } from 'stores/loading';
+import { usePortfolioStore } from 'src/stores/portfolios';
 import portfolioAPI from 'src/service/portfolio';
 import { useAreYouSure } from 'src/components/composables/useAreYouSureDialog';
 import PortfolioList from 'src/components/portfolio/PortfolioList.vue';
 import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
 import { Portfolio } from 'src/types';
 
-const emptyPortfolioTemplate = (): Portfolio => ({
-  id: '',
-  title: '',
-  currentValue: 0,
-  invested: 0,
-  target: 0,
-  profit: 0,
-  owner: 'none',
-  createdAt: Date.now(),
-  deposits: [],
-});
-
 export default defineComponent({
-  name: 'PortfoliosPage',
+  name: 'ManagePortfoliosPage',
   components: {
     PortfolioList,
     PortfolioDialog,
   },
   setup() {
+    const portfolioStore = usePortfolioStore();
+    const { emitLoadingTask } = useLoadingStore();
     const { showAreYouSure } = useAreYouSure();
 
+    const isEmpty = ref(false);
+    const showPortfolioDialog = ref(false);
     const loading = ref(true);
     const portfolioToEdit = ref<Partial<Portfolio> | undefined>(undefined);
-    const portfolios: Ref<Portfolio[]> = ref([]);
-    const { emitLoadingTask } = useLoadingStore();
 
     onMounted(async () => {
-      portfolios.value = await emitLoadingTask(() => portfolioAPI.all());
+      const portfolios = await portfolioStore.list();
 
       loading.value = false;
+      isEmpty.value = portfolios?.length === 0;
     });
 
     const showCreateOrEditPortfolio = async (portfolio?: Portfolio) => {
       const isEdit = !!portfolio?.id;
-      portfolioToEdit.value = isEdit
-        ? { ...portfolio }
-        : emptyPortfolioTemplate();
+      if (isEdit) {
+        portfolioToEdit.value = { ...portfolio };
+      }
+
+      showPortfolioDialog.value = true;
     };
 
-    const savePortfolio = async (portfolio: Portfolio) => {
-      let isNewPortfolio = !portfolio.id;
-
-      const syncState = (portfolio: Portfolio) => {
-        if (isNewPortfolio) {
-          portfolios.value.push(portfolio);
-        } else {
-          const index = portfolios.value.findIndex(
-            (p) => p.id === portfolio.id
-          );
-          portfolios.value[index] = portfolio;
-        }
-      };
-
-      const persisted = await emitLoadingTask(() =>
-        portfolioAPI.update(portfolio, portfolio.id)
-      );
-
+    const onPortfolioDialogClose = () => {
       portfolioToEdit.value = undefined;
-
-      syncState(persisted);
+      isEmpty.value = false;
+      showPortfolioDialog.value = false;
     };
 
     const deletePortfolio = (portfolio: Portfolio) => {
@@ -124,20 +113,20 @@ export default defineComponent({
         callback: async () => {
           await emitLoadingTask(() => portfolioAPI.delete(portfolio.id));
 
-          portfolios.value = portfolios.value.filter(
-            (p) => p.id !== portfolio.id
-          );
+          portfolioStore.remove(portfolio.id);
         },
       });
     };
 
     return {
       loading,
-      portfolios,
+      isEmpty,
+      showPortfolioDialog,
+      portfolioStore,
       portfolioToEdit,
       showCreateOrEditPortfolio,
+      onPortfolioDialogClose,
       deletePortfolio,
-      savePortfolio,
     };
   },
 });

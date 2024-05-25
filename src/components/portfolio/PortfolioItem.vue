@@ -77,7 +77,7 @@
                 </q-tooltip>
               </q-linear-progress>
               <div class="text-grey-6 text-caption row justify-between">
-                <span>{{ $n(portfolio.invested, 'currency') }}$</span>
+                <span>{{ $n(depositValue, 'currency') }}$</span>
                 <span>{{ $n(target.value, 'currency') }}$</span>
               </div>
             </div>
@@ -97,33 +97,14 @@
           icon="edit"
           @click="$emit('editPortfolio', portfolio)"
         />
-        <q-btn size="12px" flat dense round icon="more_vert">
-          <q-menu>
-            <q-list style="min-width: 200px">
-              <q-item
-                clickable
-                v-close-popup
-                @click="$emit('deletePortfolio', portfolio)"
-              >
-                <div
-                  class="col-12 row items-center gap-md text-grey-7"
-                  style="gap: 12px"
-                >
-                  <q-icon name="delete" size="18px" />
-                  {{ $t('delete') }}
-                </div>
-              </q-item>
-              <q-item v-close-popup>
-                <div
-                  class="col-12 row items-center gap-md text-grey-7"
-                  style="gap: 12px"
-                >
-                  <q-icon name="content_copy" size="18px" />
-                  {{ $t('clone') }}
-                </div>
-              </q-item>
-            </q-list>
-          </q-menu>
+        <q-btn
+          size="12px"
+          flat
+          dense
+          round
+          icon="delete"
+          @click="$emit('deletePortfolio', portfolio)"
+        >
         </q-btn>
       </div>
     </q-item-section>
@@ -164,18 +145,18 @@ export default defineComponent({
   setup(props) {
     const showTargets = ref(false);
     const { portfolio } = props;
+    const depositValue = viewTransformer.depositsValue(portfolio);
     const { target, profit } = viewTransformer.portfolioKPIS(portfolio);
 
     onMounted(() => {
       requestAnimationFrame(() => (showTargets.value = true));
     });
 
-
     const cashFlow = viewTransformer.cashFlow(portfolio);
 
     const profitMeta = profit.profitable ? positiveProfit : negativeProfit;
 
-    return { showTargets, target, profit, cashFlow, profitMeta };
+    return { showTargets, target, profit, cashFlow, profitMeta, depositValue };
   },
 });
 </script>

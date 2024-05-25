@@ -1,13 +1,18 @@
 import {
   collection,
+  query,
+  where,
   CollectionReference,
+  Query,
   doc,
   getDocs,
   getDoc,
+  addDoc,
   setDoc,
   deleteDoc,
 } from 'firebase/firestore';
 import { firestore } from './core';
+import { authentication } from './authentication';
 import { AppCollections, AppCollectionsNames } from './types';
 
 const createCollection = <CollectionName extends AppCollectionsNames>(
@@ -17,12 +22,49 @@ const createCollection = <CollectionName extends AppCollectionsNames>(
     AppCollections[CollectionName]
   >;
 
-export const collections = {
+/**
+ * Returns available application collections
+ */
+export const getCollections = () => ({
   portfolio: createCollection('portfolios'),
-} as const;
+  transaction: createCollection('transactions'),
+});
 
+/**
+ * List of pre-defined queries to fetch upon available applicative collections.
+ */
+export const queries = {
+  listUserPortfolios: async () => {
+    const portfoliosCollection = getCollections().portfolio;
+    const portfoliosQuery = query(
+      portfoliosCollection,
+      where('owner', '==', authentication.currentUser.uid)
+    );
+
+    const portfolios = await firestoreAPI.getAll(portfoliosQuery);
+
+    return portfolios.sort((p1, p2) => (p1.createdAt < p2.createdAt ? -1 : 1));
+  },
+
+  listPortfolioTransactions: async (portfolioId: string) => {
+    const transactionsCollection = getCollections().transaction;
+
+    const transactionsQuery = query(
+      transactionsCollection,
+      where('portfolioId', '==', portfolioId)
+    );
+
+    const transactions = await firestoreAPI.getAll(transactionsQuery);
+
+    return transactions.sort((t1, t2) => (t1.date < t2.date ? 1 : -1));
+  },
+};
+
+/**
+ * The Firestore API for document manipulations.
+ */
 export const firestoreAPI = {
-  getAll: async <T>(collection: CollectionReference<T>) => {
+  getAll: async <T>(collection: CollectionReference<T> | Query<T>) => {
     const { docs } = await getDocs(collection);
 
     return docs.map((doc) => ({ ...doc.data(), id: doc.id }));
@@ -49,6 +91,9 @@ export const firestoreAPI = {
     const docReference = doc(collection, identifier);
 
     await setDoc(docReference, { ...data }, { merge: true });
+  },
+  addDocument: <T>(collection: CollectionReference<T>, data: T) => {
+    return addDoc(collection, data);
   },
   deleteDocument: async <T>(
     identifier: string,

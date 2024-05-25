@@ -1,7 +1,6 @@
 <template>
   <q-form @submit.prevent.stop="loginWithPassword" class="q-gutter-sm">
     <q-input
-      filled
       v-model="email"
       type="email"
       lazy-rules
@@ -15,7 +14,6 @@
       leave-active-class="animated slideOutRight"
     >
       <q-input
-        filled
         v-if="loginMeta?.isSignUp"
         type="text"
         v-model="displayName"
@@ -28,7 +26,6 @@
       />
     </transition>
     <q-input
-      filled
       type="password"
       v-model="password"
       label="Password"

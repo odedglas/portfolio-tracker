@@ -7,43 +7,25 @@
         <app-navigation class="desktop-only" />
       </q-toolbar-title>
 
-      <q-btn-dropdown
-        color="white"
-        flat
-        no-caps
-        class="q-mx-sm"
-        icon="business_center"
-        label="My Portfolio"
-      >
-        <q-list style="min-width: 100px">
-          <q-item clickable>
-            <q-item-section>Having fun</q-item-section>
-          </q-item>
-          <q-item clickable>
-            <q-item-section>Crazy for transitions</q-item-section>
-          </q-item>
-          <q-separator />
-          <q-item clickable>
-            <q-item-section>Mind blown</q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
+      <portfolio-dropdown />
 
-      <q-avatar text-color="grey" color="white" class="text-subtitle1"
-        >P</q-avatar
-      >
+      <user-profile />
     </q-toolbar>
   </q-header>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import PortfolioDropdown from './PortfolioDropdown.vue';
 import AppNavigation from './Navigation.vue';
+import UserProfile from './UserProfile.vue';
 
 export default defineComponent({
   name: 'AppHeader',
   components: {
     AppNavigation,
+    PortfolioDropdown,
+    UserProfile,
   },
 });
 </script>

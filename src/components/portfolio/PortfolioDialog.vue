@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    v-model="show"
+    v-model="syntheticShow"
     backdrop-filter="blur(4px)"
     @before-show="setLocalPortfolio"
   >
@@ -12,16 +12,18 @@
             {{ isNew ? $t('portfolios.create') : $t('portfolios.edit') }}
           </q-toolbar-title>
           <q-space />
-          <q-btn flat round dense icon="close" @click="show = false" />
+          <q-btn
+            flat
+            round
+            dense
+            icon="close"
+            @click="$emit('closePortfolio')"
+          />
         </q-toolbar>
       </q-card-section>
 
       <q-card-section>
-        <q-form
-          ref="formRef"
-          @submit.prevent.stop="$emit('savePortfolio', localPortfolio)"
-          class="q-gutter-sm"
-        >
+        <q-form ref="formRef" class="q-gutter-sm">
           <q-input
             v-model="localPortfolio.title"
             type="text"
@@ -36,8 +38,9 @@
             v-model.number="localPortfolio.currentValue"
             type="number"
             lazy-rules
-            label="Initial Investment"
+            :label="$t('portfolios.initial_investment')"
             :disable="!isNew"
+            suffix="$"
             :hint="$t('portfolios.initial_value_explain')"
             :rules="[
               (val) =>
@@ -49,7 +52,7 @@
             v-model.number="localPortfolio.target"
             type="number"
             lazy-rules
-            label="Target"
+            :label="$t('portfolios.target')"
             :hint="$t('portfolios.target_explain')"
             suffix="$"
             :rules="[
@@ -61,7 +64,7 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat :label="$t('cancel')" @click="show = false" />
+        <q-btn flat :label="$t('cancel')" @click="$emit('closePortfolio')" />
         <q-btn
           color="primary"
           type="submit"
@@ -75,22 +78,44 @@
 
 <script lang="ts">
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
+import { useLoadingStore } from 'stores/loading';
+import { usePortfolioStore } from 'src/stores/portfolios';
+import portfolioAPI from 'src/service/portfolio';
 import { Portfolio } from 'src/types';
+
+const emptyPortfolioTemplate = (): Portfolio => ({
+  id: '',
+  title: '',
+  currentValue: 0,
+  invested: 0,
+  target: 0,
+  profit: 0,
+  owner: 'none',
+  createdAt: Date.now(),
+  deposits: [],
+});
 
 export default defineComponent({
   name: 'PortfolioDialog',
   props: {
+    show: {
+      type: Boolean,
+      required: true,
+    },
     portfolio: {
       type: Object as PropType<Partial<Portfolio> | undefined>,
     },
   },
-  emits: ['closePortfolio', 'savePortfolio'],
+  emits: ['closePortfolio'],
   setup(props, { emit }) {
+    const portfolioStore = usePortfolioStore();
+    const { emitLoadingTask } = useLoadingStore();
+
     const formRef: Ref<{ validate: () => void } | undefined> = ref(undefined);
     const localPortfolio = toRef(props.portfolio) as Ref<Partial<Portfolio>>;
 
-    const show = computed({
-      get: () => !!props.portfolio,
+    const syntheticShow = computed({
+      get: () => !!props.show,
       set: (value: boolean) => {
         if (!value) {
           emit('closePortfolio', undefined);
@@ -100,20 +125,37 @@ export default defineComponent({
 
     const isNew = computed(() => localPortfolio?.value?.id === '');
 
+    // Local portfolio value would be set to given props.portfolio or an empty one.
     const setLocalPortfolio = () => {
-      localPortfolio.value = { ...props.portfolio };
+      localPortfolio.value = {
+        ...(props.portfolio || emptyPortfolioTemplate()),
+      };
+    };
+
+    const savePortfolio = async (portfolio: Portfolio) => {
+      let isNewPortfolio = !portfolio.id;
+
+      const persisted = await emitLoadingTask(() =>
+        portfolioAPI.update(portfolio, portfolio.id)
+      );
+
+      if (isNewPortfolio) {
+        portfolioStore.add(persisted);
+      } else {
+        portfolioStore.update(persisted);
+      }
     };
 
     const submitForm = async () => {
       if (await formRef.value?.validate()) {
-        console.log(localPortfolio.value);
-        emit('savePortfolio', localPortfolio.value);
+        await savePortfolio(localPortfolio.value as Portfolio);
+        emit('closePortfolio');
       }
     };
 
     return {
       formRef,
-      show,
+      syntheticShow,
       isNew,
       localPortfolio,
       setLocalPortfolio,

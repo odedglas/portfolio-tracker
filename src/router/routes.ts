@@ -3,6 +3,9 @@ import { RouteRecordRaw } from 'vue-router';
 export const ROUTE_PATHS = {
   LOGIN: '/login',
   DASHBOARD: '/dashboard',
+  MANAGE_PORTFOLIOS: '/manage-portfolios',
+  TRANSACTIONS: '/transactions',
+  HOLDINGS: '/holdings',
 };
 
 const routes: RouteRecordRaw[] = [
@@ -27,8 +30,12 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: () => import('pages/Dashboard.vue') },
       {
-        path: '/manage-portfolios',
-        component: () => import('pages/Portfolios.vue'),
+        path: ROUTE_PATHS.TRANSACTIONS,
+        component: () => import('pages/Transactions.vue'),
+      },
+      {
+        path: ROUTE_PATHS.MANAGE_PORTFOLIOS,
+        component: () => import('pages/ManagePortfolios.vue'),
       },
     ],
   },

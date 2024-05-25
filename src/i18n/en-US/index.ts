@@ -7,6 +7,10 @@ export const enUsMessages = {
     dont_have_account: "Don't have an account yet ?",
     have_an_account: 'Already got an account ?',
   },
+  header: {
+    no_portfolios: 'You have no portfolios created just yet!',
+    manage_portfolios: 'Manage Portfolios',
+  },
   portfolios: {
     title: "Manage your Portfolio's",
     create: 'New Portfolio',
@@ -19,12 +23,29 @@ export const enUsMessages = {
       cash_flow: 'Cash Flow',
       current_value: 'Current Value',
     },
+    initial_investment: 'Initial Investment',
     initial_value_explain:
       'The initial value will be converted to a "Deposit" item you can later manage',
     target_explain: 'The Target will be used to track your portfolio progress',
+    empty: 'Still quiet here...',
   },
+  transactions: {
+    header: 'Portfolio Transactions',
+    search_ticker: 'Please enter a ticker symbol to search...',
+    create: 'New Transaction',
+    edit: 'Edit Transaction',
+    buy: 'Buy',
+    sell: 'Sell',
+    fees: 'Fees',
+    summary: 'Total transaction value',
+    add_your_first: 'Add your first transaction',
+    no_transactions_found:
+      "There aren't any transactions yet found within your portfolio.",
+  },
+  no_results: 'No results',
   cancel: 'Cancel',
   save: 'Save',
+  add: 'Add',
   clone: 'Clone',
   delete: 'Delete',
   yes: 'Yes',
@@ -40,8 +61,11 @@ export const enUsCurrency = {
     maximumFractionDigits: 0,
   },
   decimal: {
-    style: 'decimal',
+    style: 'currency',
+    currency: 'USD',
+    currencyDisplay: 'symbol',
     maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
   },
   percent: {
     style: 'percent',

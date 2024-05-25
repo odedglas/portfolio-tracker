@@ -1,25 +1,13 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
-  </q-page>
+  <q-page class="row items-center justify-evenly"> Dashboard </q-page>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
 
 export default defineComponent({
   name: 'DashboardPage',
-
-  components: {
-    ExampleComponent,
-  },
 
   setup() {
     const todos = ref<Todo[]>([
