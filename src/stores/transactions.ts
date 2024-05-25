@@ -1,6 +1,6 @@
 import { uniq } from 'lodash';
 import { defineStore } from 'pinia';
-import transactionsAPI from 'src/service/transactions';
+import transactionsAPI, { transformer } from 'src/service/transactions';
 import * as stocksAPI from 'src/service/stocks';
 import type { Quote } from 'src/service/stocks';
 import { usePortfolioStore } from './portfolios';
@@ -8,13 +8,17 @@ import { Transaction } from 'src/types';
 
 let loadedOnce = false;
 
+interface TransactionsStoreState {
+  transactions: Transaction[];
+  tickerQuotes: Record<string, Quote>;
+  loading: boolean;
+}
+
 export const useTransactionsStore = defineStore('transactions', {
-  state: (): {
-    transactions: Transaction[];
-    tickerQuotes: Record<string, Quote>;
-  } => ({
+  state: (): TransactionsStoreState => ({
     transactions: [],
     tickerQuotes: {},
+    loading: false,
   }),
   getters: {
     balanceMap: (state) => {
@@ -22,10 +26,9 @@ export const useTransactionsStore = defineStore('transactions', {
 
       return transactions.reduce((balanceMap, transaction) => {
         let balance = 0;
-        const transactionValue =
-          transaction.shares * transaction.price + (transaction.fees || 0);
+        const transactionValue = transformer.totalValue(transaction);
 
-        if (transaction.action === 'buy') {
+        if (transformer.isBuy(transaction)) {
           // Buy balance would be calculated by transaction value VS ticker last price from quote.
           const lastTickerValue = state.tickerQuotes[transaction.ticker];
 
@@ -38,7 +41,7 @@ export const useTransactionsStore = defineStore('transactions', {
           // Sell balance would be calculated by BUY type transactions FIFO style
           const buyTransactions = state.transactions
             .filter(
-              (t) => t.action === 'buy' && t.ticker === transaction.ticker
+              (t) => transformer.isBuy(t) && t.ticker === transaction.ticker
             )
             .reverse();
 
@@ -68,22 +71,11 @@ export const useTransactionsStore = defineStore('transactions', {
         return balanceMap;
       }, {} as Record<string, number>);
     },
-    summary: (state) => {
-      return state.transactions.reduce(
-        (summary, transaction) => {
-          const transactionValue = transaction.shares * transaction.price;
-
-          summary[transaction.action] += transactionValue;
-          summary.fees += transaction.fees || 0;
-
-          return summary;
-        },
-        { buy: 0, sell: 0, fees: 0 }
-      );
-    },
+    summary: (state) => transformer.summary(state.transactions),
   },
   actions: {
     async list() {
+      this.loading = true;
       const { selectedPortfolioId } = usePortfolioStore();
 
       if (!selectedPortfolioId) {
@@ -96,6 +88,7 @@ export const useTransactionsStore = defineStore('transactions', {
 
       const transactions = await transactionsAPI.list(selectedPortfolioId);
       if (!transactions.length) {
+        this.loading = false;
         this.transactions = [];
         return this.transactions;
       }
@@ -112,6 +105,7 @@ export const useTransactionsStore = defineStore('transactions', {
       this.transactions = transactions;
 
       loadedOnce = true;
+      this.loading = false;
 
       return this.transactions;
     },

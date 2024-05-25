@@ -3,7 +3,7 @@
     <div class="col-11">
       <p class="text-h5 text-grey-7 q-my-md">{{ $t('transactions.header') }}</p>
       <transactions-table
-        v-if="!isLoading"
+        v-if="!transactionsStore.loading"
         @delete-transaction="deleteTransaction"
         @edit-transaction="showCreateOrEditTransaction"
         :show-or-edit-transaction="showCreateOrEditTransaction"
@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useTransactionsStore } from 'src/stores/transactions';
 import { useLoadingStore } from 'stores/loading';
 import transactionsAPI from 'src/service/transactions';
@@ -55,6 +55,10 @@ export default defineComponent({
   name: 'TransactionsPage',
   components: {
     TransactionsTable,
+
+
+
+
     TransactionDialog,
   },
 
@@ -63,16 +67,8 @@ export default defineComponent({
     const { emitLoadingTask } = useLoadingStore();
     const { showAreYouSure } = useAreYouSure();
 
-    const isLoading = ref(true);
     const showTransactionsModal = ref(false);
     const transactionToEdit = ref<Transaction | undefined>(undefined);
-
-    watch(
-      () => transactionsStore.transactions,
-      () => {
-        isLoading.value = false;
-      }
-    );
 
     const showCreateOrEditTransaction = async (transaction?: Transaction) => {
       const isEdit = !!transaction?.id;
@@ -113,7 +109,7 @@ export default defineComponent({
     };
 
     return {
-      isLoading,
+      transactionsStore,
       hideTransactionsModal,
       showCreateOrEditTransaction,
       showTransactionsModal,

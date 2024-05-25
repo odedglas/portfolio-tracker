@@ -99,7 +99,7 @@
         <q-td key="total_profit" :props="props">
           <div class="flex column" :class="props.row.balance.textClass">
             <span
-              ><q-icon :name="props.row.profit.icon" />{{
+              ><q-icon :name="props.row.profit.icon" size="sm" />{{
                 props.row.profit.percent
               }}</span
             >
@@ -159,8 +159,8 @@ import { useI18n } from 'vue-i18n';
 import { date } from 'quasar';
 import { storeToRefs } from 'pinia';
 import { useTransactionsStore } from 'src/stores/transactions';
+import { transformer } from 'src/service/transactions';
 import { Transaction } from 'src/types';
-import { TRANSACTIONS_TYPES } from 'src/constants';
 import { columns } from './columns';
 
 export default defineComponent({
@@ -182,10 +182,9 @@ export default defineComponent({
 
     const viewTransactions = computed(() =>
       transactions.value.map((transaction) => {
-        const isBuyAction = transaction.action === TRANSACTIONS_TYPES.BUY;
+        const isBuyAction = transformer.isBuy(transaction);
         const profitValue = balanceMap.value[transaction.id] ?? 0;
-        const transactionValue =
-          transaction.shares * transaction.price + (transaction.fees || 0);
+        const transactionValue = transformer.totalValue(transaction);
 
         return {
           ...transaction,
