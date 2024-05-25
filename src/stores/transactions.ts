@@ -19,7 +19,7 @@ export const useTransactionsStore = defineStore('transactions', {
   getters: {
     balanceMap: (state) => {
       const transactions = [...state.transactions];
-      debugger;
+
       return transactions.reduce((balanceMap, transaction) => {
         let balance = 0;
         const transactionValue =
@@ -95,6 +95,10 @@ export const useTransactionsStore = defineStore('transactions', {
       }
 
       const transactions = await transactionsAPI.list(selectedPortfolioId);
+      if (!transactions.length) {
+        this.transactions = [];
+        return this.transactions;
+      }
 
       const tickers = uniq(
         transactions.map((transaction) => transaction.ticker)

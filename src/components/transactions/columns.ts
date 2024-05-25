@@ -31,7 +31,7 @@ export const columns: QTableProps['columns'] = [
     field: 'shares',
     sortable: true,
   },
-  { name: 'price', align: 'center', label: 'Price', field: 'price' },
+  { name: 'price', align: 'center', label: 'Price per share', field: 'price' },
   { name: 'fees', align: 'center', label: 'Fees', field: 'fees' },
   {
     name: 'balance',

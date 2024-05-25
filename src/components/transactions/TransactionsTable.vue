@@ -97,7 +97,14 @@
           {{ props.row.balance.sign }}{{ props.row.balance.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
-          {{ props.row.profit }}
+          <div class="flex column" :class="props.row.balance.textClass">
+            <span
+              ><q-icon :name="props.row.profit.icon" />{{
+                props.row.profit.percent
+              }}</span
+            >
+            <span>{{ props.row.profit.value }}</span>
+          </div>
         </q-td>
         <q-td key="item_actions" :props="props" class="text-grey-6">
           <q-btn
@@ -176,21 +183,25 @@ export default defineComponent({
     const viewTransactions = computed(() =>
       transactions.value.map((transaction) => {
         const isBuyAction = transaction.action === TRANSACTIONS_TYPES.BUY;
+        const profitValue = balanceMap.value[transaction.id] ?? 0;
+        const transactionValue =
+          transaction.shares * transaction.price + (transaction.fees || 0);
 
         return {
           ...transaction,
           actionTextClass: isBuyAction ? 'text-green-4' : 'text-red-4',
           balance: {
-            value: $n(
-              transaction.shares * transaction.price + (transaction.fees || 0),
-              'decimal'
-            ),
+            value: $n(transactionValue, 'decimal'),
             textClass: isBuyAction ? 'text-red-6' : 'text-green-6',
             sign: isBuyAction ? '-' : '+',
           },
           price: transaction.price,
           date: date.formatDate(transaction.date, 'MM/DD/YY'),
-          profit: $n(balanceMap.value[transaction.id] ?? 0, 'decimal'),
+          profit: {
+            value: $n(profitValue, 'decimal'),
+            percent: $n(Math.abs(profitValue / transactionValue), 'percent'),
+            icon: profitValue > 0 ? 'arrow_drop_up' : 'arrow_drop_down',
+          },
         };
       })
     );
