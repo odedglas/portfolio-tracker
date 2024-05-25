@@ -49,14 +49,13 @@ import transactionsAPI from 'src/service/transactions';
 import { useAreYouSure } from 'src/components/composables/useAreYouSureDialog';
 import TransactionsTable from 'src/components/transactions/TransactionsTable.vue';
 import TransactionDialog from 'src/components/transactions/TransactionDialog.vue';
+
 import { Transaction } from 'src/types';
 
 export default defineComponent({
   name: 'TransactionsPage',
   components: {
     TransactionsTable,
-
-
 
 
     TransactionDialog,
