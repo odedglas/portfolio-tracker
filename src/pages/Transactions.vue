@@ -57,7 +57,6 @@ export default defineComponent({
   components: {
     TransactionsTable,
 
-
     TransactionDialog,
   },
 
@@ -66,7 +65,11 @@ export default defineComponent({
     const { emitLoadingTask } = useLoadingStore();
     const { showAreYouSure } = useAreYouSure();
 
-    const showTransactionsModal = ref(false);
+    const showTransactionsModal = ref(
+
+      false
+
+    );
     const transactionToEdit = ref<Transaction | undefined>(undefined);
 
     const showCreateOrEditTransaction = async (transaction?: Transaction) => {
