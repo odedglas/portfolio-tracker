@@ -29,7 +29,7 @@ export const usePortfolioStore = defineStore('portfolios', {
 
       this.selectedPortfolioId = portfolioId;
 
-      await transactionsStore.list();
+      await transactionsStore.list(portfolioId);
     },
     async list() {
       const persisted = localStorage.getItem(selectedPortfolioStorageKey);
@@ -46,7 +46,7 @@ export const usePortfolioStore = defineStore('portfolios', {
       const portfolioToSelect =
         this.portfolios.find((p) => p.id === persisted) ?? this.portfolios[0];
 
-      this.selectPortfolio(portfolioToSelect.id);
+      await this.selectPortfolio(portfolioToSelect.id);
 
       localStorage.setItem(
         selectedPortfolioStorageKey,

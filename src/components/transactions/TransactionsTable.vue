@@ -81,7 +81,7 @@
           {{ props.row.date }}
         </q-td>
         <q-td key="shares" :props="props">
-          {{ props.row.shares }}
+          {{ props.row.actualShares }}
         </q-td>
         <q-td key="price" :props="props">
           {{ $n(props.row.price, 'decimal') }}
@@ -90,14 +90,14 @@
           {{ props.row.fees ? $n(props.row.fees, 'decimal') : 'None' }}
         </q-td>
         <q-td
-          key="balance"
-          :class="`${props.row.balance.textClass} text-bold`"
+          key="totalValue"
+          :class="`${props.row.totalValue.textClass} text-bold`"
           :props="props"
         >
-          {{ props.row.balance.sign }}{{ props.row.balance.value }}
+          {{ props.row.totalValue.sign }}{{ props.row.totalValue.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
-          <div class="flex column" :class="props.row.balance.textClass">
+          <div class="flex column" :class="props.row.totalValue.textClass">
             <span
               ><q-icon :name="props.row.profit.icon" size="sm" />{{
                 props.row.profit.percent
@@ -130,6 +130,14 @@
             "
           >
           </q-btn>
+        </q-td>
+      </q-tr>
+    </template>
+
+    <template v-slot:bottom-row>
+      <q-tr>
+        <q-td colspan="100%">
+          <span class="text-bold">Total</span>
         </q-td>
       </q-tr>
     </template>
@@ -189,7 +197,7 @@ export default defineComponent({
         return {
           ...transaction,
           actionTextClass: isBuyAction ? 'text-green-4' : 'text-red-4',
-          balance: {
+          totalValue: {
             value: $n(transactionValue, 'decimal'),
             textClass: isBuyAction ? 'text-red-6' : 'text-green-6',
             sign: isBuyAction ? '-' : '+',

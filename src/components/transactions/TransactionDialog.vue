@@ -76,7 +76,7 @@
 
           <div class="row" style="gap: 12px">
             <q-input
-              v-model.number="localTransaction.shares"
+              v-model.number="localTransaction.actualShares"
               class="col"
               type="text"
               lazy-rules
@@ -154,6 +154,7 @@ const emptyTransaction = (): Transaction => {
     date: Date.now(),
     createdAt: Date.now(),
     shares: 0,
+    actualShares: 0,
     price: 0,
     fees: 0,
     ticker: '',

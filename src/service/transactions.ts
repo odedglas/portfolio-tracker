@@ -24,6 +24,8 @@ const api = {
 
     if (!transactionId) {
       data.createdAt = Date.now();
+      data.actualShares = data.shares;
+      delete data.id;
 
       const result = await firestoreAPI.addDocument(
         transactionsCollection(),

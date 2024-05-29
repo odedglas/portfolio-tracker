@@ -29,9 +29,21 @@ export interface Transaction {
   action: TransactionAction;
   date: number;
   shares: number;
+  actualShares: number;
   price: number;
   fees?: number;
   ticker: string;
+  name: string;
+  logoImage?: string;
+  portfolioId: string;
+}
+
+export interface Holding {
+  id: string;
+  createdAt: number;
+  shares: number;
+  ticker: string;
+  avgPrice: number;
   name: string;
   logoImage?: string;
   portfolioId: string;

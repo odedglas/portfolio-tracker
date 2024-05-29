@@ -34,10 +34,10 @@ export const columns: QTableProps['columns'] = [
   { name: 'price', align: 'center', label: 'Price per share', field: 'price' },
   { name: 'fees', align: 'center', label: 'Fees', field: 'fees' },
   {
-    name: 'balance',
+    name: 'totalValue',
     align: 'center',
-    label: 'Balance',
-    field: 'balance',
+    label: 'Total Value',
+    field: 'totalValue',
   },
   { name: 'total_profit', align: 'center', label: 'Profit', field: 'profit' },
   { name: 'item_actions', align: 'center', label: '', field: 'none' },

@@ -3,10 +3,7 @@ import { defineStore } from 'pinia';
 import transactionsAPI, { transformer } from 'src/service/transactions';
 import * as stocksAPI from 'src/service/stocks';
 import type { Quote } from 'src/service/stocks';
-import { usePortfolioStore } from './portfolios';
 import { Transaction } from 'src/types';
-
-let loadedOnce = false;
 
 interface TransactionsStoreState {
   transactions: Transaction[];
@@ -22,7 +19,9 @@ export const useTransactionsStore = defineStore('transactions', {
   }),
   getters: {
     balanceMap: (state) => {
-      const transactions = [...state.transactions];
+      const transactions = [...state.transactions].sort((t1, t2) =>
+        t1.date < t2.date ? 1 : -1
+      );
 
       return transactions.reduce((balanceMap, transaction) => {
         let balance = 0;
@@ -56,10 +55,10 @@ export const useTransactionsStore = defineStore('transactions', {
               soldShares
             );
 
-            const transactionConst =
+            const transactionCost =
               buyTransaction.price * availableSharesToSell -
               (buyTransaction.fees ?? 0);
-            balance -= transactionConst;
+            balance -= transactionCost;
 
             soldShares -= buyTransaction.shares;
             iterator++;
@@ -74,19 +73,14 @@ export const useTransactionsStore = defineStore('transactions', {
     summary: (state) => transformer.summary(state.transactions),
   },
   actions: {
-    async list() {
+    async list(portfolioId: string) {
       this.loading = true;
-      const { selectedPortfolioId } = usePortfolioStore();
 
-      if (!selectedPortfolioId) {
+      if (!portfolioId) {
         throw Error('Cannot list transactions without Portfolio id');
       }
 
-      if (loadedOnce) {
-        return this.transactions;
-      }
-
-      const transactions = await transactionsAPI.list(selectedPortfolioId);
+      const transactions = await transactionsAPI.list(portfolioId);
       if (!transactions.length) {
         this.loading = false;
         this.transactions = [];
@@ -104,7 +98,6 @@ export const useTransactionsStore = defineStore('transactions', {
 
       this.transactions = transactions;
 
-      loadedOnce = true;
       this.loading = false;
 
       return this.transactions;
