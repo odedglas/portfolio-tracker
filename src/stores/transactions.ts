@@ -70,7 +70,10 @@ export const useTransactionsStore = defineStore('transactions', {
         return balanceMap;
       }, {} as Record<string, number>);
     },
-    summary: (state) => transformer.summary(state.transactions),
+    summary: (state) => {
+      console.log(transformer.summary(state.transactions));
+      return transformer.summary(state.transactions);
+    },
   },
   actions: {
     async list(portfolioId: string) {
@@ -102,9 +105,9 @@ export const useTransactionsStore = defineStore('transactions', {
 
       return this.transactions;
     },
-    remove(transactionId: string) {
+    remove(transaction: Transaction) {
       this.transactions = this.transactions.filter(
-        (transaction) => transaction.id !== transactionId
+        (t) => t.id !== transaction.id
       );
     },
     add(transaction: Transaction) {

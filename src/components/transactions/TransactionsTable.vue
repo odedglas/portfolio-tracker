@@ -27,7 +27,7 @@
               v-for="[keyName, value] in Object.entries(summary)"
               :key="keyName"
             >
-              <span class="flex items-center text-grey-8">
+              <span class="flex no-wrap items-center text-grey-8">
                 <span
                   :class="`summary-indicator text-weight-bold q-mr-sm ${summaryToClassMap[keyName]}`"
                   >•</span
@@ -81,7 +81,7 @@
           {{ props.row.date }}
         </q-td>
         <q-td key="shares" :props="props">
-          {{ props.row.actualShares }}
+          {{ props.row.shares }}
         </q-td>
         <q-td key="price" :props="props">
           {{ $n(props.row.price, 'decimal') }}
@@ -97,7 +97,7 @@
           {{ props.row.totalValue.sign }}{{ props.row.totalValue.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
-          <div class="flex column" :class="props.row.totalValue.textClass">
+          <div class="flex column" :class="props.row.profit.textClass">
             <span
               ><q-icon :name="props.row.profit.icon" size="sm" />{{
                 props.row.profit.percent
@@ -206,6 +206,7 @@ export default defineComponent({
           date: date.formatDate(transaction.date, 'MM/DD/YY'),
           profit: {
             value: $n(profitValue, 'decimal'),
+            textClass: profitValue > 0 ? 'text-green-6' : 'text-red-6',
             percent: $n(Math.abs(profitValue / transactionValue), 'percent'),
             icon: profitValue > 0 ? 'arrow_drop_up' : 'arrow_drop_down',
           },

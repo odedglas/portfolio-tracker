@@ -36,6 +36,7 @@ export interface Transaction {
   name: string;
   logoImage?: string;
   portfolioId: string;
+  realizedProfit?: number;
 }
 
 export interface Holding {

@@ -36,6 +36,8 @@
             <q-select
               class="col text-capitalize"
               v-model="localTransaction.action"
+              :disable="!isNew"
+              :emit-value="true"
               :options="transactionActions"
               label="Operation"
             />
@@ -80,6 +82,7 @@
               class="col"
               type="text"
               lazy-rules
+              :disable="!isNew"
               label="Shares"
               :rules="[
                 (val) =>
@@ -242,7 +245,7 @@ export default defineComponent({
 
     const totalTransaction = computed(() => {
       return (
-        localTransaction.value.price * localTransaction.value.shares +
+        localTransaction.value.price * localTransaction.value.actualShares +
         (localTransaction.value.fees || 0)
       );
     });

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import portfolioAPI from 'src/service/portfolio';
 import { Portfolio } from 'src/types';
 import { useTransactionsStore } from 'stores/transactions';
+import { useHoldingsStore } from 'stores/holdings';
 
 const selectedPortfolioStorageKey = 'selected_portfolio_id';
 
@@ -25,11 +26,15 @@ export const usePortfolioStore = defineStore('portfolios', {
   actions: {
     async selectPortfolio(portfolioId: string) {
       const transactionsStore = useTransactionsStore();
+      const holdingsStore = useHoldingsStore();
       localStorage.setItem(selectedPortfolioStorageKey, portfolioId);
 
       this.selectedPortfolioId = portfolioId;
 
-      await transactionsStore.list(portfolioId);
+      await Promise.all([
+        transactionsStore.list(portfolioId),
+        holdingsStore.list(portfolioId),
+      ]);
     },
     async list() {
       const persisted = localStorage.getItem(selectedPortfolioStorageKey);
@@ -46,14 +51,16 @@ export const usePortfolioStore = defineStore('portfolios', {
       const portfolioToSelect =
         this.portfolios.find((p) => p.id === persisted) ?? this.portfolios[0];
 
-      await this.selectPortfolio(portfolioToSelect.id);
+      if (portfolioToSelect) {
+        await this.selectPortfolio(portfolioToSelect.id);
 
-      localStorage.setItem(
-        selectedPortfolioStorageKey,
-        this.selectedPortfolioId as string
-      );
+        localStorage.setItem(
+          selectedPortfolioStorageKey,
+          this.selectedPortfolioId as string
+        );
 
-      loadedOnce = true;
+        loadedOnce = true;
+      }
 
       return this.portfolios;
     },

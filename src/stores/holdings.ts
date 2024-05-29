@@ -1,51 +1,103 @@
 import { defineStore } from 'pinia';
 import holdingsAPI from 'src/service/holdings';
+import { useTransactionsStore } from 'stores/transactions';
 import { Holding, Transaction } from 'src/types';
 
 interface HoldingsStoreState {
   holding: Holding[];
   loading: boolean;
-  empty: boolean;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let transactionsAddListener: () => void;
 
 export const useHoldingsStore = defineStore('holdings', {
   state: (): HoldingsStoreState => ({
     holding: [],
     loading: false,
-    empty: false,
   }),
   actions: {
-    async get(portfolioId: string) {
+    hasTicker(ticker: string) {
+      return this.holding.find((holding) => holding.ticker === ticker);
+    },
+    async list(portfolioId: string) {
+      const transactionsStore = useTransactionsStore();
       this.loading = true;
 
       if (!portfolioId) {
         throw Error('Cannot get holdings without Portfolio id');
       }
 
-      this.holding = await holdingsAPI.get(portfolioId);
+      this.holding = await holdingsAPI.list(portfolioId);
 
-      if (!this.holding) {
-        this.loading = false;
-        this.empty = true;
-        return this.holding;
-      }
+      transactionsAddListener ||= transactionsStore.$onAction(
+        async (context) => {
+          debugger;
+          const { name, args } = context;
+          if (name === 'list') {
+            return;
+          }
+
+          const [transaction] = args;
+          const isBuy = transaction.action === 'buy';
+
+          const holding =
+            this.holding.find(
+              (holding) => holding.ticker === transaction.ticker
+            ) ?? this.create(transaction);
+
+          if (name === 'remove') {
+            holding.shares -= transaction.shares;
+          } else if (name === 'add') {
+            holding.shares += transaction.shares * (isBuy ? 1 : -1);
+          }
+
+          // TODO - Handle holding removal (shares - 0) and early break
+
+          // Calculate after action AVG price
+          context.after(async () => {
+            const holdingTransactions = transactionsStore.transactions.filter(
+              (t) =>
+                t.ticker === transaction.ticker && transaction.action === 'buy'
+            );
+
+            const totalShares = holdingTransactions.reduce(
+              (acc, t) => acc + t.actualShares,
+              0
+            );
+
+            holding.avgPrice = totalShares
+              ? (holdingTransactions.reduce(
+                  (acc, t) => acc + t.price * t.actualShares,
+                  0
+                ) ?? 0) / totalShares
+              : 0;
+
+            holding.id = (await holdingsAPI.update(holding, holding.id)).id;
+          });
+        }
+      );
 
       this.loading = false;
 
       return this.holding;
     },
-    async create(transaction: Transaction) {
-      const { portfolioId, shares, ticker, name, logoImage } = transaction;
+    create(transaction: Transaction) {
+      const { portfolioId, ticker, name, logoImage } = transaction;
 
-      await holdingsAPI.update({
+      const holding = {
+        id: '',
         portfolioId,
-        shares,
+        shares: 0,
         ticker,
         name,
         logoImage,
-      });
+        avgPrice: transaction.price,
+      };
 
-      this.empty = false;
+      this.holding.push(holding as Holding);
+
+      return holding;
     },
   },
 });

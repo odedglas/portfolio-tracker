@@ -97,9 +97,9 @@ export default defineComponent({
         title: 'Delete Transaction',
         message: `Are you sure you want to delete transaction of "${transaction.ticker}"?`,
         callback: async () => {
-          await emitLoadingTask(() => transactionsAPI.delete(transaction.id));
+          await emitLoadingTask(() => transactionsAPI.delete(transaction));
 
-          transactionsStore.remove(transaction.id);
+          transactionsStore.remove(transaction);
         },
       });
     };
