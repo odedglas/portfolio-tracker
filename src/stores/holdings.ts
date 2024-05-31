@@ -34,11 +34,12 @@ export const useHoldingsStore = defineStore('holdings', {
         async (context) => {
           debugger;
           const { name, args } = context;
-          if (name === 'list') {
+          if (name === 'list' || name === 'update') {
+            // TODO - Handle update - Price affects holding.
             return;
           }
 
-          const [transaction] = args;
+          const [transaction] = args as [Transaction];
           const isBuy = transaction.action === 'buy';
 
           const holding =
@@ -47,18 +48,19 @@ export const useHoldingsStore = defineStore('holdings', {
             ) ?? this.create(transaction);
 
           if (name === 'remove') {
-            holding.shares -= transaction.shares;
+            holding.shares += transaction.actualShares * (isBuy ? -1 : 1);
           } else if (name === 'add') {
-            holding.shares += transaction.shares * (isBuy ? 1 : -1);
+            holding.shares += transaction.actualShares * (isBuy ? 1 : -1);
           }
 
-          // TODO - Handle holding removal (shares - 0) and early break
+          if (holding.shares <= 0) {
+            return await holdingsAPI.delete(holding.id);
+          }
 
           // Calculate after action AVG price
           context.after(async () => {
             const holdingTransactions = transactionsStore.transactions.filter(
-              (t) =>
-                t.ticker === transaction.ticker && transaction.action === 'buy'
+              (t) => t.ticker === transaction.ticker && t.action === 'buy'
             );
 
             const totalShares = holdingTransactions.reduce(
@@ -98,6 +100,10 @@ export const useHoldingsStore = defineStore('holdings', {
       this.holding.push(holding as Holding);
 
       return holding;
+    },
+    async remove(holdingId: string) {
+      await holdingsAPI.delete(holdingId);
+      this.holding = this.holding.filter((holding) => holding.id !== holdingId);
     },
   },
 });

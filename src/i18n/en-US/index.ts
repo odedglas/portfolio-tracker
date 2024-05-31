@@ -41,6 +41,7 @@ export const enUsMessages = {
     add_your_first: 'Add your first transaction',
     no_transactions_found:
       "There aren't any transactions yet found within your portfolio.",
+    all_profit_is_realized: 'All profit is realized',
   },
   no_results: 'No results',
   cancel: 'Cancel',

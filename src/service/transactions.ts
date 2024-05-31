@@ -25,6 +25,8 @@ export const transformer = {
     ),
   totalValue: (transaction: Transaction) =>
     transaction.shares * transaction.price + (transaction.fees || 0),
+  actualValue: (transaction: Transaction) =>
+    transaction.actualShares * transaction.price + (transaction.fees || 0),
 };
 
 const api = {
@@ -43,16 +45,11 @@ const api = {
 
     if (!transactionId) {
       data.createdAt = Date.now();
-      data.shares = data.actualShares;
 
       const result = await firestoreAPI.addDocument(
         transactionsCollection(),
         data
       );
-
-      if (!transformer.isBuy(data)) {
-        await api.sellTransaction(data);
-      }
 
       transactionId = result.id;
     } else {
@@ -65,11 +62,15 @@ const api = {
 
     return api.get(transactionId);
   },
-  delete: async (transaction: Transaction) =>
-    firestoreAPI.deleteDocument(transaction.id, transactionsCollection()),
-  sellTransaction: async (transaction: Transaction) => {
-    debugger;
-    const available = (await api.list(transaction.portfolioId)).filter(
+  delete: async (transaction: Transaction) => {
+    await firestoreAPI.deleteDocument(transaction.id, transactionsCollection());
+  },
+  allocateSellTransaction: (
+    transaction: Transaction,
+    transactions: Transaction[],
+    allocate = true
+  ) => {
+    const available = [...transactions].filter(
       (t) =>
         transformer.isBuy(t) &&
         t.ticker === transaction.ticker &&
@@ -77,18 +78,34 @@ const api = {
     );
 
     let remainingShares = transaction.actualShares;
+    let realizedProfitOrLoss = 0;
     let iterator = 0;
+
     while (remainingShares > 0 && available.length > 0) {
       const buyTransaction = available[iterator];
-      const soldShares = Math.min(buyTransaction.actualShares, remainingShares);
+      const buyTransactionPotentialShares = allocate
+        ? buyTransaction.actualShares
+        : buyTransaction.shares;
+      const soldShares = Math.min(
+        buyTransactionPotentialShares,
+        remainingShares
+      );
 
-      buyTransaction.actualShares -= soldShares;
+      buyTransaction.actualShares += soldShares * (allocate ? -1 : 1);
+      realizedProfitOrLoss +=
+        soldShares * (transaction.price - buyTransaction.price);
       remainingShares -= soldShares;
-
-      await api.update(buyTransaction, buyTransaction.id);
 
       iterator++;
     }
+
+    // Bound realized profit if sold and allocated (not deleted)
+    if (allocate) {
+      transaction.realizedProfit = realizedProfitOrLoss;
+      debugger;
+    }
+
+    return available;
   },
 };
 

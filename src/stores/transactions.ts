@@ -25,44 +25,20 @@ export const useTransactionsStore = defineStore('transactions', {
 
       return transactions.reduce((balanceMap, transaction) => {
         let balance = 0;
-        const transactionValue = transformer.totalValue(transaction);
+        const transactionValue = transformer.actualValue(transaction);
 
+        // Buy balance would be calculated by transaction value VS ticker last price from quote.
+        // Sell balance would be transaction realized profit / loss
         if (transformer.isBuy(transaction)) {
-          // Buy balance would be calculated by transaction value VS ticker last price from quote.
           const lastTickerValue = state.tickerQuotes[transaction.ticker];
 
           if (lastTickerValue) {
             const currentPrice =
-              transaction.shares * lastTickerValue.regularMarketPrice;
+              transaction.actualShares * lastTickerValue.regularMarketPrice;
             balance = currentPrice - transactionValue;
           }
         } else {
-          // Sell balance would be calculated by BUY type transactions FIFO style
-          const buyTransactions = state.transactions
-            .filter(
-              (t) => transformer.isBuy(t) && t.ticker === transaction.ticker
-            )
-            .reverse();
-
-          // For each buy transaction, we should cover if sell action covered it's shares or not and calculate the balance relatively
-          balance = transactionValue;
-          let soldShares = transaction.shares;
-          let iterator = 0;
-          while (soldShares > 0 && buyTransactions.length > 0) {
-            const buyTransaction = buyTransactions[iterator];
-            const availableSharesToSell = Math.min(
-              buyTransaction.shares,
-              soldShares
-            );
-
-            const transactionCost =
-              buyTransaction.price * availableSharesToSell -
-              (buyTransaction.fees ?? 0);
-            balance -= transactionCost;
-
-            soldShares -= buyTransaction.shares;
-            iterator++;
-          }
+          balance = transaction.realizedProfit || 0;
         }
 
         balanceMap[transaction.id] = balance;
@@ -70,10 +46,15 @@ export const useTransactionsStore = defineStore('transactions', {
         return balanceMap;
       }, {} as Record<string, number>);
     },
-    summary: (state) => {
-      console.log(transformer.summary(state.transactions));
-      return transformer.summary(state.transactions);
-    },
+    summary: (state) => transformer.summary(state.transactions),
+    actualShares: (state) =>
+      state.transactions.reduce((shares, transaction) => {
+        if (!transformer.isBuy(transaction)) {
+          return shares;
+        }
+
+        return shares + transaction.actualShares;
+      }, 0),
   },
   actions: {
     async list(portfolioId: string) {
@@ -105,17 +86,44 @@ export const useTransactionsStore = defineStore('transactions', {
 
       return this.transactions;
     },
-    remove(transaction: Transaction) {
+    async remove(transaction: Transaction) {
+      // DE - Allocate sell transactions to available buy transactions
+      if (!transformer.isBuy(transaction)) {
+        const affectedTransaction = transactionsAPI.allocateSellTransaction(
+          transaction,
+          this.transactions,
+          false
+        );
+
+        affectedTransaction.forEach(this.update);
+      }
+
+      await transactionsAPI.delete(transaction);
+
       this.transactions = this.transactions.filter(
         (t) => t.id !== transaction.id
       );
     },
-    add(transaction: Transaction) {
+    async add(transaction: Transaction) {
+      // Allocate sell transactions to available buy transactions
+      if (!transformer.isBuy(transaction)) {
+        const affectedTransaction = transactionsAPI.allocateSellTransaction(
+          transaction,
+          this.transactions
+        );
+
+        affectedTransaction.forEach(this.update);
+      }
+
+      transaction = await transactionsAPI.update(transaction);
+
       this.transactions = [...this.transactions, transaction].sort((t1, t2) =>
         t1.date < t2.date ? 1 : -1
       );
     },
-    update(transaction: Transaction) {
+    async update(transaction: Transaction) {
+      await transactionsAPI.update(transaction, transaction.id);
+
       const index = this.transactions.findIndex(
         (current) => current.id === transaction.id
       );

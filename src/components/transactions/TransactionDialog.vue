@@ -78,7 +78,7 @@
 
           <div class="row" style="gap: 12px">
             <q-input
-              v-model.number="localTransaction.actualShares"
+              v-model.number="syntheticShares"
               class="col"
               type="text"
               lazy-rules
@@ -141,9 +141,7 @@
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
 import { date as dateUtils } from 'quasar';
 import { useI18n } from 'vue-i18n';
-import { useLoadingStore } from 'stores/loading';
 import { usePortfolioStore } from 'stores/portfolios';
-import transactionsAPI from 'src/service/transactions';
 import { Transaction } from 'src/types';
 import { TRANSACTIONS_TYPES } from 'src/constants';
 import TickerSearch, { TickerOption } from '../common/TickerSearch.vue';
@@ -183,7 +181,6 @@ export default defineComponent({
   emits: ['saveTransaction', 'closeTransaction'],
   setup(props, { emit }) {
     const $t = useI18n().t;
-    const { emitLoadingTask } = useLoadingStore();
 
     const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
       ref(undefined);
@@ -206,6 +203,14 @@ export default defineComponent({
       },
     });
 
+    const syntheticShares = computed({
+      get: () => localTransaction.value.shares,
+      set: (shares: number) => {
+        localTransaction.value.shares = shares;
+        localTransaction.value.actualShares = shares;
+      },
+    });
+
     const isNew = computed(() => localTransaction?.value?.id === '');
 
     const setLocalTransaction = () => {
@@ -221,17 +226,9 @@ export default defineComponent({
       localTransaction.value.price = tickerOption?.lastPrice ?? 0;
     };
 
-    const saveTransaction = async (transaction: Transaction) => {
-      const persisted = await emitLoadingTask(() =>
-        transactionsAPI.update(transaction, transaction.id)
-      );
-
-      emit('saveTransaction', persisted);
-    };
-
     const submitForm = async () => {
       if (await formRef.value?.validate()) {
-        await saveTransaction(localTransaction.value as Transaction);
+        emit('saveTransaction', localTransaction.value as Transaction);
         emit('closeTransaction');
       }
     };
@@ -245,7 +242,7 @@ export default defineComponent({
 
     const totalTransaction = computed(() => {
       return (
-        localTransaction.value.price * localTransaction.value.actualShares +
+        localTransaction.value.price * localTransaction.value.shares +
         (localTransaction.value.fees || 0)
       );
     });
@@ -253,6 +250,7 @@ export default defineComponent({
     return {
       formRef,
       syntheticShow,
+      syntheticShares,
       formattedDate,
       isNew,
       localTransaction,
