@@ -4,7 +4,7 @@ import { useTransactionsStore } from 'stores/transactions';
 import { Holding, Transaction } from 'src/types';
 
 interface HoldingsStoreState {
-  holding: Holding[];
+  holdings: Holding[];
   loading: boolean;
 }
 
@@ -13,13 +13,27 @@ let transactionsAddListener: () => void;
 
 export const useHoldingsStore = defineStore('holdings', {
   state: (): HoldingsStoreState => ({
-    holding: [],
+    holdings: [],
     loading: false,
   }),
-  actions: {
-    hasTicker(ticker: string) {
-      return this.holding.find((holding) => holding.ticker === ticker);
+  getters: {
+    total(state) {
+      return state.holdings.reduce((total, holding) => {
+        const lastTickerValue = useTransactionsStore().tickerQuotes[holding.ticker];
+
+        if (lastTickerValue) {
+          const currentPrice = holding.shares * lastTickerValue.regularMarketPrice;
+          const avgCost = holding.shares * holding.avgPrice;
+
+          total.value += currentPrice;
+          total.profit += currentPrice - avgCost;
+        }
+
+        return total;
+      }, { profit: 0, value: 0 });
     },
+  },
+  actions: {
     async list(portfolioId: string) {
       const transactionsStore = useTransactionsStore();
       this.loading = true;
@@ -28,11 +42,10 @@ export const useHoldingsStore = defineStore('holdings', {
         throw Error('Cannot get holdings without Portfolio id');
       }
 
-      this.holding = await holdingsAPI.list(portfolioId);
+      this.holdings = await holdingsAPI.list(portfolioId);
 
       transactionsAddListener ||= transactionsStore.$onAction(
         async (context) => {
-          debugger;
           const { name, args } = context;
           if (name === 'list' || name === 'update') {
             // TODO - Handle update - Price affects holding.
@@ -43,7 +56,7 @@ export const useHoldingsStore = defineStore('holdings', {
           const isBuy = transaction.action === 'buy';
 
           const holding =
-            this.holding.find(
+            this.holdings.find(
               (holding) => holding.ticker === transaction.ticker
             ) ?? this.create(transaction);
 
@@ -82,7 +95,7 @@ export const useHoldingsStore = defineStore('holdings', {
 
       this.loading = false;
 
-      return this.holding;
+      return this.holdings;
     },
     create(transaction: Transaction) {
       const { portfolioId, ticker, name, logoImage } = transaction;
@@ -97,13 +110,13 @@ export const useHoldingsStore = defineStore('holdings', {
         avgPrice: transaction.price,
       };
 
-      this.holding.push(holding as Holding);
+      this.holdings.push(holding as Holding);
 
       return holding;
     },
     async remove(holdingId: string) {
       await holdingsAPI.delete(holdingId);
-      this.holding = this.holding.filter((holding) => holding.id !== holdingId);
+      this.holdings = this.holdings.filter((holding) => holding.id !== holdingId);
     },
   },
 });

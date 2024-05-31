@@ -43,6 +43,10 @@ export const enUsMessages = {
       "There aren't any transactions yet found within your portfolio.",
     all_profit_is_realized: 'All profit is realized',
   },
+  holdings: {
+    header: 'Holdings',
+    no_holdings: 'No holding are there yet, You can start by creating a Transaction'
+  },
   no_results: 'No results',
   cancel: 'Cancel',
   save: 'Save',
