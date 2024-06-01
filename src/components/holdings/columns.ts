@@ -26,7 +26,7 @@ export const columns: QTableProps['columns'] = [
     name: 'invested',
     align: 'center',
     label: 'Funds Invested',
-    field: 'invested'
+    field: 'invested',
   },
   {
     name: 'total_value',

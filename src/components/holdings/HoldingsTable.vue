@@ -66,16 +66,12 @@
           {{ totalSummary.shares }}
         </q-td>
         <q-td colspan="1"></q-td>
-        <q-td
-          v-if="totalSummary.invested"
-          colspan="1"
-        >{{ $n(totalSummary.invested, 'decimal') }}</q-td
-        >
-        <q-td
-          v-if="totalSummary.currentValue"
-          colspan="1"
-          >{{ $n(totalSummary.currentValue, 'decimal') }}</q-td
-        >
+        <q-td v-if="totalSummary.invested" colspan="1">{{
+          $n(totalSummary.invested, 'decimal')
+        }}</q-td>
+        <q-td v-if="totalSummary.currentValue" colspan="1">{{
+          $n(totalSummary.currentValue, 'decimal')
+        }}</q-td>
         <q-td
           v-if="totalSummary.profit"
           colspan="1"

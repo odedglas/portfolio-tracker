@@ -231,7 +231,9 @@ export default defineComponent({
             value: profitValue ? $n(profitValue, 'decimal') : undefined,
             textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
             percent: $n(
-              Math.abs(profitValue / (transaction?.paidPrice ?? transactionActualValue)),
+              Math.abs(
+                profitValue / (transaction?.paidPrice ?? transactionActualValue)
+              ),
               'percent'
             ),
             icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
