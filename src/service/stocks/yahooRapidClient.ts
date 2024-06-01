@@ -9,7 +9,7 @@ import { cachedOperation } from 'src/service/stocks/localStorageCache';
 const axiosInstance = axios.create({
   baseURL: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com',
   headers: {
-    'X-RapidAPI-Key': 'b755b7ef07msh350b7776c07b300p112a41jsn7fc145707dc8', // TODO - Env
+    'X-RapidAPI-Key': process.env.RAPID_YAHOO_API_KEY,
     'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
   },
 });

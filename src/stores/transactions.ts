@@ -38,7 +38,7 @@ export const useTransactionsStore = defineStore('transactions', {
             balance = currentPrice - transactionValue;
           }
         } else {
-          balance = transaction.realizedProfit || 0; // TODO - Should be calculated by funds
+          balance = transaction.realizedProfit || 0;
         }
 
         balanceMap[transaction.id] = balance;

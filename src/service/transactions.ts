@@ -79,6 +79,7 @@ const api = {
 
     let remainingShares = transaction.actualShares;
     let realizedProfitOrLoss = 0;
+    let paidPrice = 0;
     let iterator = 0;
 
     while (remainingShares > 0 && available.length > 0) {
@@ -94,14 +95,16 @@ const api = {
       buyTransaction.actualShares += soldShares * (allocate ? -1 : 1);
       realizedProfitOrLoss +=
         soldShares * (transaction.price - buyTransaction.price);
-      remainingShares -= soldShares;
+      paidPrice += soldShares * buyTransaction.price;
 
+      remainingShares -= soldShares;
       iterator++;
     }
 
     // Bound realized profit if sold and allocated (not deleted)
     if (allocate) {
       transaction.realizedProfit = realizedProfitOrLoss;
+      transaction.paidPrice = paidPrice;
     }
 
     return available;

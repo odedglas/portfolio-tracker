@@ -35,6 +35,7 @@ export interface Transaction {
   ticker: string;
   name: string;
   logoImage?: string;
+  paidPrice?: number;
   portfolioId: string;
   realizedProfit?: number;
 }
@@ -49,5 +50,6 @@ export interface Holding {
   logoImage?: string;
   portfolioId: string;
   fees?: number;
+  invested: number;
   realizedProfits?: number;
 }

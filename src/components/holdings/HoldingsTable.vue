@@ -35,7 +35,10 @@
         <q-td key="avg_price" :props="props">
           {{ $n(props.row.avgPrice, 'decimal') }}
         </q-td>
-        <q-td key="totalValue" :props="props">
+        <q-td key="invested" :props="props">
+          {{ $n(props.row.invested, 'decimal') }}
+        </q-td>
+        <q-td key="total_value" :props="props">
           {{ props.row.totalValue.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
@@ -64,11 +67,13 @@
         </q-td>
         <q-td colspan="1"></q-td>
         <q-td
+          v-if="totalSummary.invested"
+          colspan="1"
+        >{{ $n(totalSummary.invested, 'decimal') }}</q-td
+        >
+        <q-td
           v-if="totalSummary.currentValue"
           colspan="1"
-          :class="`${
-            totalSummary.currentValue > 0 ? 'text-green-5' : 'text-red-5'
-          }`"
           >{{ $n(totalSummary.currentValue, 'decimal') }}</q-td
         >
         <q-td
@@ -131,7 +136,7 @@ export default defineComponent({
             textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
             percent:
               totalValue > 0
-                ? $n(Math.abs(profitValue / totalValue), 'percent')
+                ? $n(Math.abs(profitValue / holding.invested), 'percent')
                 : 0,
             icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
           },
@@ -148,6 +153,7 @@ export default defineComponent({
           acc.shares += holding.shares;
           acc.profit += holding.profit;
           acc.currentValue += holding.currentValue;
+          acc.invested += holding.invested;
 
           return acc;
         },
@@ -155,6 +161,7 @@ export default defineComponent({
           shares: 0,
           profit: 0,
           currentValue: 0,
+          invested: 0,
         }
       )
     );

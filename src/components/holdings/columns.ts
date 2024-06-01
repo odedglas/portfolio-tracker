@@ -23,7 +23,13 @@ export const columns: QTableProps['columns'] = [
     field: 'avgPrice',
   },
   {
-    name: 'totalValue',
+    name: 'invested',
+    align: 'center',
+    label: 'Funds Invested',
+    field: 'invested'
+  },
+  {
+    name: 'total_value',
     align: 'center',
     label: 'Total Value',
     field: 'totalValue',

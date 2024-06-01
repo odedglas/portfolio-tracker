@@ -62,6 +62,11 @@ export const useHoldingsStore = defineStore('holdings', {
           totalShares
         : 0;
 
+      // Calculate invested by transactions funds (original shares)
+      holding.invested = transactions
+        .filter(transformer.isBuy)
+        .reduce((acc, t) => acc + t.price * t.shares, 0);
+
       // Fees and profits would be calculated by the whole set.
       holding.fees = transactions.reduce((acc, t) => acc + (t.fees ?? 0), 0);
 
@@ -125,8 +130,8 @@ export const useHoldingsStore = defineStore('holdings', {
 
       return this.holdings;
     },
-    create(transaction: Transaction) {
-      const { portfolioId, ticker, name, logoImage } = transaction;
+    create(transaction: Transaction): Holding {
+      const { portfolioId, ticker, name, logoImage, price } = transaction;
 
       const holding = {
         id: '',
@@ -136,7 +141,8 @@ export const useHoldingsStore = defineStore('holdings', {
         ticker,
         name,
         logoImage,
-        avgPrice: transaction.price,
+        avgPrice: price,
+        invested: price * transaction.actualShares,
       };
 
       this.holdings.push(holding as Holding);
