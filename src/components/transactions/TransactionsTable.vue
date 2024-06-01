@@ -149,7 +149,7 @@
         <q-td colspan="1" class="text-left">
           <span>Total</span>
         </q-td>
-        <q-td colspan="2"/>
+        <q-td colspan="2" />
         <q-td colspan="1">
           {{ actualShares }}
         </q-td>
@@ -230,7 +230,10 @@ export default defineComponent({
           profit: {
             value: profitValue ? $n(profitValue, 'decimal') : undefined,
             textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
-            percent: $n(Math.abs(profitValue / transactionActualValue), 'percent'),
+            percent: $n(
+              Math.abs(profitValue / transactionActualValue),
+              'percent'
+            ),
             icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
           },
         };

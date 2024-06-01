@@ -35,10 +35,7 @@
         <q-td key="avg_price" :props="props">
           {{ $n(props.row.avgPrice, 'decimal') }}
         </q-td>
-        <q-td
-          key="totalValue"
-          :props="props"
-        >
+        <q-td key="totalValue" :props="props">
           {{ props.row.totalValue.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
@@ -52,7 +49,7 @@
           </div>
         </q-td>
         <q-td key="daily_change" :props="props">
-          {{props.row.daily}}
+          {{ props.row.daily }}
         </q-td>
       </q-tr>
     </template>
@@ -69,8 +66,10 @@
         <q-td
           v-if="totalSummary.currentValue"
           colspan="1"
-          :class="`${totalSummary.currentValue > 0 ? 'text-green-5' : 'text-red-5'}`"
-        >{{ $n(totalSummary.currentValue, 'decimal') }}</q-td
+          :class="`${
+            totalSummary.currentValue > 0 ? 'text-green-5' : 'text-red-5'
+          }`"
+          >{{ $n(totalSummary.currentValue, 'decimal') }}</q-td
         >
         <q-td
           v-if="totalSummary.profit"
@@ -78,7 +77,7 @@
           :class="`${totalSummary.profit > 0 ? 'text-green-5' : 'text-red-5'}`"
           >{{ $n(totalSummary.profit, 'decimal') }}</q-td
         >
-        <q-td colspan="1"/>
+        <q-td colspan="1" />
       </q-tr>
     </template>
 
@@ -119,7 +118,7 @@ export default defineComponent({
     const viewHoldings = computed(() =>
       holdingsWithProfits.value.map((holding) => {
         const totalValue = holding.currentValue;
-        const profitValue = holding.profit
+        const profitValue = holding.profit;
 
         return {
           ...holding,
@@ -130,7 +129,10 @@ export default defineComponent({
           profit: {
             value: profitValue ? $n(profitValue, 'decimal') : undefined,
             textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
-            percent: totalValue > 0 ? $n(Math.abs(profitValue / totalValue), 'percent') : 0,
+            percent:
+              totalValue > 0
+                ? $n(Math.abs(profitValue / totalValue), 'percent')
+                : 0,
             icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
           },
           daily: 2,
@@ -141,17 +143,20 @@ export default defineComponent({
     const isEmpty = computed(() => viewHoldings.value.length === 0);
 
     const totalSummary = computed(() =>
-      holdingsWithProfits.value.reduce((acc, holding) => {
-        acc.shares += holding.shares
-        acc.profit += holding.profit
-        acc.currentValue += holding.currentValue
+      holdingsWithProfits.value.reduce(
+        (acc, holding) => {
+          acc.shares += holding.shares;
+          acc.profit += holding.profit;
+          acc.currentValue += holding.currentValue;
 
-        return acc;
-      }, {
-        shares: 0,
-        profit: 0,
-        currentValue: 0
-      })
+          return acc;
+        },
+        {
+          shares: 0,
+          profit: 0,
+          currentValue: 0,
+        }
+      )
     );
     return {
       isEmpty,

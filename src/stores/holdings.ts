@@ -31,7 +31,8 @@ export const useHoldingsStore = defineStore('holdings', {
         if (lastTickerValue) {
           const currentValue =
             holding.shares * lastTickerValue.regularMarketPrice;
-          const avgCost = holding.shares * holding.avgPrice - (holding?.fees ?? 0);
+          const avgCost =
+            holding.shares * holding.avgPrice - (holding?.fees ?? 0);
 
           return {
             ...holding,
@@ -45,25 +46,24 @@ export const useHoldingsStore = defineStore('holdings', {
     },
   },
   actions: {
-    async syncHoldingWithTransactions(holding: Holding, transactions: Transaction[]) {
+    async syncHoldingWithTransactions(
+      holding: Holding,
+      transactions: Transaction[]
+    ) {
       // Total and Average price are calculated by current Buy transactions
-      const totalShares = transactions.filter(transformer.isBuy).reduce(
-        (acc, t) => acc + t.actualShares,
-        0
-      );
+      const totalShares = transactions
+        .filter(transformer.isBuy)
+        .reduce((acc, t) => acc + t.actualShares, 0);
 
       holding.avgPrice = totalShares
-        ? (transactions.filter(transformer.isBuy).reduce(
-        (acc, t) => acc + t.price * t.actualShares,
-        0
-      ) ?? 0) / totalShares
+        ? (transactions
+            .filter(transformer.isBuy)
+            .reduce((acc, t) => acc + t.price * t.actualShares, 0) ?? 0) /
+          totalShares
         : 0;
 
       // Fees and profits would be calculated by the whole set.
-      holding.fees = transactions.reduce(
-        (acc, t) => acc + (t.fees ?? 0),
-        0
-      );
+      holding.fees = transactions.reduce((acc, t) => acc + (t.fees ?? 0), 0);
 
       holding.realizedProfits = transactions.reduce(
         (acc, t) => acc + (t.realizedProfit ?? 0),
@@ -113,7 +113,10 @@ export const useHoldingsStore = defineStore('holdings', {
               (t) => t.ticker === transaction.ticker
             );
 
-            await this.syncHoldingWithTransactions(holding, holdingTransactions);
+            await this.syncHoldingWithTransactions(
+              holding,
+              holdingTransactions
+            );
           });
         }
       );
