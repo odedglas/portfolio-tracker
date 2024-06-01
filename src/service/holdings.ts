@@ -1,11 +1,39 @@
-import { Holding } from 'src/types';
+import { Holding, Transaction } from 'src/types';
 import {
   getCollections,
   firestoreAPI,
   queries,
 } from 'src/service/firebase/collections';
+import { transformer as transactionTransformer } from 'src/service/transactions';
+import { Quote } from 'src/service/stocks';
 
 const holdingsCollection = () => getCollections().holding;
+
+export const transformer = {
+  currentValue: (holding: Holding, quote: Quote) =>
+    holding.shares * quote.regularMarketPrice,
+  totalValue: (holding: Holding) => holding.shares * holding.avgPrice,
+  profit: (holding: Holding, quote: Quote) => {
+    const profitValue =
+      transformer.currentValue(holding, quote) -
+      transformer.totalValue(holding) +
+      (holding?.realizedProfits ?? 0) -
+      (holding?.fees ?? 0);
+
+    return {
+      value: profitValue,
+      percent: Math.abs(profitValue / holding.invested),
+    };
+  },
+  dailyChange: (holding: Holding, quote: Quote) => {
+    const dailyChangeValue = quote.regularMarketChange * holding.shares;
+
+    return {
+      value: dailyChangeValue,
+      percent: dailyChangeValue / transformer.currentValue(holding, quote),
+    };
+  },
+};
 
 const api = {
   list: async (portfolioId: string) =>
@@ -37,6 +65,51 @@ const api = {
   },
   delete: async (holdingId: string) =>
     firestoreAPI.deleteDocument(holdingId, holdingsCollection()),
+
+  syncHoldingWithTransactions: async (
+    holding: Holding,
+    transactions: Transaction[]
+  ) => {
+    const holdingTransactions = transactions.filter(
+      (t) => t.ticker === holding.ticker
+    );
+
+    const buyTransactions = holdingTransactions.filter(
+      transactionTransformer.isBuy
+    );
+
+    // Total and Average price are calculated by current Buy transactions
+    const totalShares = buyTransactions.reduce(
+      (acc, t) => acc + t.actualShares,
+      0
+    );
+
+    holding.avgPrice = totalShares
+      ? (buyTransactions.reduce(
+          (acc, t) => acc + transactionTransformer.actualValue(t),
+          0
+        ) ?? 0) / totalShares
+      : 0;
+
+    // Calculate invested by transactions funds (original shares)
+    holding.invested = buyTransactions.reduce(
+      (acc, t) => acc + transactionTransformer.totalValue(t),
+      0
+    );
+
+    // Fees and profits would be calculated by the whole set.
+    holding.fees = holdingTransactions.reduce(
+      (acc, t) => acc + (t.fees ?? 0),
+      0
+    );
+
+    holding.realizedProfits = holdingTransactions.reduce(
+      (acc, t) => acc + (t.realizedProfit ?? 0),
+      0
+    );
+
+    return await api.update(holding, holding.id);
+  },
 };
 
 export default api;

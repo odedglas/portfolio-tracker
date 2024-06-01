@@ -91,7 +91,6 @@ export default defineComponent({
     const options: Ref<TickerOption[]> = ref([]);
     const noResults = ref(false);
 
-    console.log('********************', props.disabled);
     const filter: QSelectProps['onFilter'] = async (input, update) => {
       if (!input) {
         noResults.value = false;

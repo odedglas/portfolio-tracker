@@ -19,9 +19,7 @@ export const useTransactionsStore = defineStore('transactions', {
   }),
   getters: {
     balanceMap: (state) => {
-      const transactions = [...state.transactions].sort((t1, t2) =>
-        t1.date < t2.date ? 1 : -1
-      );
+      const transactions = [...state.transactions].reverse();
 
       return transactions.reduce((balanceMap, transaction) => {
         let balance = 0;

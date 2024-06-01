@@ -13,10 +13,10 @@ export interface Portfolio {
   owner: string;
   title: string;
   createdAt: number;
-  currentValue: number;
+  currentValue: number; // TODO - Calc ( Sum of holdings current value )
   target: number;
-  invested: number;
-  profit: number;
+  invested: number; // TODO - Calculated ( Sum of holdings invested )
+  profit: number; // TODO - Calc ( Sum of holdings profits )
   deposits: Deposit[];
 }
 

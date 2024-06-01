@@ -70,20 +70,20 @@
           <span>Total</span>
         </q-td>
         <q-td colspan="1">
-          {{ totalSummary.shares }}
+          {{ summary.shares }}
         </q-td>
         <q-td colspan="1"></q-td>
-        <q-td v-if="totalSummary.invested" colspan="1">{{
-          $n(totalSummary.invested, 'decimal')
+        <q-td v-if="summary.invested" colspan="1">{{
+          $n(summary.invested, 'decimal')
         }}</q-td>
-        <q-td v-if="totalSummary.currentValue" colspan="1">{{
-          $n(totalSummary.currentValue, 'decimal')
+        <q-td v-if="summary.currentValue" colspan="1">{{
+          $n(summary.currentValue, 'decimal')
         }}</q-td>
         <q-td
-          v-if="totalSummary.profit"
+          v-if="summary.profit"
           colspan="1"
-          :class="`${totalSummary.profit > 0 ? 'text-green-5' : 'text-red-5'}`"
-          >{{ $n(totalSummary.profit, 'decimal') }}</q-td
+          :class="`${summary.profit > 0 ? 'text-green-5' : 'text-red-5'}`"
+          >{{ $n(summary.profit, 'decimal') }}</q-td
         >
         <q-td colspan="1" />
       </q-tr>
@@ -121,7 +121,7 @@ export default defineComponent({
     const filter = ref('');
     const holdingsStore = useHoldingsStore();
 
-    const { holdingsWithProfits } = storeToRefs(holdingsStore);
+    const { holdingsWithProfits, summary } = storeToRefs(holdingsStore);
 
     const viewHoldings = computed(() =>
       holdingsWithProfits.value.map((holding) => {
@@ -153,30 +153,12 @@ export default defineComponent({
 
     const isEmpty = computed(() => viewHoldings.value.length === 0);
 
-    const totalSummary = computed(() =>
-      holdingsWithProfits.value.reduce(
-        (acc, holding) => {
-          acc.shares += holding.shares;
-          acc.profit += holding.profit.value;
-          acc.currentValue += holding.currentValue;
-          acc.invested += holding.invested;
-
-          return acc;
-        },
-        {
-          shares: 0,
-          profit: 0,
-          currentValue: 0,
-          invested: 0,
-        }
-      )
-    );
     return {
       isEmpty,
       filter,
       columns,
       viewHoldings,
-      totalSummary,
+      summary,
     };
   },
 });

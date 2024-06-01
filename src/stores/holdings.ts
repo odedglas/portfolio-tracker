@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
-import holdingsAPI from 'src/service/holdings';
+import holdingsAPI, { transformer } from 'src/service/holdings';
 import { useTransactionsStore } from 'stores/transactions';
 import { Holding, Transaction } from 'src/types';
-import { transformer } from 'src/service/transactions';
 
 interface HoldingsStoreState {
   holdings: Holding[];
@@ -21,6 +20,13 @@ interface HoldingWithProfits extends Holding {
   };
 }
 
+interface HoldingsSummary {
+  shares: number;
+  invested: number;
+  profit: number;
+  currentValue: number;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let transactionsAddListener: () => void;
 
@@ -35,68 +41,38 @@ export const useHoldingsStore = defineStore('holdings', {
         const lastTickerQuote =
           useTransactionsStore().tickerQuotes[holding.ticker];
 
-        if (lastTickerQuote) {
-          const currentValue =
-            holding.shares * lastTickerQuote.regularMarketPrice;
-          const avgCost = holding.shares * holding.avgPrice;
-          const profitValue =
-            currentValue -
-            avgCost +
-            (holding?.realizedProfits ?? 0) -
-            (holding?.fees ?? 0);
-          const dailyChangeValue =
-            lastTickerQuote.regularMarketChange * holding.shares;
+        const currentValue = transformer.currentValue(holding, lastTickerQuote);
+        const profit = transformer.profit(holding, lastTickerQuote);
+        const dailyChange = transformer.dailyChange(holding, lastTickerQuote);
 
-          return {
-            ...holding,
-            currentValue,
-            profit: {
-              value: profitValue,
-              percent: Math.abs(profitValue / holding.invested),
-            },
-            dailyChange: {
-              value: dailyChangeValue,
-              percent: dailyChangeValue / currentValue,
-            },
-          };
+        return {
+          ...holding,
+          currentValue,
+          profit,
+          dailyChange,
+        };
+      });
+    },
+    summary(): HoldingsSummary {
+      return this.holdingsWithProfits.reduce(
+        (acc, holding) => {
+          acc.shares += holding.shares;
+          acc.profit += holding.profit.value;
+          acc.currentValue += holding.currentValue;
+          acc.invested += holding.invested;
+
+          return acc;
+        },
+        {
+          shares: 0,
+          profit: 0,
+          currentValue: 0,
+          invested: 0,
         }
-
-        return holding;
-      }) as HoldingWithProfits[];
+      );
     },
   },
   actions: {
-    async syncHoldingWithTransactions(
-      holding: Holding,
-      transactions: Transaction[]
-    ) {
-      // Total and Average price are calculated by current Buy transactions
-      const totalShares = transactions
-        .filter(transformer.isBuy)
-        .reduce((acc, t) => acc + t.actualShares, 0);
-
-      holding.avgPrice = totalShares
-        ? (transactions
-            .filter(transformer.isBuy)
-            .reduce((acc, t) => acc + t.price * t.actualShares, 0) ?? 0) /
-          totalShares
-        : 0;
-
-      // Calculate invested by transactions funds (original shares)
-      holding.invested = transactions
-        .filter(transformer.isBuy)
-        .reduce((acc, t) => acc + t.price * t.shares, 0);
-
-      // Fees and profits would be calculated by the whole set.
-      holding.fees = transactions.reduce((acc, t) => acc + (t.fees ?? 0), 0);
-
-      holding.realizedProfits = transactions.reduce(
-        (acc, t) => acc + (t.realizedProfit ?? 0),
-        0
-      );
-
-      holding.id = (await holdingsAPI.update(holding, holding.id)).id;
-    },
     async list(portfolioId: string) {
       const transactionsStore = useTransactionsStore();
       this.loading = true;
@@ -134,14 +110,12 @@ export const useHoldingsStore = defineStore('holdings', {
 
           // Calculate after action AVG price
           context.after(async () => {
-            const holdingTransactions = transactionsStore.transactions.filter(
-              (t) => t.ticker === transaction.ticker
-            );
-
-            await this.syncHoldingWithTransactions(
-              holding,
-              holdingTransactions
-            );
+            holding.id = (
+              await holdingsAPI.syncHoldingWithTransactions(
+                holding,
+                transactionsStore.transactions
+              )
+            ).id;
           });
         }
       );
