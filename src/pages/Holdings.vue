@@ -2,7 +2,7 @@
   <q-page class="row justify-center q-pa-md">
     <div class="col-11">
       <p class="text-h5 text-grey-7 q-my-md">{{ $t('holdings.header') }}</p>
-      <holdings-table/>
+      <holdings-table />
     </div>
   </q-page>
 </template>
@@ -18,9 +18,7 @@ export default defineComponent({
   },
 
   setup() {
-    return {
-
-    };
+    return {};
   },
 });
 </script>

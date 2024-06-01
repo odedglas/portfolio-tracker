@@ -16,7 +16,12 @@ export const columns: QTableProps['columns'] = [
     field: 'shares',
     sortable: true,
   },
-  { name: 'avg_price', align: 'center', label: 'Average Price', field: 'avgPrice' },
+  {
+    name: 'avg_price',
+    align: 'center',
+    label: 'Average Price',
+    field: 'avgPrice',
+  },
   {
     name: 'totalValue',
     align: 'center',

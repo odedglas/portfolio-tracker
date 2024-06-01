@@ -102,7 +102,6 @@ const api = {
     // Bound realized profit if sold and allocated (not deleted)
     if (allocate) {
       transaction.realizedProfit = realizedProfitOrLoss;
-      debugger;
     }
 
     return available;

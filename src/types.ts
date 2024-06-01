@@ -48,4 +48,6 @@ export interface Holding {
   name: string;
   logoImage?: string;
   portfolioId: string;
+  fees?: number;
+  realizedProfits?: number
 }

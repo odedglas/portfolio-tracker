@@ -45,7 +45,8 @@ export const enUsMessages = {
   },
   holdings: {
     header: 'Holdings',
-    no_holdings: 'No holding are there yet, You can start by creating a Transaction'
+    no_holdings:
+      'No holding are there yet, You can start by creating a Transaction',
   },
   no_results: 'No results',
   cancel: 'Cancel',

@@ -107,7 +107,7 @@
                 props.row.profit.percent
               }}</span
             >
-            <span class="text-grey-8">{{ props.row.profit.value }}</span>
+            <span>{{ props.row.profit.value }}</span>
           </div>
           <span v-else>
             --
@@ -145,10 +145,11 @@
     </template>
 
     <template v-slot:bottom-row>
-      <q-tr class="text-bold text-center">
-        <q-td colspan="3">
+      <q-tr class="text-bold text-center" v-if="viewTransactions.length">
+        <q-td colspan="1" class="text-left">
           <span>Total</span>
         </q-td>
+        <q-td colspan="2"/>
         <q-td colspan="1">
           {{ actualShares }}
         </q-td>
@@ -159,7 +160,7 @@
           :class="`${totalProfit > 0 ? 'text-green-5' : 'text-red-5'}`"
           >{{ $n(totalProfit, 'decimal') }}</q-td
         >
-        <td colspan="1" />
+        <td colspan="2" />
       </q-tr>
     </template>
 
@@ -214,6 +215,7 @@ export default defineComponent({
         const isBuyAction = transformer.isBuy(transaction);
         const profitValue = balanceMap.value[transaction.id] ?? 0;
         const transactionValue = transformer.totalValue(transaction);
+        const transactionActualValue = transformer.actualValue(transaction);
 
         return {
           ...transaction,
@@ -228,7 +230,7 @@ export default defineComponent({
           profit: {
             value: profitValue ? $n(profitValue, 'decimal') : undefined,
             textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
-            percent: $n(Math.abs(profitValue / transactionValue), 'percent'),
+            percent: $n(Math.abs(profitValue / transactionActualValue), 'percent'),
             icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
           },
         };

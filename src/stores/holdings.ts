@@ -2,10 +2,16 @@ import { defineStore } from 'pinia';
 import holdingsAPI from 'src/service/holdings';
 import { useTransactionsStore } from 'stores/transactions';
 import { Holding, Transaction } from 'src/types';
+import { transformer } from 'src/service/transactions';
 
 interface HoldingsStoreState {
   holdings: Holding[];
   loading: boolean;
+}
+
+interface HoldingWithProfits extends Holding {
+  currentValue: number;
+  profit: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -17,23 +23,55 @@ export const useHoldingsStore = defineStore('holdings', {
     loading: false,
   }),
   getters: {
-    total(state) {
-      return state.holdings.reduce((total, holding) => {
-        const lastTickerValue = useTransactionsStore().tickerQuotes[holding.ticker];
+    holdingsWithProfits(state): HoldingWithProfits[] {
+      return state.holdings.map((holding) => {
+        const lastTickerValue =
+          useTransactionsStore().tickerQuotes[holding.ticker];
 
         if (lastTickerValue) {
-          const currentPrice = holding.shares * lastTickerValue.regularMarketPrice;
-          const avgCost = holding.shares * holding.avgPrice;
+          const currentValue =
+            holding.shares * lastTickerValue.regularMarketPrice;
+          const avgCost = holding.shares * holding.avgPrice - (holding?.fees ?? 0);
 
-          total.value += currentPrice;
-          total.profit += currentPrice - avgCost;
+          return {
+            ...holding,
+            currentValue,
+            profit: currentValue - avgCost + (holding?.realizedProfits ?? 0),
+          };
         }
 
-        return total;
-      }, { profit: 0, value: 0 });
+        return holding;
+      }) as HoldingWithProfits[];
     },
   },
   actions: {
+    async syncHoldingWithTransactions(holding: Holding, transactions: Transaction[]) {
+      // Total and Average price are calculated by current Buy transactions
+      const totalShares = transactions.filter(transformer.isBuy).reduce(
+        (acc, t) => acc + t.actualShares,
+        0
+      );
+
+      holding.avgPrice = totalShares
+        ? (transactions.filter(transformer.isBuy).reduce(
+        (acc, t) => acc + t.price * t.actualShares,
+        0
+      ) ?? 0) / totalShares
+        : 0;
+
+      // Fees and profits would be calculated by the whole set.
+      holding.fees = transactions.reduce(
+        (acc, t) => acc + (t.fees ?? 0),
+        0
+      );
+
+      holding.realizedProfits = transactions.reduce(
+        (acc, t) => acc + (t.realizedProfit ?? 0),
+        0
+      );
+
+      holding.id = (await holdingsAPI.update(holding, holding.id)).id;
+    },
     async list(portfolioId: string) {
       const transactionsStore = useTransactionsStore();
       this.loading = true;
@@ -47,8 +85,7 @@ export const useHoldingsStore = defineStore('holdings', {
       transactionsAddListener ||= transactionsStore.$onAction(
         async (context) => {
           const { name, args } = context;
-          if (name === 'list' || name === 'update') {
-            // TODO - Handle update - Price affects holding.
+          if (name === 'list') {
             return;
           }
 
@@ -67,28 +104,16 @@ export const useHoldingsStore = defineStore('holdings', {
           }
 
           if (holding.shares <= 0) {
-            return await holdingsAPI.delete(holding.id);
+            return await this.remove(holding.id);
           }
 
           // Calculate after action AVG price
           context.after(async () => {
             const holdingTransactions = transactionsStore.transactions.filter(
-              (t) => t.ticker === transaction.ticker && t.action === 'buy'
+              (t) => t.ticker === transaction.ticker
             );
 
-            const totalShares = holdingTransactions.reduce(
-              (acc, t) => acc + t.actualShares,
-              0
-            );
-
-            holding.avgPrice = totalShares
-              ? (holdingTransactions.reduce(
-                  (acc, t) => acc + t.price * t.actualShares,
-                  0
-                ) ?? 0) / totalShares
-              : 0;
-
-            holding.id = (await holdingsAPI.update(holding, holding.id)).id;
+            await this.syncHoldingWithTransactions(holding, holdingTransactions);
           });
         }
       );
@@ -102,6 +127,7 @@ export const useHoldingsStore = defineStore('holdings', {
 
       const holding = {
         id: '',
+        createdAt: Date.now(),
         portfolioId,
         shares: 0,
         ticker,
@@ -116,7 +142,9 @@ export const useHoldingsStore = defineStore('holdings', {
     },
     async remove(holdingId: string) {
       await holdingsAPI.delete(holdingId);
-      this.holdings = this.holdings.filter((holding) => holding.id !== holdingId);
+      this.holdings = this.holdings.filter(
+        (holding) => holding.id !== holdingId
+      );
     },
   },
 });

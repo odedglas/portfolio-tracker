@@ -37,43 +37,48 @@
         </q-td>
         <q-td
           key="totalValue"
-          :class="`${props.row.totalValue.textClass} text-bold`"
           :props="props"
         >
-          {{ props.row.totalValue.sign }}{{ props.row.totalValue.value }}
+          {{ props.row.totalValue.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
-          <div
-            class="flex column"
-            :class="props.row.profit.textClass"
-          >
+          <div class="flex column" :class="props.row.profit.textClass">
             <span
               ><q-icon :name="props.row.profit.icon" size="sm" />{{
                 props.row.profit.percent
               }}</span
             >
-            <span class="text-grey-8">{{ props.row.profit.value }}</span>
+            <span>{{ props.row.profit.value }}</span>
           </div>
+        </q-td>
+        <q-td key="daily_change" :props="props">
+          {{props.row.daily}}
         </q-td>
       </q-tr>
     </template>
 
     <template v-slot:bottom-row>
-      <q-tr class="text-bold text-center">
-        <q-td colspan="3">
+      <q-tr class="text-bold text-center" v-if="viewHoldings.length">
+        <q-td colspan="1">
           <span>Total</span>
         </q-td>
         <q-td colspan="1">
-          {{ totalShares }}
+          {{ totalSummary.shares }}
         </q-td>
-        <q-td colspan="3"></q-td>
+        <q-td colspan="1"></q-td>
         <q-td
-          v-if="total.profit"
+          v-if="totalSummary.currentValue"
           colspan="1"
-          :class="`${total.profit > 0 ? 'text-green-5' : 'text-red-5'}`"
-          >{{ $n(total.profit, 'decimal') }}</q-td
+          :class="`${totalSummary.currentValue > 0 ? 'text-green-5' : 'text-red-5'}`"
+        >{{ $n(totalSummary.currentValue, 'decimal') }}</q-td
         >
-        <td colspan="1" />
+        <q-td
+          v-if="totalSummary.profit"
+          colspan="1"
+          :class="`${totalSummary.profit > 0 ? 'text-green-5' : 'text-red-5'}`"
+          >{{ $n(totalSummary.profit, 'decimal') }}</q-td
+        >
+        <q-td colspan="1"/>
       </q-tr>
     </template>
 
@@ -100,7 +105,6 @@ import { defineComponent, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useHoldingsStore } from 'src/stores/holdings';
-import { useTransactionsStore } from 'stores/transactions';
 import { columns } from './columns';
 
 export default defineComponent({
@@ -109,48 +113,52 @@ export default defineComponent({
     const $n = useI18n().n;
     const filter = ref('');
     const holdingsStore = useHoldingsStore();
-    const transactionsStore = useTransactionsStore();
 
-    const { holdings, total } =
-      storeToRefs(holdingsStore);
+    const { holdingsWithProfits } = storeToRefs(holdingsStore);
 
     const viewHoldings = computed(() =>
-      holdings.value.map((holding) => {
-        const lastTickerValue = transactionsStore.tickerQuotes[holding.ticker];
-
-        const totalValue = holding.shares * lastTickerValue.regularMarketPrice;
-        const avgCost = holding.shares * holding.avgPrice;
-
-        const profitValue = totalValue - avgCost;
+      holdingsWithProfits.value.map((holding) => {
+        const totalValue = holding.currentValue;
+        const profitValue = holding.profit
 
         return {
           ...holding,
           totalValue: {
             value: $n(totalValue, 'decimal'),
-            textClass: totalValue >= 0 ? 'text-red-6' : 'text-green-6',
-            sign: totalValue ? (totalValue > 0 ? '-' : '+') : '',
+            textClass: totalValue >= 0 ? 'text-green-6' : 'text-red-6',
           },
           profit: {
             value: profitValue ? $n(profitValue, 'decimal') : undefined,
             textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
-            percent: $n(Math.abs(profitValue / totalValue), 'percent'),
+            percent: totalValue > 0 ? $n(Math.abs(profitValue / totalValue), 'percent') : 0,
             icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
           },
+          daily: 2,
         };
       })
     );
 
-    const isEmpty = computed(() => holdings.value.length === 0);
+    const isEmpty = computed(() => viewHoldings.value.length === 0);
 
-    const totalShares = computed(() => holdings.value.reduce((acc, holding) => acc + holding.shares, 0));
+    const totalSummary = computed(() =>
+      holdingsWithProfits.value.reduce((acc, holding) => {
+        acc.shares += holding.shares
+        acc.profit += holding.profit
+        acc.currentValue += holding.currentValue
 
+        return acc;
+      }, {
+        shares: 0,
+        profit: 0,
+        currentValue: 0
+      })
+    );
     return {
       isEmpty,
       filter,
       columns,
       viewHoldings,
-      total,
-      totalShares,
+      totalSummary,
     };
   },
 });
