@@ -97,7 +97,6 @@
               type="text"
               lazy-rules
               suffix="$"
-              :disable="!isNew"
               label="Price"
               :rules="[
                 (val) =>

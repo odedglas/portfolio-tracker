@@ -63,7 +63,6 @@ const api = {
 
       transactionId = result.id;
     } else {
-      // TODO - Support price update - Realized profits + Paid price. (calculated be allocate/deallocate sell logic)
       await firestoreAPI.updateDocument(
         transactionId,
         transactionsCollection(),

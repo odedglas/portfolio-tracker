@@ -122,13 +122,20 @@ export const useTransactionsStore = defineStore('transactions', {
       );
     },
     async update(transaction: Transaction) {
-      await transactionsAPI.update(transaction, transaction.id);
-
-      const index = this.transactions.findIndex(
+      const updateIndex = this.transactions.findIndex(
         (current) => current.id === transaction.id
       );
 
-      this.transactions[index] = transaction;
+      const existing = this.transactions[updateIndex];
+      if (existing && !transformer.isBuy(existing)) {
+        transaction.realizedProfit =
+          (existing.realizedProfit ?? 0) +
+          (transaction.price - existing.price) * transaction.actualShares;
+      }
+
+      await transactionsAPI.update(transaction, transaction.id);
+
+      this.transactions[updateIndex] = transaction;
     },
   },
 });
