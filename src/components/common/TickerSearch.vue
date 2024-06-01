@@ -5,6 +5,7 @@
     @update:model-value="(value) => $emit('update:tickerValue', value)"
     input-debounce="500"
     clearable
+    :disable="disabled"
     lazy-rules
     label="Search Ticker"
     :display-value="
@@ -74,6 +75,11 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
     tickerMeta: {
       type: Object as PropType<TickerMeta>,
       required: false,
@@ -85,6 +91,7 @@ export default defineComponent({
     const options: Ref<TickerOption[]> = ref([]);
     const noResults = ref(false);
 
+    console.log('********************', props.disabled);
     const filter: QSelectProps['onFilter'] = async (input, update) => {
       if (!input) {
         noResults.value = false;

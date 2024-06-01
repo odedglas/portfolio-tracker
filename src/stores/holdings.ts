@@ -11,7 +11,14 @@ interface HoldingsStoreState {
 
 interface HoldingWithProfits extends Holding {
   currentValue: number;
-  profit: number;
+  profit: {
+    value: number;
+    percent: number;
+  };
+  dailyChange: {
+    value: number;
+    percent: number;
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -25,19 +32,32 @@ export const useHoldingsStore = defineStore('holdings', {
   getters: {
     holdingsWithProfits(state): HoldingWithProfits[] {
       return state.holdings.map((holding) => {
-        const lastTickerValue =
+        const lastTickerQuote =
           useTransactionsStore().tickerQuotes[holding.ticker];
 
-        if (lastTickerValue) {
+        if (lastTickerQuote) {
           const currentValue =
-            holding.shares * lastTickerValue.regularMarketPrice;
-          const avgCost =
-            holding.shares * holding.avgPrice - (holding?.fees ?? 0);
+            holding.shares * lastTickerQuote.regularMarketPrice;
+          const avgCost = holding.shares * holding.avgPrice;
+          const profitValue =
+            currentValue -
+            avgCost +
+            (holding?.realizedProfits ?? 0) -
+            (holding?.fees ?? 0);
+          const dailyChangeValue =
+            lastTickerQuote.regularMarketChange * holding.shares;
 
           return {
             ...holding,
             currentValue,
-            profit: currentValue - avgCost + (holding?.realizedProfits ?? 0),
+            profit: {
+              value: profitValue,
+              percent: Math.abs(profitValue / holding.invested),
+            },
+            dailyChange: {
+              value: dailyChangeValue,
+              percent: dailyChangeValue / currentValue,
+            },
           };
         }
 

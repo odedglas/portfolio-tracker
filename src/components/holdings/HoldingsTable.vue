@@ -52,7 +52,14 @@
           </div>
         </q-td>
         <q-td key="daily_change" :props="props">
-          {{ props.row.daily }}
+          <div class="flex column" :class="props.row.daily.textClass">
+            <span
+              ><q-icon :name="props.row.daily.icon" size="sm" />{{
+                props.row.daily.percent
+              }}</span
+            >
+            <span>{{ props.row.daily.value }}</span>
+          </div>
         </q-td>
       </q-tr>
     </template>
@@ -119,7 +126,8 @@ export default defineComponent({
     const viewHoldings = computed(() =>
       holdingsWithProfits.value.map((holding) => {
         const totalValue = holding.currentValue;
-        const profitValue = holding.profit;
+        const profitValue = holding.profit.value;
+        const dailyChange = holding.dailyChange;
 
         return {
           ...holding,
@@ -130,13 +138,15 @@ export default defineComponent({
           profit: {
             value: profitValue ? $n(profitValue, 'decimal') : undefined,
             textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
-            percent:
-              totalValue > 0
-                ? $n(Math.abs(profitValue / holding.invested), 'percent')
-                : 0,
+            percent: totalValue > 0 ? $n(holding.profit.percent, 'percent') : 0,
             icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
           },
-          daily: 2,
+          daily: {
+            value: $n(dailyChange.value, 'decimal'),
+            percent: $n(dailyChange.percent, 'percent'),
+            textClass: dailyChange.value >= 0 ? 'text-green-6' : 'text-red-6',
+            icon: dailyChange.value >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
+          },
         };
       })
     );
@@ -147,7 +157,7 @@ export default defineComponent({
       holdingsWithProfits.value.reduce(
         (acc, holding) => {
           acc.shares += holding.shares;
-          acc.profit += holding.profit;
+          acc.profit += holding.profit.value;
           acc.currentValue += holding.currentValue;
           acc.invested += holding.invested;
 

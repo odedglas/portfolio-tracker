@@ -24,9 +24,19 @@ export const transformer = {
       { buy: 0, sell: 0, fees: 0 }
     ),
   totalValue: (transaction: Transaction) =>
-    transaction.shares * transaction.price + (transaction.fees || 0),
+    transaction.shares * transaction.price,
   actualValue: (transaction: Transaction) =>
-    transaction.actualShares * transaction.price + (transaction.fees || 0),
+    transaction.actualShares * transaction.price,
+  profitPercent: (profit: number, transaction: Transaction) => {
+    const actualValue = transformer.actualValue(transaction);
+
+    return actualValue
+      ? Math.abs(
+          profit /
+            (transaction?.paidPrice ?? transformer.actualValue(transaction))
+        )
+      : 0;
+  },
 };
 
 const api = {
@@ -53,6 +63,7 @@ const api = {
 
       transactionId = result.id;
     } else {
+      // TODO - Support price update - Realized profits + Paid price. (calculated be allocate/deallocate sell logic)
       await firestoreAPI.updateDocument(
         transactionId,
         transactionsCollection(),
@@ -70,12 +81,9 @@ const api = {
     transactions: Transaction[],
     allocate = true
   ) => {
-    const available = [...transactions].filter(
-      (t) =>
-        transformer.isBuy(t) &&
-        t.ticker === transaction.ticker &&
-        t.actualShares > 0
-    );
+    const available = [...transactions]
+      .reverse()
+      .filter((t) => transformer.isBuy(t) && t.ticker === transaction.ticker);
 
     let remainingShares = transaction.actualShares;
     let realizedProfitOrLoss = 0;
@@ -84,9 +92,11 @@ const api = {
 
     while (remainingShares > 0 && available.length > 0) {
       const buyTransaction = available[iterator];
+
       const buyTransactionPotentialShares = allocate
         ? buyTransaction.actualShares
-        : buyTransaction.shares;
+        : buyTransaction.shares - buyTransaction.actualShares;
+
       const soldShares = Math.min(
         buyTransactionPotentialShares,
         remainingShares

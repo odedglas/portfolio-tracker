@@ -98,7 +98,7 @@
         </q-td>
         <q-td key="total_profit" :props="props">
           <div
-            v-if="props.row.profit.value || props.row.actualShares > 0"
+            v-if="props.row.profit.value && props.row.actualShares > 0"
             class="flex column"
             :class="props.row.profit.textClass"
           >
@@ -215,7 +215,6 @@ export default defineComponent({
         const isBuyAction = transformer.isBuy(transaction);
         const profitValue = balanceMap.value[transaction.id] ?? 0;
         const transactionValue = transformer.totalValue(transaction);
-        const transactionActualValue = transformer.actualValue(transaction);
 
         return {
           ...transaction,
@@ -231,9 +230,7 @@ export default defineComponent({
             value: profitValue ? $n(profitValue, 'decimal') : undefined,
             textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
             percent: $n(
-              Math.abs(
-                profitValue / (transaction?.paidPrice ?? transactionActualValue)
-              ),
+              transformer.profitPercent(profitValue, transaction),
               'percent'
             ),
             icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',

@@ -25,6 +25,7 @@
         <q-form ref="formRef" class="q-gutter-sm">
           <ticker-search
             :ticker="localTransaction.ticker || ''"
+            :disabled="!isNew"
             :ticker-meta="{
               display: localTransaction.name,
               logo: localTransaction.logoImage,
@@ -96,6 +97,7 @@
               type="text"
               lazy-rules
               suffix="$"
+              :disable="!isNew"
               label="Price"
               :rules="[
                 (val) =>
