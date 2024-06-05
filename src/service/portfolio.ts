@@ -59,19 +59,16 @@ export const viewTransformer = {
     return viewTransformer.depositsValue(portfolio) - portfolio.invested;
   },
   portfolioKPIS(portfolio: Portfolio) {
-    const profitValue = portfolio.currentValue - portfolio.invested;
-
     const target = {
       value: portfolio.target,
       percentage: portfolio.currentValue / portfolio.target,
     };
 
     const profit = {
-      value: profitValue,
+      value: portfolio.profit,
       percentage: portfolio.invested
-        ? profitValue / portfolio.invested
+        ? portfolio.profit / portfolio.invested
         : portfolio.invested,
-      profitable: profitValue >= 0,
     };
 
     return { target, profit };

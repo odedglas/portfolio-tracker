@@ -1,35 +1,33 @@
+import { groupBy, mapValues } from 'lodash';
 import { defineStore } from 'pinia';
 import holdingsAPI, { transformer } from 'src/service/holdings';
+import { usePortfolioStore } from 'stores/portfolios';
 import { useTransactionsStore } from 'stores/transactions';
 import { useQuotesStore } from 'stores/quotes';
-import { Holding, Transaction } from 'src/types';
+import { Holding, Transaction, HoldingsSummary } from 'src/types';
 
 interface HoldingsStoreState {
   holdings: Holding[];
   loading: boolean;
 }
 
-interface HoldingWithProfits extends Holding {
-  currentValue: number;
-  profit: {
-    value: number;
-    percent: number;
-  };
-  dailyChange: {
-    value: number;
-    percent: number;
-  };
-}
-
-interface HoldingsSummary {
-  shares: number;
-  invested: number;
-  profit: number;
-  currentValue: number;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let transactionsAddListener: () => void;
+
+const calculateHoldingValue = (holding: Holding) => {
+  const lastTickerQuote = useQuotesStore().tickerQuotes[holding.ticker];
+
+  const currentValue = transformer.currentValue(holding, lastTickerQuote);
+  const profit = transformer.profit(holding, lastTickerQuote);
+  const dailyChange = transformer.dailyChange(holding, lastTickerQuote);
+
+  return {
+    ...holding,
+    currentValue,
+    profit,
+    dailyChange,
+  };
+};
 
 export const useHoldingsStore = defineStore('holdings', {
   state: (): HoldingsStoreState => ({
@@ -37,51 +35,32 @@ export const useHoldingsStore = defineStore('holdings', {
     loading: false,
   }),
   getters: {
-    holdingsWithProfits(state): HoldingWithProfits[] {
-      return state.holdings.map((holding) => {
-        const lastTickerQuote = useQuotesStore().tickerQuotes[holding.ticker];
+    portfolioHoldings(state) {
+      const portfoliosStore = usePortfolioStore();
+      const selectedPortfolio = portfoliosStore.selectedPortfolio;
 
-        const currentValue = transformer.currentValue(holding, lastTickerQuote);
-        const profit = transformer.profit(holding, lastTickerQuote);
-        const dailyChange = transformer.dailyChange(holding, lastTickerQuote);
+      return state.holdings
+        .filter((holding) => holding.portfolioId === selectedPortfolio?.id)
+        .map(calculateHoldingValue);
+    },
+    portfoliosHoldingsMap(state) {
+      // Portfolio to holdings map with summary attached
+      const holdingsByPortfolio = groupBy(state.holdings, 'portfolioId');
 
-        return {
-          ...holding,
-          currentValue,
-          profit,
-          dailyChange,
-        };
+      return mapValues(holdingsByPortfolio, (holdings) => {
+        const holdingsWithProfits = holdings.map(calculateHoldingValue);
+
+        return transformer.summary(holdingsWithProfits);
       });
     },
     summary(): HoldingsSummary {
-      return this.holdingsWithProfits.reduce(
-        (acc, holding) => {
-          acc.shares += holding.shares;
-          acc.profit += holding.profit.value;
-          acc.currentValue += holding.currentValue;
-          acc.invested += holding.invested;
-
-          return acc;
-        },
-        {
-          shares: 0,
-          profit: 0,
-          currentValue: 0,
-          invested: 0,
-        }
-      );
+      return transformer.summary(this.portfolioHoldings);
     },
   },
   actions: {
-    async list(portfolioId: string) {
+    setPortfoliosHoldings(holdings: Holding[]) {
       const transactionsStore = useTransactionsStore();
-      this.loading = true;
-
-      if (!portfolioId) {
-        throw Error('Cannot get holdings without Portfolio id');
-      }
-
-      this.holdings = await holdingsAPI.list(portfolioId);
+      this.holdings = holdings;
 
       transactionsAddListener ||= transactionsStore.$onAction(
         async (context) => {
@@ -119,10 +98,6 @@ export const useHoldingsStore = defineStore('holdings', {
           });
         }
       );
-
-      this.loading = false;
-
-      return this.holdings;
     },
     create(transaction: Transaction): Holding {
       const { portfolioId, ticker, name, logoImage, price } = transaction;

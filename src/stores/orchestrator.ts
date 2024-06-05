@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { useLoadingStore } from 'stores/loading';
 import { usePortfolioStore } from 'stores/portfolios';
+import { useHoldingsStore } from 'stores/holdings';
 import { useQuotesStore } from 'stores/quotes';
 import { queries } from 'src/service/firebase/collections';
 
@@ -10,6 +11,7 @@ export const useOrchestratorStore = defineStore('orchestrator', {
     async initialize() {
       const loadingStore = useLoadingStore();
       const quotesStore = useQuotesStore();
+      const holdingsStore = useHoldingsStore();
       const portfoliosStore = usePortfolioStore();
 
       await loadingStore.emitLoadingTask(async () => {
@@ -23,9 +25,9 @@ export const useOrchestratorStore = defineStore('orchestrator', {
           new Set(holdings.map((holding) => holding.ticker))
         );
 
-        const quotes = await quotesStore.getTickersQuotes(holdingsTickers);
+        await quotesStore.getTickersQuotes(holdingsTickers);
 
-        console.log('Holdings:', holdings, quotes);
+        holdingsStore.setPortfoliosHoldings(holdings);
       });
     },
   },

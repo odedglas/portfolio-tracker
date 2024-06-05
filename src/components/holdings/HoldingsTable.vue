@@ -121,10 +121,10 @@ export default defineComponent({
     const filter = ref('');
     const holdingsStore = useHoldingsStore();
 
-    const { holdingsWithProfits, summary } = storeToRefs(holdingsStore);
+    const { portfolioHoldings, summary } = storeToRefs(holdingsStore);
 
     const viewHoldings = computed(() =>
-      holdingsWithProfits.value.map((holding) => {
+      portfolioHoldings.value.map((holding) => {
         const totalValue = holding.currentValue;
         const profitValue = holding.profit.value;
         const dailyChange = holding.dailyChange;

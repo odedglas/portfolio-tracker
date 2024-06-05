@@ -5,7 +5,9 @@
     </q-item-section>
 
     <q-item-section center class="col-1">
-      <q-item-label class="text-subtitle2">{{ portfolio.title }}</q-item-label>
+      <q-item-label class="text-subtitle2">{{
+        viewPortfolio.title
+      }}</q-item-label>
     </q-item-section>
 
     <q-separator spaced vertical />
@@ -18,7 +20,7 @@
               $t('portfolios.invested')
             }}</q-item-label>
             <q-item-label class="q-mt-md">{{
-              $n(portfolio.invested, 'currency')
+              $n(viewPortfolio.invested, 'currency')
             }}</q-item-label>
           </q-item-section>
         </q-item>
@@ -29,7 +31,7 @@
               $t('portfolios.kpis.current_value')
             }}</q-item-label>
             <q-item-label
-              >{{ $n(portfolio.currentValue, 'currency') }}$</q-item-label
+              >{{ $n(viewPortfolio.currentValue, 'currency') }}$</q-item-label
             >
           </q-item-section>
         </q-item>
@@ -39,9 +41,14 @@
             <q-item-label class="text-grey-6 label">{{
               $t('portfolios.profit')
             }}</q-item-label>
-            <q-item-label :class="`flex items-center ${profitMeta.textClass}`">
-              <q-icon :name="profitMeta.percentageIcon" size="14px" />
-              {{ $n(profit.percentage, 'percent') }}
+            <q-item-label
+              :class="`flex items-center ${viewPortfolio.profitMeta.textClass}`"
+            >
+              <q-icon
+                :name="viewPortfolio.profitMeta.percentageIcon"
+                size="14px"
+              />
+              {{ $n(viewPortfolio.kpis.profit.percentage, 'percent') }}
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -52,7 +59,7 @@
               $t('portfolios.kpis.cash_flow')
             }}</q-item-label>
             <q-item-label class="q-mt-md">{{
-              $n(cashFlow, 'currency')
+              $n(viewPortfolio.cashFlow, 'currency')
             }}</q-item-label>
           </q-item-section>
         </q-item>
@@ -65,20 +72,25 @@
             <div>
               <q-linear-progress
                 size="8px"
-                :value="showTargets ? target.percentage : 0"
+                :value="showTargets ? viewPortfolio.kpis.target.percentage : 0"
                 class="q-my-xs"
               >
                 <q-tooltip>
                   {{
                     $t('portfolios.target_explainer', {
-                      percentage: $n(target.percentage, 'percent'),
+                      percentage: $n(
+                        viewPortfolio.kpis.target.percentage,
+                        'percent'
+                      ),
                     })
                   }}
                 </q-tooltip>
               </q-linear-progress>
               <div class="text-grey-6 text-caption row justify-between">
-                <span>{{ $n(depositValue, 'currency') }}$</span>
-                <span>{{ $n(target.value, 'currency') }}$</span>
+                <span>{{ $n(viewPortfolio.depositValue, 'currency') }}$</span>
+                <span
+                  >{{ $n(viewPortfolio.kpis.target.value, 'currency') }}$</span
+                >
               </div>
             </div>
           </q-item-section>
@@ -113,7 +125,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref, onMounted } from 'vue';
+import { defineComponent, PropType, ref, onMounted, computed } from 'vue';
 import { viewTransformer } from 'src/service/portfolio';
 import { Portfolio } from 'src/types';
 
@@ -144,19 +156,22 @@ export default defineComponent({
   emits: ['editPortfolio', 'deletePortfolio'],
   setup(props) {
     const showTargets = ref(false);
+
+    const viewPortfolio = computed(() => ({
+      ...props.portfolio,
+      cashFlow: viewTransformer.cashFlow(props.portfolio),
+      depositValue: viewTransformer.depositsValue(props.portfolio),
+      profitMeta: portfolio.profit >= 0 ? positiveProfit : negativeProfit,
+      kpis: viewTransformer.portfolioKPIS(props.portfolio),
+    }));
+
     const { portfolio } = props;
-    const depositValue = viewTransformer.depositsValue(portfolio);
-    const { target, profit } = viewTransformer.portfolioKPIS(portfolio);
 
     onMounted(() => {
       requestAnimationFrame(() => (showTargets.value = true));
     });
 
-    const cashFlow = viewTransformer.cashFlow(portfolio);
-
-    const profitMeta = profit.profitable ? positiveProfit : negativeProfit;
-
-    return { showTargets, target, profit, cashFlow, profitMeta, depositValue };
+    return { viewPortfolio, showTargets };
   },
 });
 </script>

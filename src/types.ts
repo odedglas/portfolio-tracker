@@ -53,3 +53,22 @@ export interface Holding {
   invested: number;
   realizedProfits?: number;
 }
+
+export interface HoldingsSummary {
+  shares: number;
+  invested: number;
+  profit: number;
+  currentValue: number;
+}
+
+export interface HoldingWithProfits extends Holding {
+  currentValue: number;
+  profit: {
+    value: number;
+    percent: number;
+  };
+  dailyChange: {
+    value: number;
+    percent: number;
+  };
+}

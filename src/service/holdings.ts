@@ -1,4 +1,4 @@
-import { Holding, Transaction } from 'src/types';
+import { Holding, HoldingWithProfits, Transaction } from 'src/types';
 import {
   getCollections,
   firestoreAPI,
@@ -33,6 +33,23 @@ export const transformer = {
       percent: dailyChangeValue / transformer.currentValue(holding, quote),
     };
   },
+  summary: (holdings: HoldingWithProfits[]) =>
+    holdings.reduce(
+      (acc, holding) => {
+        acc.shares += holding.shares;
+        acc.profit += holding.profit.value;
+        acc.currentValue += holding.currentValue;
+        acc.invested += holding.invested;
+
+        return acc;
+      },
+      {
+        shares: 0,
+        profit: 0,
+        currentValue: 0,
+        invested: 0,
+      }
+    ),
 };
 
 const api = {

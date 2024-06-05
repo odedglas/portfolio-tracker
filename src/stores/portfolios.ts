@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import portfolioAPI from 'src/service/portfolio';
 import { Portfolio } from 'src/types';
 import { useTransactionsStore } from 'stores/transactions';
+import { useHoldingsStore } from 'stores/holdings';
 
 const selectedPortfolioStorageKey = 'selected_portfolio_id';
 
@@ -21,11 +22,18 @@ export const usePortfolioStore = defineStore('portfolios', {
         (portfolio) => portfolio.id === state.selectedPortfolioId
       );
     },
-    computedPortfolios(state) {
-      // TODO -  Return the portfolios the computed properties such as `invested`/`currentValue`/`profit`.
-      return state.portfolios.map((portfolio) => ({
-        ...portfolio,
-      }));
+    portfoliosWithHoldings(state): Portfolio[] {
+      const holdingsStore = useHoldingsStore();
+      const portfoliosHoldingMap = holdingsStore.portfoliosHoldingsMap;
+
+      return state.portfolios.map((portfolio) => {
+        const portfolioHoldings = portfoliosHoldingMap[portfolio.id];
+
+        return {
+          ...portfolio,
+          ...portfolioHoldings,
+        };
+      });
     },
   },
   actions: {
