@@ -28,7 +28,7 @@
         <q-item class="col-2">
           <q-item-section top class="items-center">
             <q-item-label class="text-grey-6 label">{{
-              $t('portfolios.kpis.current_value')
+              $t('portfolios.kpis.holdings_value')
             }}</q-item-label>
             <q-item-label
               >{{ $n(viewPortfolio.currentValue, 'currency') }}$</q-item-label
@@ -87,7 +87,7 @@
                 </q-tooltip>
               </q-linear-progress>
               <div class="text-grey-6 text-caption row justify-between">
-                <span>{{ $n(viewPortfolio.depositValue, 'currency') }}$</span>
+                <span>{{ $n(viewPortfolio.initialDeposit, 'currency') }}$</span>
                 <span
                   >{{ $n(viewPortfolio.kpis.target.value, 'currency') }}$</span
                 >
@@ -159,6 +159,7 @@ export default defineComponent({
 
     const viewPortfolio = computed(() => ({
       ...props.portfolio,
+      initialDeposit: viewTransformer.initialDeposit(props.portfolio),
       cashFlow: viewTransformer.cashFlow(props.portfolio),
       depositValue: viewTransformer.depositsValue(props.portfolio),
       profitMeta: portfolio.profit >= 0 ? positiveProfit : negativeProfit,

@@ -49,6 +49,9 @@ const api = {
 };
 
 export const viewTransformer = {
+  initialDeposit(portfolio :Portfolio) {
+    return portfolio.deposits.find((deposit) => deposit.initial)?.value ?? 0;
+  },
   depositsValue(portfolio: Portfolio) {
     return portfolio.deposits.reduce(
       (amount, deposit) => amount + deposit.value,
@@ -61,7 +64,7 @@ export const viewTransformer = {
   portfolioKPIS(portfolio: Portfolio) {
     const target = {
       value: portfolio.target,
-      percentage: portfolio.currentValue / portfolio.target,
+      percentage: portfolio.currentValue / portfolio.target, // TODO - missing free cash flow
     };
 
     const profit = {

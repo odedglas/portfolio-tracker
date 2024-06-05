@@ -21,7 +21,7 @@ export const enUsMessages = {
     invested: 'Invested',
     kpis: {
       cash_flow: 'Cash Flow',
-      current_value: 'Current Value',
+      holdings_value: 'Holdings Value',
     },
     initial_investment: 'Initial Investment',
     initial_value_explain:
