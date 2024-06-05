@@ -5,5 +5,17 @@ service cloud.firestore {
     match /{document=**} {
       allow read, write: if false;
     }
+    match /portfolios/{portfolio} {
+      allow read, update: if request.auth.uid != null && resource.data.owner == request.auth.uid;
+      allow write: if request.auth.uid != null
+    }
+    match /transactions/{transaction} {
+      allow read, update: if request.auth.uid != null && get(/databases/$(database)/documents/portfolios/$(resource.data.portfolioId)).data.owner == request.auth.uid
+      allow write: if request.auth.uid != null
+    }
+    match /holdings/{holding} {
+      allow read, update: if request.auth.uid != null && get(/databases/$(database)/documents/portfolios/$(resource.data.portfolioId)).data.owner == request.auth.uid
+      allow write: if request.auth.uid != null
+    }
   }
 }

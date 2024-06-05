@@ -13,7 +13,7 @@ export interface Portfolio {
   owner: string;
   title: string;
   createdAt: number;
-  currentValue: number; // TODO - Calc ( Sum of holdings current value )
+  currentValue: number; // TODO - Calc ( Sum of holdings current value ) -> Shares * Quote price
   target: number;
   invested: number; // TODO - Calculated ( Sum of holdings invested )
   profit: number; // TODO - Calc ( Sum of holdings profits )

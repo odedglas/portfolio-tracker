@@ -1,24 +1,21 @@
-import { uniq } from 'lodash';
 import { defineStore } from 'pinia';
 import transactionsAPI, { transformer } from 'src/service/transactions';
-import * as stocksAPI from 'src/service/stocks';
-import type { Quote } from 'src/service/stocks';
 import { Transaction } from 'src/types';
+import { useQuotesStore } from 'stores/quotes';
 
 interface TransactionsStoreState {
   transactions: Transaction[];
-  tickerQuotes: Record<string, Quote>;
   loading: boolean;
 }
 
 export const useTransactionsStore = defineStore('transactions', {
   state: (): TransactionsStoreState => ({
     transactions: [],
-    tickerQuotes: {},
     loading: false,
   }),
   getters: {
     balanceMap: (state) => {
+      const quotesStore = useQuotesStore();
       const transactions = [...state.transactions].reverse();
 
       return transactions.reduce((balanceMap, transaction) => {
@@ -28,7 +25,7 @@ export const useTransactionsStore = defineStore('transactions', {
         // Buy balance would be calculated by transaction value VS ticker last price from quote.
         // Sell balance would be transaction realized profit / loss
         if (transformer.isBuy(transaction)) {
-          const lastTickerValue = state.tickerQuotes[transaction.ticker];
+          const lastTickerValue = quotesStore.tickerQuotes[transaction.ticker];
 
           if (lastTickerValue) {
             const currentPrice =
@@ -68,15 +65,6 @@ export const useTransactionsStore = defineStore('transactions', {
         this.transactions = [];
         return this.transactions;
       }
-
-      const tickers = uniq(
-        transactions.map((transaction) => transaction.ticker)
-      );
-
-      const quotes = await stocksAPI.getQuotes(tickers);
-      quotes.quoteResponse.result.forEach((quote) => {
-        this.tickerQuotes[quote.symbol] = quote;
-      });
 
       this.transactions = transactions;
 

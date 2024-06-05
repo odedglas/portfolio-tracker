@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import portfolioAPI from 'src/service/portfolio';
 import { Portfolio } from 'src/types';
 import { useTransactionsStore } from 'stores/transactions';
-import { useHoldingsStore } from 'stores/holdings';
 
 const selectedPortfolioStorageKey = 'selected_portfolio_id';
 
@@ -22,19 +21,21 @@ export const usePortfolioStore = defineStore('portfolios', {
         (portfolio) => portfolio.id === state.selectedPortfolioId
       );
     },
+    computedPortfolios(state) {
+      // TODO -  Return the portfolios the computed properties such as `invested`/`currentValue`/`profit`.
+      return state.portfolios.map((portfolio) => ({
+        ...portfolio,
+      }));
+    },
   },
   actions: {
     async selectPortfolio(portfolioId: string) {
       const transactionsStore = useTransactionsStore();
-      const holdingsStore = useHoldingsStore();
       localStorage.setItem(selectedPortfolioStorageKey, portfolioId);
 
       this.selectedPortfolioId = portfolioId;
 
-      await Promise.all([
-        transactionsStore.list(portfolioId),
-        holdingsStore.list(portfolioId),
-      ]);
+      await transactionsStore.list(portfolioId);
     },
     async list() {
       const persisted = localStorage.getItem(selectedPortfolioStorageKey);

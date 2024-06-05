@@ -45,7 +45,8 @@ export const getQuotes = cachedOperation(
       region: 'US',
       symbols: tickers.join(','),
     }),
-  (tickers: string[]) => `ticker-quotes-${tickers.join('-')}`
+  (tickers: string[]) => `ticker-quotes-${tickers.join('-')}`,
+  1000 * 60 * 60 // One hour quotes caching
 );
 
 export const getDailyPrice = async (ticker: string, date = new Date()) => {

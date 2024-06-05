@@ -69,6 +69,16 @@ export const queries = {
 
     return firestoreAPI.getAll(holdingsQuery);
   },
+  listPortfoliosHoldings: async (portfoliosIds: string[]) => {
+    const holdingsCollection = getCollections().holding;
+
+    const holdingsQuery = query(
+      holdingsCollection,
+      where('portfolioId', 'in', portfoliosIds)
+    );
+
+    return firestoreAPI.getAll(holdingsQuery);
+  },
 };
 
 /**

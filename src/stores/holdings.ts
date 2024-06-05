@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import holdingsAPI, { transformer } from 'src/service/holdings';
 import { useTransactionsStore } from 'stores/transactions';
+import { useQuotesStore } from 'stores/quotes';
 import { Holding, Transaction } from 'src/types';
 
 interface HoldingsStoreState {
@@ -38,8 +39,7 @@ export const useHoldingsStore = defineStore('holdings', {
   getters: {
     holdingsWithProfits(state): HoldingWithProfits[] {
       return state.holdings.map((holding) => {
-        const lastTickerQuote =
-          useTransactionsStore().tickerQuotes[holding.ticker];
+        const lastTickerQuote = useQuotesStore().tickerQuotes[holding.ticker];
 
         const currentValue = transformer.currentValue(holding, lastTickerQuote);
         const profit = transformer.profit(holding, lastTickerQuote);
