@@ -41,6 +41,8 @@ export const transformer = {
         acc.currentValue += holding.currentValue;
         acc.invested += holding.invested;
         acc.realized += holding.realizedProfits ?? 0;
+        acc.captialGains =
+          holding.profit.value - (holding.realizedProfits ?? 0);
 
         return acc;
       },
@@ -50,6 +52,7 @@ export const transformer = {
         currentValue: 0,
         invested: 0,
         realized: 0,
+        captialGains: 0,
       }
     ),
 };

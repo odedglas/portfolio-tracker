@@ -17,6 +17,8 @@ export interface Portfolio {
   target: number;
   invested: number;
   profit: number;
+  realized?: number;
+  captialGains?: number;
   deposits: Deposit[];
 }
 

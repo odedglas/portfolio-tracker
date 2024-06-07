@@ -92,11 +92,13 @@ const emptyPortfolioTemplate = (): Portfolio => ({
   profit: 0,
   owner: 'none',
   createdAt: Date.now(),
-  deposits: [{
-    value: 0,
-    date: Date.now(),
-    initial: true
-  }],
+  deposits: [
+    {
+      value: 0,
+      date: Date.now(),
+      initial: true,
+    },
+  ],
 });
 
 export default defineComponent({

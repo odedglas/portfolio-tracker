@@ -156,7 +156,7 @@ export default defineComponent({
   emits: ['editPortfolio', 'deletePortfolio'],
   setup(props) {
     const showTargets = ref(false);
-
+    // TODO - Better UI X.x. Portfolios to cards / Target success indicator
     const viewPortfolio = computed(() => ({
       ...props.portfolio,
       initialDeposit: viewTransformer.initialDeposit(props.portfolio),
