@@ -44,6 +44,7 @@ const api = {
 
     return await api.get(portfolioId);
   },
+  // TODO - Deletion should clean all portfolio related entities such as Transactions / Holdings.
   delete: async (portfolioId: string) =>
     firestoreAPI.deleteDocument(portfolioId, portfolioCollection()),
 };

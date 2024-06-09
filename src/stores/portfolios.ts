@@ -8,6 +8,15 @@ const selectedPortfolioStorageKey = 'selected_portfolio_id';
 
 let loadedOnce = false;
 
+const holdingsDefaults = {
+  shares: 0,
+  currentValue: 0,
+  profit: 0,
+  invested: 0,
+  realized: 0,
+  captialGains: 0,
+};
+
 export const usePortfolioStore = defineStore('portfolios', {
   state: (): {
     portfolios: Portfolio[];
@@ -31,6 +40,7 @@ export const usePortfolioStore = defineStore('portfolios', {
 
         return {
           ...portfolio,
+          ...holdingsDefaults,
           ...portfolioHoldings,
         };
       });

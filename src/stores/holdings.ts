@@ -64,6 +64,7 @@ export const useHoldingsStore = defineStore('holdings', {
 
       transactionsAddListener ||= transactionsStore.$onAction(
         async (context) => {
+          const selectedPortfolioId = usePortfolioStore().selectedPortfolioId;
           const { name, args } = context;
           if (name === 'list') {
             return;
@@ -74,7 +75,9 @@ export const useHoldingsStore = defineStore('holdings', {
 
           const holding =
             this.holdings.find(
-              (holding) => holding.ticker === transaction.ticker
+              (holding) =>
+                holding.ticker === transaction.ticker &&
+                holding.portfolioId === selectedPortfolioId
             ) ?? this.create(transaction);
 
           if (name === 'remove') {

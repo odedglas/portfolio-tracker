@@ -91,6 +91,10 @@ export const useTransactionsStore = defineStore('transactions', {
       );
     },
     async add(transaction: Transaction) {
+      // Add quote
+      await useQuotesStore().addTicker(transaction.ticker);
+
+      console.log(useQuotesStore().tickers);
       // Allocate sell transactions to available buy transactions
       if (!transformer.isBuy(transaction)) {
         const affectedTransaction = transactionsAPI.allocateSellTransaction(
