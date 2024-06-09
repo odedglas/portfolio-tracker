@@ -34,6 +34,10 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/Transactions.vue'),
       },
       {
+        path: ROUTE_PATHS.HOLDINGS,
+        component: () => import('pages/Holdings.vue'),
+      },
+      {
         path: ROUTE_PATHS.MANAGE_PORTFOLIOS,
         component: () => import('pages/ManagePortfolios.vue'),
       },

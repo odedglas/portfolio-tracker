@@ -49,6 +49,9 @@ const api = {
 };
 
 export const viewTransformer = {
+  initialDeposit(portfolio: Portfolio) {
+    return portfolio.deposits.find((deposit) => deposit.initial)?.value ?? 0;
+  },
   depositsValue(portfolio: Portfolio) {
     return portfolio.deposits.reduce(
       (amount, deposit) => amount + deposit.value,
@@ -59,19 +62,18 @@ export const viewTransformer = {
     return viewTransformer.depositsValue(portfolio) - portfolio.invested;
   },
   portfolioKPIS(portfolio: Portfolio) {
-    const profitValue = portfolio.currentValue - portfolio.invested;
+    const cashFlow = viewTransformer.cashFlow(portfolio);
 
     const target = {
       value: portfolio.target,
-      percentage: portfolio.currentValue / portfolio.target,
+      percentage: (portfolio.currentValue + cashFlow) / portfolio.target,
     };
 
     const profit = {
-      value: profitValue,
+      value: portfolio.profit,
       percentage: portfolio.invested
-        ? profitValue / portfolio.invested
-        : portfolio.invested,
-      profitable: profitValue >= 0,
+        ? portfolio.profit / portfolio.invested
+        : 0,
     };
 
     return { target, profit };

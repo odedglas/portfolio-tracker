@@ -14,14 +14,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import AppHeader from 'components/header/AppHeader.vue';
+import { useOrchestratorStore } from 'stores/orchestrator';
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
     AppHeader,
+  },
+
+  setup() {
+    const orchestratorStore = useOrchestratorStore();
+
+    onMounted(async () => {
+      await orchestratorStore.initialize();
+    });
   },
 });
 </script>

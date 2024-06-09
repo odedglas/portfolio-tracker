@@ -47,7 +47,7 @@
         <q-btn
           :disable="isManagePortfolios"
           size="sm"
-          class="col"
+          class="col q-mr-sm"
           icon="settings"
           outline
           color="secondary"

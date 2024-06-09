@@ -35,7 +35,7 @@
           />
 
           <q-input
-            v-model.number="localPortfolio.currentValue"
+            v-model.number="initialDeposit"
             type="number"
             lazy-rules
             :label="$t('portfolios.initial_investment')"
@@ -80,7 +80,7 @@
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
 import { useLoadingStore } from 'stores/loading';
 import { usePortfolioStore } from 'src/stores/portfolios';
-import portfolioAPI from 'src/service/portfolio';
+import portfolioAPI, { viewTransformer } from 'src/service/portfolio';
 import { Portfolio } from 'src/types';
 
 const emptyPortfolioTemplate = (): Portfolio => ({
@@ -92,7 +92,13 @@ const emptyPortfolioTemplate = (): Portfolio => ({
   profit: 0,
   owner: 'none',
   createdAt: Date.now(),
-  deposits: [],
+  deposits: [
+    {
+      value: 0,
+      date: Date.now(),
+      initial: true,
+    },
+  ],
 });
 
 export default defineComponent({
@@ -120,6 +126,14 @@ export default defineComponent({
         if (!value) {
           emit('closePortfolio', undefined);
         }
+      },
+    });
+
+    const initialDeposit = computed({
+      get: () => localPortfolio?.value?.deposits?.[0]?.value ?? 0,
+      set: (value: number) => {
+        localPortfolio.value.deposits ||= [];
+        localPortfolio.value.deposits[0].value = value;
       },
     });
 
@@ -157,7 +171,9 @@ export default defineComponent({
       formRef,
       syntheticShow,
       isNew,
+      initialDeposit,
       localPortfolio,
+      viewTransformer,
       setLocalPortfolio,
       submitForm,
     };

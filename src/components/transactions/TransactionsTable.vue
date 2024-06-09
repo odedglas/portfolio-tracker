@@ -27,7 +27,7 @@
               v-for="[keyName, value] in Object.entries(summary)"
               :key="keyName"
             >
-              <span class="flex items-center text-grey-8">
+              <span class="flex no-wrap items-center text-grey-8">
                 <span
                   :class="`summary-indicator text-weight-bold q-mr-sm ${summaryToClassMap[keyName]}`"
                   >•</span
@@ -55,7 +55,7 @@
     <template v-slot:body="props">
       <q-tr :props="props">
         <q-td key="action" :props="props" :class="props.row.actionTextClass">
-          <span class="text-uppercase text-bold">{{ props.row.action }}</span>
+          <span class="text-capitalize text-bold">{{ props.row.action }}</span>
         </q-td>
         <q-td key="holdings_name" :props="props">
           <div class="row items-center">
@@ -90,14 +90,18 @@
           {{ props.row.fees ? $n(props.row.fees, 'decimal') : 'None' }}
         </q-td>
         <q-td
-          key="balance"
-          :class="`${props.row.balance.textClass} text-bold`"
+          key="totalValue"
+          :class="`${props.row.totalValue.textClass} text-bold`"
           :props="props"
         >
-          {{ props.row.balance.sign }}{{ props.row.balance.value }}
+          {{ props.row.totalValue.sign }}{{ props.row.totalValue.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
-          <div class="flex column" :class="props.row.balance.textClass">
+          <div
+            v-if="props.row.profit.value && props.row.actualShares > 0"
+            class="flex column"
+            :class="props.row.profit.textClass"
+          >
             <span
               ><q-icon :name="props.row.profit.icon" size="sm" />{{
                 props.row.profit.percent
@@ -105,6 +109,12 @@
             >
             <span>{{ props.row.profit.value }}</span>
           </div>
+          <span v-else>
+            --
+            <q-tooltip>
+              <span>{{ $t('transactions.all_profit_is_realized') }}</span>
+            </q-tooltip>
+          </span>
         </q-td>
         <q-td key="item_actions" :props="props" class="text-grey-6">
           <q-btn
@@ -131,6 +141,26 @@
           >
           </q-btn>
         </q-td>
+      </q-tr>
+    </template>
+
+    <template v-slot:bottom-row>
+      <q-tr class="text-bold text-center" v-if="viewTransactions.length">
+        <q-td colspan="1" class="text-left">
+          <span>Total</span>
+        </q-td>
+        <q-td colspan="2" />
+        <q-td colspan="1">
+          {{ actualShares }}
+        </q-td>
+        <q-td colspan="3"></q-td>
+        <q-td
+          v-if="totalProfit"
+          colspan="1"
+          :class="`${totalProfit > 0 ? 'text-green-5' : 'text-red-5'}`"
+          >{{ $n(totalProfit, 'decimal') }}</q-td
+        >
+        <td colspan="2" />
       </q-tr>
     </template>
 
@@ -177,7 +207,7 @@ export default defineComponent({
     const filter = ref('');
     const transactionsStore = useTransactionsStore();
 
-    const { transactions, summary, balanceMap } =
+    const { transactions, summary, balanceMap, actualShares } =
       storeToRefs(transactionsStore);
 
     const viewTransactions = computed(() =>
@@ -189,7 +219,7 @@ export default defineComponent({
         return {
           ...transaction,
           actionTextClass: isBuyAction ? 'text-green-4' : 'text-red-4',
-          balance: {
+          totalValue: {
             value: $n(transactionValue, 'decimal'),
             textClass: isBuyAction ? 'text-red-6' : 'text-green-6',
             sign: isBuyAction ? '-' : '+',
@@ -197,12 +227,23 @@ export default defineComponent({
           price: transaction.price,
           date: date.formatDate(transaction.date, 'MM/DD/YY'),
           profit: {
-            value: $n(profitValue, 'decimal'),
-            percent: $n(Math.abs(profitValue / transactionValue), 'percent'),
-            icon: profitValue > 0 ? 'arrow_drop_up' : 'arrow_drop_down',
+            value: profitValue ? $n(profitValue, 'decimal') : undefined,
+            textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
+            percent: $n(
+              transformer.profitPercent(profitValue, transaction),
+              'percent'
+            ),
+            icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
           },
         };
       })
+    );
+
+    const totalProfit = computed(() =>
+      viewTransactions.value.reduce((acc, transaction) => {
+        const profitValue = balanceMap.value[transaction.id] ?? 0;
+        return acc + profitValue;
+      }, 0)
     );
 
     const isEmpty = computed(() => transactions.value.length === 0);
@@ -228,6 +269,8 @@ export default defineComponent({
       viewTransactions,
       summary,
       summaryToClassMap,
+      actualShares,
+      totalProfit,
     };
   },
 });

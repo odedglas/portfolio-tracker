@@ -28,6 +28,7 @@ const createCollection = <CollectionName extends AppCollectionsNames>(
 export const getCollections = () => ({
   portfolio: createCollection('portfolios'),
   transaction: createCollection('transactions'),
+  holding: createCollection('holdings'),
 });
 
 /**
@@ -57,6 +58,26 @@ export const queries = {
     const transactions = await firestoreAPI.getAll(transactionsQuery);
 
     return transactions.sort((t1, t2) => (t1.date < t2.date ? 1 : -1));
+  },
+  getPortfolioHoldings: async (portfolioId: string) => {
+    const holdingsCollection = getCollections().holding;
+
+    const holdingsQuery = query(
+      holdingsCollection,
+      where('portfolioId', '==', portfolioId)
+    );
+
+    return firestoreAPI.getAll(holdingsQuery);
+  },
+  listPortfoliosHoldings: async (portfoliosIds: string[]) => {
+    const holdingsCollection = getCollections().holding;
+
+    const holdingsQuery = query(
+      holdingsCollection,
+      where('portfolioId', 'in', portfoliosIds)
+    );
+
+    return firestoreAPI.getAll(holdingsQuery);
   },
 };
 

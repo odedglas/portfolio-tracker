@@ -5,6 +5,7 @@
     @update:model-value="(value) => $emit('update:tickerValue', value)"
     input-debounce="500"
     clearable
+    :disable="disabled"
     lazy-rules
     label="Search Ticker"
     :display-value="
@@ -73,6 +74,11 @@ export default defineComponent({
     ticker: {
       type: String,
       required: true,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
     tickerMeta: {
       type: Object as PropType<TickerMeta>,

@@ -6,7 +6,7 @@
       </h3>
       <portfolio-list
         v-if="!loading"
-        :portfolios="portfolioStore.portfolios"
+        :portfolios="portfolioStore.portfoliosWithHoldings"
         class="col-12"
         :edit-portfolio="showCreateOrEditPortfolio"
         :delete-portfolio="deletePortfolio"

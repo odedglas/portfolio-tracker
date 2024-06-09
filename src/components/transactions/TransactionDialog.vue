@@ -25,6 +25,7 @@
         <q-form ref="formRef" class="q-gutter-sm">
           <ticker-search
             :ticker="localTransaction.ticker || ''"
+            :disabled="!isNew"
             :ticker-meta="{
               display: localTransaction.name,
               logo: localTransaction.logoImage,
@@ -36,6 +37,8 @@
             <q-select
               class="col text-capitalize"
               v-model="localTransaction.action"
+              :disable="!isNew"
+              :emit-value="true"
               :options="transactionActions"
               label="Operation"
             />
@@ -76,10 +79,11 @@
 
           <div class="row" style="gap: 12px">
             <q-input
-              v-model.number="localTransaction.shares"
+              v-model.number="syntheticShares"
               class="col"
               type="text"
               lazy-rules
+              :disable="!isNew"
               label="Shares"
               :rules="[
                 (val) =>
@@ -138,9 +142,7 @@
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
 import { date as dateUtils } from 'quasar';
 import { useI18n } from 'vue-i18n';
-import { useLoadingStore } from 'stores/loading';
 import { usePortfolioStore } from 'stores/portfolios';
-import transactionsAPI from 'src/service/transactions';
 import { Transaction } from 'src/types';
 import { TRANSACTIONS_TYPES } from 'src/constants';
 import TickerSearch, { TickerOption } from '../common/TickerSearch.vue';
@@ -154,6 +156,7 @@ const emptyTransaction = (): Transaction => {
     date: Date.now(),
     createdAt: Date.now(),
     shares: 0,
+    actualShares: 0,
     price: 0,
     fees: 0,
     ticker: '',
@@ -179,7 +182,6 @@ export default defineComponent({
   emits: ['saveTransaction', 'closeTransaction'],
   setup(props, { emit }) {
     const $t = useI18n().t;
-    const { emitLoadingTask } = useLoadingStore();
 
     const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
       ref(undefined);
@@ -202,6 +204,14 @@ export default defineComponent({
       },
     });
 
+    const syntheticShares = computed({
+      get: () => localTransaction.value.shares,
+      set: (shares: number) => {
+        localTransaction.value.shares = shares;
+        localTransaction.value.actualShares = shares;
+      },
+    });
+
     const isNew = computed(() => localTransaction?.value?.id === '');
 
     const setLocalTransaction = () => {
@@ -217,17 +227,9 @@ export default defineComponent({
       localTransaction.value.price = tickerOption?.lastPrice ?? 0;
     };
 
-    const saveTransaction = async (transaction: Transaction) => {
-      const persisted = await emitLoadingTask(() =>
-        transactionsAPI.update(transaction, transaction.id)
-      );
-
-      emit('saveTransaction', persisted);
-    };
-
     const submitForm = async () => {
       if (await formRef.value?.validate()) {
-        await saveTransaction(localTransaction.value as Transaction);
+        emit('saveTransaction', localTransaction.value as Transaction);
         emit('closeTransaction');
       }
     };
@@ -249,6 +251,7 @@ export default defineComponent({
     return {
       formRef,
       syntheticShow,
+      syntheticShares,
       formattedDate,
       isNew,
       localTransaction,

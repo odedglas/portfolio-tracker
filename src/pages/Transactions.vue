@@ -35,7 +35,7 @@
     <transaction-dialog
       :show="showTransactionsModal"
       :transaction="transactionToEdit"
-      @save-transaction="syncTransactionState"
+      @save-transaction="saveTransaction"
       @close-transaction="hideTransactionsModal"
     />
   </q-page>
@@ -45,7 +45,6 @@
 import { defineComponent, ref } from 'vue';
 import { useTransactionsStore } from 'src/stores/transactions';
 import { useLoadingStore } from 'stores/loading';
-import transactionsAPI from 'src/service/transactions';
 import { useAreYouSure } from 'src/components/composables/useAreYouSureDialog';
 import TransactionsTable from 'src/components/transactions/TransactionsTable.vue';
 import TransactionDialog from 'src/components/transactions/TransactionDialog.vue';
@@ -80,16 +79,15 @@ export default defineComponent({
       showTransactionsModal.value = false;
     };
 
-    const syncTransactionState = (transaction: Transaction) => {
+    const saveTransaction = async (transaction: Transaction) => {
       const existing =
         transactionsStore.transactions.find((t) => t.id === transaction.id) !==
         undefined;
 
-      if (!existing) {
-        transactionsStore.add(transaction);
-      } else {
-        transactionsStore.update(transaction);
-      }
+      const action = existing
+        ? transactionsStore.update
+        : transactionsStore.add;
+      await emitLoadingTask(() => action(transaction));
     };
 
     const deleteTransaction = (transaction: Transaction) => {
@@ -97,9 +95,7 @@ export default defineComponent({
         title: 'Delete Transaction',
         message: `Are you sure you want to delete transaction of "${transaction.ticker}"?`,
         callback: async () => {
-          await emitLoadingTask(() => transactionsAPI.delete(transaction.id));
-
-          transactionsStore.remove(transaction.id);
+          await emitLoadingTask(() => transactionsStore.remove(transaction));
         },
       });
     };
@@ -110,7 +106,7 @@ export default defineComponent({
       showCreateOrEditTransaction,
       showTransactionsModal,
       transactionToEdit,
-      syncTransactionState,
+      saveTransaction,
       deleteTransaction,
     };
   },

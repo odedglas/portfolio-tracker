@@ -1,69 +1,39 @@
-import { uniq } from 'lodash';
 import { defineStore } from 'pinia';
 import transactionsAPI, { transformer } from 'src/service/transactions';
-import * as stocksAPI from 'src/service/stocks';
-import type { Quote } from 'src/service/stocks';
-import { usePortfolioStore } from './portfolios';
 import { Transaction } from 'src/types';
-
-let loadedOnce = false;
+import { useQuotesStore } from 'stores/quotes';
 
 interface TransactionsStoreState {
   transactions: Transaction[];
-  tickerQuotes: Record<string, Quote>;
   loading: boolean;
 }
 
 export const useTransactionsStore = defineStore('transactions', {
   state: (): TransactionsStoreState => ({
     transactions: [],
-    tickerQuotes: {},
     loading: false,
   }),
   getters: {
     balanceMap: (state) => {
-      const transactions = [...state.transactions];
+      const quotesStore = useQuotesStore();
+      const transactions = [...state.transactions].reverse();
 
       return transactions.reduce((balanceMap, transaction) => {
         let balance = 0;
-        const transactionValue = transformer.totalValue(transaction);
+        const transactionValue = transformer.actualValue(transaction);
 
+        // Buy balance would be calculated by transaction value VS ticker last price from quote.
+        // Sell balance would be transaction realized profit / loss
         if (transformer.isBuy(transaction)) {
-          // Buy balance would be calculated by transaction value VS ticker last price from quote.
-          const lastTickerValue = state.tickerQuotes[transaction.ticker];
+          const lastTickerValue = quotesStore.tickerQuotes[transaction.ticker];
 
           if (lastTickerValue) {
             const currentPrice =
-              transaction.shares * lastTickerValue.regularMarketPrice;
+              transaction.actualShares * lastTickerValue.regularMarketPrice;
             balance = currentPrice - transactionValue;
           }
         } else {
-          // Sell balance would be calculated by BUY type transactions FIFO style
-          const buyTransactions = state.transactions
-            .filter(
-              (t) => transformer.isBuy(t) && t.ticker === transaction.ticker
-            )
-            .reverse();
-
-          // For each buy transaction, we should cover if sell action covered it's shares or not and calculate the balance relatively
-          balance = transactionValue;
-          let soldShares = transaction.shares;
-          let iterator = 0;
-          while (soldShares > 0 && buyTransactions.length > 0) {
-            const buyTransaction = buyTransactions[iterator];
-            const availableSharesToSell = Math.min(
-              buyTransaction.shares,
-              soldShares
-            );
-
-            const transactionConst =
-              buyTransaction.price * availableSharesToSell -
-              (buyTransaction.fees ?? 0);
-            balance -= transactionConst;
-
-            soldShares -= buyTransaction.shares;
-            iterator++;
-          }
+          balance = transaction.realizedProfit || 0;
         }
 
         balanceMap[transaction.id] = balance;
@@ -72,59 +42,86 @@ export const useTransactionsStore = defineStore('transactions', {
       }, {} as Record<string, number>);
     },
     summary: (state) => transformer.summary(state.transactions),
+    actualShares: (state) =>
+      state.transactions.reduce((shares, transaction) => {
+        if (!transformer.isBuy(transaction)) {
+          return shares;
+        }
+
+        return shares + transaction.actualShares;
+      }, 0),
   },
   actions: {
-    async list() {
+    async list(portfolioId: string) {
       this.loading = true;
-      const { selectedPortfolioId } = usePortfolioStore();
 
-      if (!selectedPortfolioId) {
+      if (!portfolioId) {
         throw Error('Cannot list transactions without Portfolio id');
       }
 
-      if (loadedOnce) {
-        return this.transactions;
-      }
-
-      const transactions = await transactionsAPI.list(selectedPortfolioId);
+      const transactions = await transactionsAPI.list(portfolioId);
       if (!transactions.length) {
         this.loading = false;
         this.transactions = [];
         return this.transactions;
       }
 
-      const tickers = uniq(
-        transactions.map((transaction) => transaction.ticker)
-      );
-
-      const quotes = await stocksAPI.getQuotes(tickers);
-      quotes.quoteResponse.result.forEach((quote) => {
-        this.tickerQuotes[quote.symbol] = quote;
-      });
-
       this.transactions = transactions;
 
-      loadedOnce = true;
       this.loading = false;
 
       return this.transactions;
     },
-    remove(transactionId: string) {
+    async remove(transaction: Transaction) {
+      // DE - Allocate sell transactions to available buy transactions
+      if (!transformer.isBuy(transaction)) {
+        const affectedTransaction = transactionsAPI.allocateSellTransaction(
+          transaction,
+          this.transactions,
+          false
+        );
+
+        affectedTransaction.forEach(this.update);
+      }
+
+      await transactionsAPI.delete(transaction);
+
       this.transactions = this.transactions.filter(
-        (transaction) => transaction.id !== transactionId
+        (t) => t.id !== transaction.id
       );
     },
-    add(transaction: Transaction) {
+    async add(transaction: Transaction) {
+      // Allocate sell transactions to available buy transactions
+      if (!transformer.isBuy(transaction)) {
+        const affectedTransaction = transactionsAPI.allocateSellTransaction(
+          transaction,
+          this.transactions
+        );
+
+        affectedTransaction.forEach(this.update);
+      }
+
+      transaction = await transactionsAPI.update(transaction);
+
       this.transactions = [...this.transactions, transaction].sort((t1, t2) =>
         t1.date < t2.date ? 1 : -1
       );
     },
-    update(transaction: Transaction) {
-      const index = this.transactions.findIndex(
+    async update(transaction: Transaction) {
+      const updateIndex = this.transactions.findIndex(
         (current) => current.id === transaction.id
       );
 
-      this.transactions[index] = transaction;
+      const existing = this.transactions[updateIndex];
+      if (existing && !transformer.isBuy(existing)) {
+        transaction.realizedProfit =
+          (existing.realizedProfit ?? 0) +
+          (transaction.price - existing.price) * transaction.actualShares;
+      }
+
+      await transactionsAPI.update(transaction, transaction.id);
+
+      this.transactions[updateIndex] = transaction;
     },
   },
 });

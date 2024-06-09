@@ -17,6 +17,8 @@ export interface Portfolio {
   target: number;
   invested: number;
   profit: number;
+  realized?: number;
+  captialGains?: number;
   deposits: Deposit[];
 }
 
@@ -29,10 +31,46 @@ export interface Transaction {
   action: TransactionAction;
   date: number;
   shares: number;
+  actualShares: number;
   price: number;
   fees?: number;
   ticker: string;
   name: string;
   logoImage?: string;
+  paidPrice?: number;
   portfolioId: string;
+  realizedProfit?: number;
+}
+
+export interface Holding {
+  id: string;
+  createdAt: number;
+  shares: number;
+  ticker: string;
+  avgPrice: number;
+  name: string;
+  logoImage?: string;
+  portfolioId: string;
+  fees?: number;
+  invested: number;
+  realizedProfits?: number;
+}
+
+export interface HoldingsSummary {
+  shares: number;
+  invested: number;
+  profit: number;
+  currentValue: number;
+}
+
+export interface HoldingWithProfits extends Holding {
+  currentValue: number;
+  profit: {
+    value: number;
+    percent: number;
+  };
+  dailyChange: {
+    value: number;
+    percent: number;
+  };
 }
