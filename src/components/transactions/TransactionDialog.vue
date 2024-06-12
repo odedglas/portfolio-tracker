@@ -11,13 +11,7 @@
             <q-icon name="transform" class="q-mr-md" />
             {{ isNew ? $t('transactions.create') : $t('transactions.edit') }}
           </q-toolbar-title>
-          <q-btn
-            flat
-            round
-            dense
-            icon="close"
-            @click="$emit('closeTransaction')"
-          />
+          <q-btn flat round dense icon="close" @click="$emit('close')" />
         </q-toolbar>
       </q-card-section>
 
@@ -126,7 +120,7 @@
       </q-card-section>
 
       <q-card-actions align="right">
-        <q-btn flat :label="$t('cancel')" @click="$emit('closeTransaction')" />
+        <q-btn flat :label="$t('cancel')" @click="$emit('close')" />
         <q-btn
           color="primary"
           type="submit"
@@ -143,6 +137,9 @@ import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
 import { date as dateUtils } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { usePortfolioStore } from 'stores/portfolios';
+import { useTransactionsStore } from 'stores/transactions';
+import { useLoadingStore } from 'stores/loading';
+import { useQuotesStore } from 'stores/quotes';
 import { Transaction } from 'src/types';
 import { TRANSACTIONS_TYPES } from 'src/constants';
 import TickerSearch, { TickerOption } from '../common/TickerSearch.vue';
@@ -179,9 +176,12 @@ export default defineComponent({
   components: {
     TickerSearch,
   },
-  emits: ['saveTransaction', 'closeTransaction'],
+  emits: ['close'],
   setup(props, { emit }) {
     const $t = useI18n().t;
+    const transactionsStore = useTransactionsStore();
+    const quotesStore = useQuotesStore();
+    const { emitLoadingTask } = useLoadingStore();
 
     const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
       ref(undefined);
@@ -191,7 +191,7 @@ export default defineComponent({
       get: () => props.show,
       set: (value: boolean) => {
         if (!value) {
-          emit('closeTransaction', undefined);
+          emit('close', undefined);
         }
       },
     });
@@ -229,8 +229,19 @@ export default defineComponent({
 
     const submitForm = async () => {
       if (await formRef.value?.validate()) {
-        emit('saveTransaction', localTransaction.value as Transaction);
-        emit('closeTransaction');
+        const transaction = localTransaction.value;
+
+        await emitLoadingTask(async () => {
+          const action = isNew.value
+            ? transactionsStore.add
+            : transactionsStore.update;
+
+          await quotesStore.addTicker(transaction.ticker);
+
+          await action(transaction);
+        });
+
+        emit('close');
       }
     };
 

@@ -20,9 +20,13 @@ export const useQuotesStore = defineStore('quotes', {
 
       const quotes = await stocksAPI.getQuotes(tickers);
 
-      quotes.quoteResponse.result.forEach((quote) => {
-        this.tickerQuotes[quote.symbol] = quote;
-      });
+      this.tickerQuotes = quotes.quoteResponse.result.reduce(
+        (tickerQuotes, quote) => ({
+          ...tickerQuotes,
+          [quote.symbol]: quote,
+        }),
+        this.tickerQuotes
+      );
 
       this.tickers = Array.from(new Set(Object.keys(this.tickerQuotes)));
 
@@ -30,9 +34,7 @@ export const useQuotesStore = defineStore('quotes', {
     },
     async addTicker(ticker: string) {
       if (!this.tickers.includes(ticker)) {
-        this.tickers.push(ticker);
-
-        await this.getTickersQuotes(this.tickers);
+        await this.getTickersQuotes([...this.tickers, ticker]);
       }
     },
   },

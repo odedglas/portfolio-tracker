@@ -4,9 +4,9 @@
       <p class="text-h5 text-grey-7 q-my-md">{{ $t('transactions.header') }}</p>
       <transactions-table
         v-if="!transactionsStore.loading"
-        @delete-transaction="deleteTransaction"
-        @edit-transaction="showCreateOrEditTransaction"
-        :show-or-edit-transaction="showCreateOrEditTransaction"
+        @delete-transaction="deleteEntity"
+        @edit-transaction="openEntityModal"
+        :show-or-edit-transaction="openEntityModal"
       />
 
       <q-card v-else class="loading-holder q-pa-sm">
@@ -33,19 +33,17 @@
     </div>
 
     <transaction-dialog
-      :show="showTransactionsModal"
-      :transaction="transactionToEdit"
-      @save-transaction="saveTransaction"
-      @close-transaction="hideTransactionsModal"
+      :show="showModal"
+      :transaction="editEntity"
+      @close="hideEntityModal"
     />
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import { useTransactionsStore } from 'src/stores/transactions';
-import { useLoadingStore } from 'stores/loading';
-import { useAreYouSure } from 'src/components/composables/useAreYouSureDialog';
+import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
 import TransactionsTable from 'src/components/transactions/TransactionsTable.vue';
 import TransactionDialog from 'src/components/transactions/TransactionDialog.vue';
 import { Transaction } from 'src/types';
@@ -59,55 +57,28 @@ export default defineComponent({
 
   setup() {
     const transactionsStore = useTransactionsStore();
-    const { emitLoadingTask } = useLoadingStore();
-    const { showAreYouSure } = useAreYouSure();
-
-    const showTransactionsModal = ref(false);
-    const transactionToEdit = ref<Transaction | undefined>(undefined);
-
-    const showCreateOrEditTransaction = async (transaction?: Transaction) => {
-      const isEdit = !!transaction?.id;
-      if (isEdit) {
-        transactionToEdit.value = { ...transaction };
-      }
-
-      showTransactionsModal.value = true;
-    };
-
-    const hideTransactionsModal = () => {
-      transactionToEdit.value = undefined;
-      showTransactionsModal.value = false;
-    };
-
-    const saveTransaction = async (transaction: Transaction) => {
-      const existing =
-        transactionsStore.transactions.find((t) => t.id === transaction.id) !==
-        undefined;
-
-      const action = existing
-        ? transactionsStore.update
-        : transactionsStore.add;
-      await emitLoadingTask(() => action(transaction));
-    };
-
-    const deleteTransaction = (transaction: Transaction) => {
-      showAreYouSure({
+    const {
+      editEntity,
+      showModal,
+      openEntityModal,
+      hideEntityModal,
+      deleteEntity,
+    } = useEditableEntityPage<Transaction>({
+      deleteModal: {
         title: 'Delete Transaction',
-        message: `Are you sure you want to delete transaction of "${transaction.ticker}"?`,
-        callback: async () => {
-          await emitLoadingTask(() => transactionsStore.remove(transaction));
-        },
-      });
-    };
+        message: (transaction) =>
+          `Are you sure you want to delete transaction of "${transaction.ticker}"?`,
+        callback: (transaction) => transactionsStore.remove(transaction),
+      },
+    });
 
     return {
       transactionsStore,
-      hideTransactionsModal,
-      showCreateOrEditTransaction,
-      showTransactionsModal,
-      transactionToEdit,
-      saveTransaction,
-      deleteTransaction,
+      showModal,
+      editEntity,
+      openEntityModal,
+      hideEntityModal,
+      deleteEntity,
     };
   },
 });

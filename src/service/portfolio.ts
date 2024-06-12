@@ -24,10 +24,6 @@ const api = {
       data.createdAt = Date.now();
       data.owner = authentication.currentUser.uid;
 
-      data.deposits = [
-        { date: Date.now(), value: data.currentValue || 0, initial: true },
-      ];
-
       const result = await firestoreAPI.addDocument(
         portfolioCollection(),
         data

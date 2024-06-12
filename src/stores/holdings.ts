@@ -15,7 +15,8 @@ interface HoldingsStoreState {
 let transactionsAddListener: () => void;
 
 const calculateHoldingValue = (holding: Holding) => {
-  const lastTickerQuote = useQuotesStore().tickerQuotes[holding.ticker];
+  const tickerQuotes = useQuotesStore().tickerQuotes;
+  const lastTickerQuote = tickerQuotes[holding.ticker];
 
   const currentValue = transformer.currentValue(holding, lastTickerQuote);
   const profit = transformer.profit(holding, lastTickerQuote);

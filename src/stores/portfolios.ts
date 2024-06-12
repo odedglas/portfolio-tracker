@@ -88,6 +88,12 @@ export const usePortfolioStore = defineStore('portfolios', {
         (portfolio) => portfolio.id !== portfolioId
       );
 
+      if (this.portfolios.length === 0) {
+        this.selectedPortfolioId = undefined;
+        localStorage.removeItem(selectedPortfolioStorageKey);
+        return;
+      }
+
       const selectedPortfolio = this.portfolios.find(
         (portfolio) => portfolio.id === this.selectedPortfolioId
       );

@@ -66,7 +66,7 @@
 
     <template v-slot:bottom-row>
       <q-tr class="text-bold text-center" v-if="viewHoldings.length">
-        <q-td colspan="1">
+        <q-td colspan="1" class="text-left">
           <span>Total</span>
         </q-td>
         <q-td colspan="1">
