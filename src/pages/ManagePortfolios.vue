@@ -1,9 +1,7 @@
 <template>
   <q-page class="row justify-center q-pa-md">
     <div class="col-10">
-      <h3 class="text-subtitle1 text-grey-7">
-        {{ $t('portfolios.title') }}
-      </h3>
+      <p class="text-h5 text-grey-7 q-my-md">{{ $t('portfolios.title') }}</p>
       <portfolio-list
         v-if="!loading"
         :portfolios="portfolioStore.portfoliosWithHoldings"

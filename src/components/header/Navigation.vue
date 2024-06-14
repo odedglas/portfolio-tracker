@@ -57,7 +57,7 @@ export default defineComponent({
         props: { label: 'Portfolio' },
         component: 'q-btn',
         preventNavigation: true,
-        route: ['/transactions', '/holdings', '/events'],
+        route: ['/transactions', '/holdings', '/cash'],
         menuOptions: [
           {
             id: 'transactions',

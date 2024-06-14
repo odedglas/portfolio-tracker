@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import portfolioAPI from 'src/service/portfolio';
+import { transformer as holdingsTransformer } from 'src/service/holdings';
 import { Deposit, Portfolio } from 'src/types';
 import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
@@ -30,6 +31,20 @@ export const usePortfolioStore = defineStore('portfolios', {
       return state.portfolios.find(
         (portfolio) => portfolio.id === state.selectedPortfolioId
       );
+    },
+    selectedPortfolioWithHoldings(): Portfolio | undefined {
+      const selected = this.selectedPortfolio;
+      const holdingsStore = useHoldingsStore();
+
+      if (!selected) return undefined;
+
+      const holdings = holdingsStore.portfolioHoldings;
+
+      return {
+        ...selected,
+        ...holdingsDefaults,
+        ...holdingsTransformer.summary(holdings),
+      };
     },
     portfoliosWithHoldings(state): Portfolio[] {
       const holdingsStore = useHoldingsStore();

@@ -85,7 +85,11 @@
           :class="`${summary.profit > 0 ? 'text-green-5' : 'text-red-5'}`"
           >{{ $n(summary.profit, 'decimal') }}</q-td
         >
-        <q-td colspan="1" />
+        <q-td
+          colspan="1"
+          :class="`${summary.dailyChange > 0 ? 'text-green-5' : 'text-red-5'}`"
+          >{{ $n(summary.dailyChange, 'decimal') }}</q-td
+        >
       </q-tr>
     </template>
 
