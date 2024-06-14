@@ -6,10 +6,15 @@ export interface Entity {
   id: string;
 }
 
-interface Deposit {
+export interface Deposit {
   date: number;
   value: number;
   initial?: boolean;
+}
+
+export interface DepositEntity extends Deposit {
+  id: string;
+  index: number;
 }
 
 export interface Portfolio extends Entity {

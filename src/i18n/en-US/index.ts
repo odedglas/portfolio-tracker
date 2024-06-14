@@ -11,6 +11,9 @@ export const enUsMessages = {
     no_portfolios: 'You have no portfolios created just yet!',
     manage_portfolios: 'Manage Portfolios',
   },
+  total: 'Total',
+  deposit: 'Deposit',
+  withdrawal: 'Withdrawal',
   portfolios: {
     title: "Manage your Portfolio's",
     create: 'New Portfolio',
@@ -19,6 +22,7 @@ export const enUsMessages = {
     target: 'Target',
     target_explainer: 'You are {percentage} from reaching your target 🎉',
     invested: 'Invested',
+    cash_flow: 'Cash Flow',
     kpis: {
       cash_flow: 'Cash Flow',
       holdings_value: 'Holdings Value',

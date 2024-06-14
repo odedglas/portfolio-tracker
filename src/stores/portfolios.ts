@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import portfolioAPI from 'src/service/portfolio';
-import { Portfolio } from 'src/types';
+import { Deposit, Portfolio } from 'src/types';
 import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
 
@@ -114,6 +114,26 @@ export const usePortfolioStore = defineStore('portfolios', {
       );
 
       this.portfolios[index] = portfolio;
+    },
+    async updateDeposit(deposit: Deposit, index: number) {
+      const portfolio = this.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      portfolio.deposits[index] = deposit;
+
+      return portfolioAPI.update(portfolio, portfolio.id);
+    },
+    async deleteDeposit(index: number) {
+      const portfolio = this.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      portfolio.deposits.splice(index, 1);
+
+      return portfolioAPI.update(portfolio, portfolio.id);
     },
   },
 });

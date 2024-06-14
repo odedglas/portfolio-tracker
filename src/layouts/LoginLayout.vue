@@ -1,7 +1,7 @@
 <template>
   <q-layout>
     <q-page-container>
-      <q-page class="flex flex-center bg-grey-2">
+      <q-page class="flex flex-center bg-grey-1">
         <login-page />
       </q-page>
     </q-page-container>

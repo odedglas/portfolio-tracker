@@ -121,7 +121,7 @@ export default defineComponent({
     const localPortfolio = toRef(props.portfolio) as Ref<Partial<Portfolio>>;
 
     const syntheticShow = computed({
-      get: () => !!props.show,
+      get: () => props.show,
       set: (value: boolean) => {
         if (!value) {
           emit('closePortfolio', undefined);
