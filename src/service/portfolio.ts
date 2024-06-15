@@ -56,9 +56,10 @@ export const viewTransformer = {
     );
   },
   cashFlow(portfolio: Portfolio) {
-    return viewTransformer.depositsValue(portfolio) - portfolio.invested;
+    return viewTransformer.depositsValue(portfolio) - portfolio.invested - (portfolio.fees ?? 0);
   },
   portfolioKPIS(portfolio: Portfolio) {
+    const depositsValue = viewTransformer.depositsValue(portfolio);
     const cashFlow = viewTransformer.cashFlow(portfolio);
 
     const target = {
@@ -69,11 +70,18 @@ export const viewTransformer = {
     const profit = {
       value: portfolio.profit,
       percentage: portfolio.invested
-        ? portfolio.profit / portfolio.invested
+        ? portfolio.profit / depositsValue
         : 0,
     };
 
-    return { target, profit };
+    const dailyChange = {
+      value: portfolio.dailyChange ?? 0,
+      percentage: portfolio.dailyChange
+       ? portfolio.dailyChange / depositsValue
+        : 0
+    };
+
+    return { target, profit, dailyChange };
   },
 };
 

@@ -45,6 +45,7 @@ export const transformer = {
         acc.captialGains +=
           holding.profit.value - (holding.realizedProfits ?? 0);
         acc.dailyChange += holding.dailyChange.value;
+        acc.fees += holding?.fees ?? 0;
 
         return acc;
       },
@@ -56,6 +57,7 @@ export const transformer = {
         realized: 0,
         captialGains: 0,
         dailyChange: 0,
+        fees: 0,
       }
     ),
 };

@@ -2,7 +2,7 @@
   <q-page class="row justify-center q-pa-md">
     <div class="col-10">
       <p class="text-h5 text-grey-7 q-mt-md">{{ viewPortfolio?.title }}</p>
-      <div class="flex q-my-lg q-gutter-md">
+      <div class="flex q-gutter-md">
         <div v-for="kpi in kpis" :key="kpi.title" class="col">
           <dashboard-kpi v-bind="kpi" />
         </div>
@@ -53,9 +53,10 @@ export default defineComponent({
           icon: 'trending_up',
           subtitle: {
             text: 'daily',
-            value: portfolio.dailyChange,
+            value: portfolioKpis.dailyChange.value,
+            percentage: portfolioKpis.dailyChange.percentage,
             className:
-              (portfolio?.dailyChange ?? 0) >= 0
+              portfolioKpis.dailyChange.value >= 0
                 ? 'text-green-5'
                 : 'text-red-5',
           },

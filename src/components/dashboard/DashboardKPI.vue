@@ -15,8 +15,14 @@
           class="q-mx-sm text-subtitle1"
         />
       </div>
-      <div class="flex q-gutter-xs">
-        <span :class="`${subtitle.className ?? 'text-grey-6'}`">
+      <div class="flex items-center q-gutter-xs">
+        <profit-indicator
+          v-if="subtitle.percentage"
+          :value="subtitle.value"
+          :percentage="subtitle.percentage"
+          class="q-mx-sm"
+        />
+        <span v-else :class="`${subtitle.className ?? 'text-grey-6'}`">
           {{ $n(subtitle?.value ?? 0, 'decimal') }}
         </span>
         <span class="text-grey-6">
@@ -61,6 +67,7 @@ export default defineComponent({
       type: Object as PropType<{
         text: string;
         value?: number;
+        percentage?: number;
         className?: string;
       }>,
       required: true,
@@ -76,4 +83,8 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.dashboard-kpi-card {
+  height: 100%;
+}
+</style>

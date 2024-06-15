@@ -24,9 +24,9 @@ export const transformer = {
       { buy: 0, sell: 0, fees: 0 }
     ),
   totalValue: (transaction: Transaction) =>
-    transaction.shares * transaction.price,
+    transaction.shares * transaction.price + (transaction.fees ?? 0),
   actualValue: (transaction: Transaction) =>
-    transaction.actualShares * transaction.price,
+    transaction.actualShares * transaction.price + (transaction.fees ?? 0),
   profitPercent: (profit: number, transaction: Transaction) => {
     const actualValue = transformer.actualValue(transaction);
 

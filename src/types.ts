@@ -28,6 +28,7 @@ export interface Portfolio extends Entity {
   realized?: number;
   captialGains?: number;
   dailyChange?: number;
+  fees?: number;
   deposits: Deposit[];
 }
 
@@ -69,6 +70,7 @@ export interface HoldingsSummary {
   profit: number;
   currentValue: number;
   dailyChange: number;
+  fees: number;
 }
 
 export interface HoldingWithProfits extends Holding {

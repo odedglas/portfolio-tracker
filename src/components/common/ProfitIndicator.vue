@@ -1,9 +1,9 @@
 <template>
-  <span class="flex column inline" :class="textClass">
-    <span
+  <span class="flex items-center" :class="textClass">
+    <span v-if="value !== undefined">{{ $n(value, 'decimal') }}</span>
+    <span class="flex items-center"
       ><q-icon :name="icon" size="sm" />{{ $n(percentage, 'percent') }}</span
     >
-    <span v-if="value !== undefined">{{ value }}</span>
   </span>
 </template>
 
