@@ -13,15 +13,18 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { usePortfolioStore } from 'stores/portfolios';
 import { viewTransformer } from 'src/service/portfolio';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
+
 export default defineComponent({
   name: 'DashboardPage',
   components: {
     DashboardKpi,
   },
   setup() {
+    const $t = useI18n().t;
     const portfolioStore = usePortfolioStore();
 
     const viewPortfolio = computed(
@@ -37,16 +40,16 @@ export default defineComponent({
       const portfolioKpis = viewTransformer.portfolioKPIS(portfolio);
       return [
         {
-          title: 'Value',
+          title: $t('dashboard.kpis.value'),
           value: portfolio.currentValue ?? 0,
-          icon: 'account_balance',
+          icon: 'balance',
           subtitle: {
             text: 'invested',
             value: portfolio.invested ?? 0,
           },
         },
         {
-          title: 'Total profit',
+          title: $t('dashboard.kpis.profit'),
           value: portfolioKpis.profit.value ?? 0,
           valuePercentage: portfolioKpis.profit.percentage,
           showValueSign: true,
@@ -62,9 +65,9 @@ export default defineComponent({
           },
         },
         {
-          title: 'Cash flow',
+          title: $t('dashboard.kpis.cash_flow'),
           value: viewTransformer.cashFlow(portfolio),
-          icon: 'balance',
+          icon: 'account_balance',
           subtitle: {
             text: 'deposited',
             value: viewTransformer.depositsValue(portfolio),

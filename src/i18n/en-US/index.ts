@@ -13,6 +13,7 @@ export const enUsMessages = {
   },
   total: 'Total',
   deposit: 'Deposit',
+  balance: 'Balance',
   withdrawal: 'Withdrawal',
   portfolios: {
     title: "Manage portfolio's",
@@ -51,6 +52,13 @@ export const enUsMessages = {
     header: 'Holdings',
     no_holdings:
       'No holding are there yet, You can start by creating a Transaction',
+  },
+  dashboard: {
+    kpis: {
+      cash_flow: 'Free Cash Flow',
+      profit: 'Total Profit',
+      value: 'Current Value',
+    },
   },
   no_results: 'No results',
   cancel: 'Cancel',

@@ -50,13 +50,22 @@ export const viewTransformer = {
     return portfolio.deposits.find((deposit) => deposit.initial)?.value ?? 0;
   },
   depositsValue(portfolio: Portfolio) {
-    return portfolio.deposits.reduce(
-      (amount, deposit) => amount + deposit.value,
-      0
-    );
+    return portfolio.deposits
+      .filter((d) => d.type !== 'balance')
+      .reduce((amount, deposit) => amount + deposit.value, 0);
+  },
+  depositManualBalance(portfolio: Portfolio) {
+    return portfolio.deposits
+      .filter((d) => d.type === 'balance')
+      .reduce((amount, deposit) => amount + deposit.value, 0);
   },
   cashFlow(portfolio: Portfolio) {
-    return viewTransformer.depositsValue(portfolio) - portfolio.invested - (portfolio.fees ?? 0);
+    return (
+      viewTransformer.depositsValue(portfolio) -
+      portfolio.invested -
+      (portfolio.fees ?? 0) +
+      viewTransformer.depositManualBalance(portfolio)
+    );
   },
   portfolioKPIS(portfolio: Portfolio) {
     const depositsValue = viewTransformer.depositsValue(portfolio);
@@ -69,16 +78,14 @@ export const viewTransformer = {
 
     const profit = {
       value: portfolio.profit,
-      percentage: portfolio.invested
-        ? portfolio.profit / depositsValue
-        : 0,
+      percentage: portfolio.invested ? portfolio.profit / depositsValue : 0,
     };
 
     const dailyChange = {
       value: portfolio.dailyChange ?? 0,
       percentage: portfolio.dailyChange
-       ? portfolio.dailyChange / depositsValue
-        : 0
+        ? portfolio.dailyChange / depositsValue
+        : 0,
     };
 
     return { target, profit, dailyChange };

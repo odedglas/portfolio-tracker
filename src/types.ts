@@ -9,6 +9,7 @@ export interface Entity {
 export interface Deposit {
   date: number;
   value: number;
+  type: 'deposit' | 'withdrawal' | 'balance';
   initial?: boolean;
 }
 

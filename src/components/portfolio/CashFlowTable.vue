@@ -147,7 +147,7 @@ export default defineComponent({
         (portfolioDeposit, index) => ({
           ...portfolioDeposit,
           index,
-          action: $t(portfolioDeposit.value > 0 ? 'deposit' : 'withdrawal'),
+          action: $t(portfolioDeposit.type),
         })
       );
 
@@ -184,6 +184,7 @@ export default defineComponent({
           date: Date.now(),
           value: 0,
           index: deposits.value.length,
+          type: 'deposit',
         };
       }
     };

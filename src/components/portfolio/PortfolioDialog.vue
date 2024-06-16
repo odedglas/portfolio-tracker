@@ -97,6 +97,7 @@ const emptyPortfolioTemplate = (): Portfolio => ({
       value: 0,
       date: Date.now(),
       initial: true,
+      type: 'deposit',
     },
   ],
 });
