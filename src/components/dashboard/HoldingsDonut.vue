@@ -32,7 +32,7 @@ export default defineComponent({
     apexchart: VueApexCharts,
   },
   setup() {
-    const $n = useI18n().n
+    const $n = useI18n().n;
     const showInvested = ref(false);
 
     const holdingsDonutData = computed(() => {

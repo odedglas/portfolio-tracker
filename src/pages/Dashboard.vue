@@ -10,7 +10,7 @@
         </div>
       </div>
 
-      <holdings-donut/>
+      <holdings-donut />
     </div>
   </q-page>
 </template>
