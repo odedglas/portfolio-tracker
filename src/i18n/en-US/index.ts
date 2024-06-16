@@ -35,7 +35,7 @@ export const enUsMessages = {
     empty: 'Still quiet here...',
   },
   transactions: {
-    header: 'Portfolio Transactions',
+    header: 'Transactions',
     search_ticker: 'Please enter a ticker symbol to search...',
     create: 'New Transaction',
     edit: 'Edit Transaction',

@@ -59,19 +59,13 @@
         </q-td>
         <q-td key="holdings_name" :props="props">
           <div class="row items-center">
-            <img
-              v-if="props.row.logoImage"
-              width="35"
-              height="35"
-              :src="props.row.logoImage"
-              :alt="props.row.ticker"
+            <ticker-logo
+              :ticker="props.row.ticker"
+              :logoImage="props.row.logoImage"
             />
-            <div class="empty-logo-alt flex items-center justify-center" v-else>
-              <span class="ticker">{{ props.row.ticker }}</span>
-            </div>
             <div class="column q-ml-sm">
               <span class="text-body2">{{ props.row.name }}</span>
-              <span class="text-uppercase text-grey-6">{{
+              <span class="text-uppercase text-grey-7">{{
                 props.row.ticker
               }}</span>
             </div>
@@ -188,6 +182,7 @@ import { defineComponent, ref, PropType, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { date } from 'quasar';
 import { storeToRefs } from 'pinia';
+import TickerLogo from 'components/common/TickerLogo.vue';
 import { useTransactionsStore } from 'src/stores/transactions';
 import { transformer } from 'src/service/transactions';
 import { Transaction } from 'src/types';
@@ -195,6 +190,9 @@ import { columns } from './columns';
 
 export default defineComponent({
   name: 'TransactionsTable',
+  components: {
+    TickerLogo,
+  },
   props: {
     showOrEditTransaction: {
       required: true,
