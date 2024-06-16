@@ -10,47 +10,27 @@
         </div>
       </div>
 
-      <q-card class="q-mt-md" flat bordered>
-        <q-card-section>
-          <div class="flex col justify-between">
-            <p class="text-h5 text-grey-8">Holdings</p>
-            <q-toggle v-model="showInvested" label="Show Invested" />
-          </div>
-        </q-card-section>
-        <q-card-section class="row q-py-lg">
-          <div class="col-11">
-            <apexchart
-              class="chart"
-              height="350"
-              type="donut"
-              :options="holdingsDonutData.options"
-              :series="holdingsDonutData.series"
-            ></apexchart>
-          </div>
-        </q-card-section>
-      </q-card>
+      <holdings-donut/>
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
-import VueApexCharts from 'vue3-apexcharts';
 import { usePortfolioStore } from 'stores/portfolios';
 import { viewTransformer } from 'src/service/portfolio';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
-import { getHoldingsDonutChatOptions } from 'src/service/charts';
+import HoldingsDonut from 'components/dashboard/HoldingsDonut.vue';
 
 export default defineComponent({
   name: 'DashboardPage',
   components: {
+    HoldingsDonut,
     DashboardKpi,
-    apexchart: VueApexCharts,
   },
   setup() {
-    const { t: $t, n: $n } = useI18n();
-    const showInvested = ref(false);
+    const { t: $t } = useI18n();
     const portfolioStore = usePortfolioStore();
 
     const viewPortfolio = computed(
@@ -102,18 +82,9 @@ export default defineComponent({
       ];
     });
 
-    const holdingsDonutData = computed(() => {
-      return getHoldingsDonutChatOptions(
-        showInvested.value ? 'invested' : 'currentValue',
-        $n
-      );
-    });
-
     return {
       viewPortfolio,
       kpis,
-      holdingsDonutData,
-      showInvested,
     };
   },
 });

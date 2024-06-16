@@ -46,6 +46,7 @@ export const getHoldingsDonutChatOptions = (
       labels: holdings.map(({ name }) => name),
       legend: {
         fontSize: 14,
+        fontFamily: 'inherit',
         itemMargin: {
           vertical: 6,
         },
@@ -67,6 +68,7 @@ export const getHoldingsDonutChatOptions = (
         enabled: true,
         style: {
           fontSize: '12px',
+          fontFamily: 'inherit',
           fontWeight: 'normal',
           colors: ['#9e9e9e'],
         },
@@ -77,6 +79,7 @@ export const getHoldingsDonutChatOptions = (
       plotOptions: {
         pie: {
           expandOnClick: false,
+          customScale: 0.95,
           dataLabels: {
             offset: 55,
           },
