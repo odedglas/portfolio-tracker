@@ -12,7 +12,10 @@
 
       <q-card class="q-mt-md" flat bordered>
         <q-card-section>
-          <p class="text-h5 text-grey-8">Holdings</p>
+          <div class="flex col justify-between">
+            <p class="text-h5 text-grey-8">Holdings</p>
+            <q-toggle v-model="showInvested" label="Show Invested" />
+          </div>
         </q-card-section>
         <q-card-section class="row q-py-lg">
           <div class="col-11">
@@ -31,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import VueApexCharts from 'vue3-apexcharts';
 import { usePortfolioStore } from 'stores/portfolios';
@@ -46,7 +49,8 @@ export default defineComponent({
     apexchart: VueApexCharts,
   },
   setup() {
-    const $t = useI18n().t;
+    const { t: $t, n: $n } = useI18n();
+    const showInvested = ref(false);
     const portfolioStore = usePortfolioStore();
 
     const viewPortfolio = computed(
@@ -98,12 +102,18 @@ export default defineComponent({
       ];
     });
 
-    const holdingsDonutData = computed(() => getHoldingsDonutChatOptions());
+    const holdingsDonutData = computed(() => {
+      return getHoldingsDonutChatOptions(
+        showInvested.value ? 'invested' : 'currentValue',
+        $n
+      );
+    });
 
     return {
       viewPortfolio,
       kpis,
       holdingsDonutData,
+      showInvested,
     };
   },
 });

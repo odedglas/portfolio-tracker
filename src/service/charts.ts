@@ -1,22 +1,47 @@
-import { useI18n } from 'vue-i18n';
 import { HoldingWithProfits } from 'src/types';
 import { useHoldingsStore } from 'stores/holdings';
 
-export const getHoldingsDonutChatOptions = () => {
-  const i18n = useI18n();
+const colorPallet = [
+  '#EC407A',
+  '#AB47BC',
+  '#7E57C2',
+  '#5C6BC0',
+  '#42A5F5',
+  '#29B6F6',
+  '#26C6DA',
+  '#26A69A',
+  '#66BB6A',
+  '#9CCC65',
+  '#D4E157',
+  '#FFEE58',
+  '#FFCA28',
+  '#FFA726',
+  '#FF7043',
+  '#8D6E63',
+  '#BDBDBD',
+  '#78909C',
+];
+
+type Formatter = (value: number, type: string) => string;
+type HoldingDataProperty = 'currentValue' | 'invested';
+
+export const getHoldingsDonutChatOptions = (
+  property: HoldingDataProperty = 'currentValue',
+  formatter: Formatter
+) => {
   const holdingsStore = useHoldingsStore();
 
   const holdings: HoldingWithProfits[] = holdingsStore.portfolioHoldings.sort(
-    (a, b) => b.currentValue - a.currentValue
+    (a, b) => b[property] - a[property]
   );
 
   const totalValue = holdings.reduce(
-    (acc, { currentValue }) => acc + currentValue,
+    (acc, holding) => acc + holding[property],
     0
   );
 
   return {
-    series: holdings.map(({ currentValue }) => currentValue),
+    series: holdings.map((holding) => holding[property]),
     options: {
       labels: holdings.map(({ name }) => name),
       legend: {
@@ -26,9 +51,9 @@ export const getHoldingsDonutChatOptions = () => {
         },
         formatter: (seriesName: string) => {
           const holdingValue =
-            holdings.find(({ name }) => name === seriesName)?.currentValue ?? 0;
+            holdings.find(({ name }) => name === seriesName)?.[property] ?? 0;
 
-          return `${seriesName} - ${i18n.n(
+          return `${seriesName} ${formatter(
             holdingValue / totalValue,
             'percent'
           )}`;
@@ -37,29 +62,9 @@ export const getHoldingsDonutChatOptions = () => {
           highlightDataSeries: false,
         },
       },
-      colors: [
-        '#EC407A',
-        '#AB47BC',
-        '#7E57C2',
-        '#5C6BC0',
-        '#42A5F5',
-        '#29B6F6',
-        '#26C6DA',
-        '#26A69A',
-        '#66BB6A',
-        '#9CCC65',
-        '#D4E157',
-        '#FFEE58',
-        '#FFCA28',
-        '#FFA726',
-        '#FF7043',
-        '#8D6E63',
-        '#BDBDBD',
-        '#78909C',
-      ],
+      colors: colorPallet,
       dataLabels: {
         enabled: true,
-        offsetX: 0,
         style: {
           fontSize: '12px',
           fontWeight: 'normal',
@@ -79,7 +84,7 @@ export const getHoldingsDonutChatOptions = () => {
       },
       tooltip: {
         y: {
-          formatter: (value: number) => i18n.n(value, 'decimal'),
+          formatter: (value: number) => formatter(value, 'decimal'),
         },
       },
     },
