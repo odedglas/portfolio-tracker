@@ -1,12 +1,31 @@
 <template>
   <q-page class="row justify-center q-pa-md">
     <div class="col-10">
-      <p class="text-h5 text-grey-7 q-mt-md">{{ viewPortfolio?.title }}</p>
+      <p class="text-h5 text-grey-7 q-mt-md">
+        Portfolio's / {{ viewPortfolio?.title }}
+      </p>
       <div class="flex q-gutter-md">
         <div v-for="kpi in kpis" :key="kpi.title" class="col">
           <dashboard-kpi v-bind="kpi" />
         </div>
       </div>
+
+      <q-card class="q-mt-md" flat bordered>
+        <q-card-section>
+          <p class="text-h5 text-grey-8">Holdings</p>
+        </q-card-section>
+        <q-card-section class="row q-py-lg">
+          <div class="col-11">
+            <apexchart
+              class="chart"
+              height="350"
+              type="donut"
+              :options="holdingsDonutData.options"
+              :series="holdingsDonutData.series"
+            ></apexchart>
+          </div>
+        </q-card-section>
+      </q-card>
     </div>
   </q-page>
 </template>
@@ -14,14 +33,17 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
+import VueApexCharts from 'vue3-apexcharts';
 import { usePortfolioStore } from 'stores/portfolios';
 import { viewTransformer } from 'src/service/portfolio';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
+import { getHoldingsDonutChatOptions } from 'src/service/charts';
 
 export default defineComponent({
   name: 'DashboardPage',
   components: {
     DashboardKpi,
+    apexchart: VueApexCharts,
   },
   setup() {
     const $t = useI18n().t;
@@ -76,10 +98,29 @@ export default defineComponent({
       ];
     });
 
+    const holdingsDonutData = computed(() => getHoldingsDonutChatOptions());
+
     return {
       viewPortfolio,
       kpis,
+      holdingsDonutData,
     };
   },
 });
 </script>
+
+<style lang="scss">
+.chart {
+  svg {
+    overflow: visible;
+  }
+
+  .apexcharts-legend-marker {
+    margin-right: 12px;
+  }
+
+  .apexcharts-legend-text {
+    color: $grey-7 !important;
+  }
+}
+</style>

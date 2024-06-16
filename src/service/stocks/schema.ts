@@ -199,71 +199,17 @@ interface Resolution {
   tag: string;
 }
 
-export interface StockChartResponse {
-  chart: {
-    result: ChartResult[];
-    error: unknown;
-  };
-}
-
-interface ChartResult {
-  meta: Meta;
+export interface StockCharData {
+  dataGranularity: number;
   timestamp: number[];
-  indicators: Indicators;
-}
-
-interface Meta {
-  currency: string;
+  end: number | null;
   symbol: string;
-  exchangeName: string;
-  fullExchangeName: string;
-  instrumentType: string;
-  firstTradeDate: number;
-  regularMarketTime: number;
-  hasPrePostMarketData: boolean;
-  gmtoffset: number;
-  timezone: string;
-  exchangeTimezoneName: string;
-  regularMarketPrice: number;
-  fiftyTwoWeekHigh: number;
-  fiftyTwoWeekLow: number;
-  regularMarketDayHigh: number;
-  regularMarketDayLow: number;
-  regularMarketVolume: number;
+  previousClose: number | null;
   chartPreviousClose: number;
-  priceHint: number;
-  currentTradingPeriod: TradingPeriod;
-  dataGranularity: string;
-  range: string;
-  validRanges: string[];
-}
-
-interface TradingPeriod {
-  pre: Period;
-  regular: Period;
-  post: Period;
-}
-
-interface Period {
-  timezone: string;
-  start: number;
-  end: number;
-  gmtoffset: number;
-}
-
-interface Indicators {
-  quote: QuoteIndicator[];
-  adjclose: AdjCloseIndicator[];
-}
-
-interface QuoteIndicator {
+  start: number | null;
   close: number[];
-  volume: number[];
-  open: number[];
-  low: number[];
-  high: number[];
 }
 
-interface AdjCloseIndicator {
-  adjclose: number[];
+export interface StockChartResponse {
+  [symbol: string]: StockCharData;
 }

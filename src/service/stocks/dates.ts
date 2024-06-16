@@ -7,4 +7,4 @@ export const tomorrow = (date: Date) => DateAPI.addToDate(date, { days: 1 });
 
 export const toEpocNumeric = (date: Date) => date.getTime() / 1e3;
 
-export const fromEpocNumeric = (date: number) => new Date(date * 1e3);
+export const fromEpocNumeric = (date: number) => new Date(date * 1e3).getTime();
