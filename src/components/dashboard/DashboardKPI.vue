@@ -1,5 +1,5 @@
 <template>
-  <q-card flat bordered class="q-pl-md q-pr-lg dashboard-kpi-card">
+  <q-card flat bordered class="dashboard-kpi-card">
     <q-card-section>
       <div class="row items-center no-wrap">
         <q-icon :name="icon" size="medium" class="text-green-8 q-mr-sm" />

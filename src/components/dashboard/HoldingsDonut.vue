@@ -1,13 +1,13 @@
 <template>
-  <q-card class="q-mt-md" flat bordered>
-    <q-card-section>
+  <q-card flat bordered>
+    <q-card-section class="q-px-lg">
       <div class="flex col justify-between">
-        <p class="text-h6 text-grey-8">Holdings</p>
-        <q-toggle v-model="showInvested" label="Show Invested" />
+        <p class="text-h6 text-grey-8">Holdings allocation</p>
+        <q-toggle v-model="showInvested" label="By Invested" />
       </div>
     </q-card-section>
     <q-card-section class="row q-py-lg">
-      <div class="col-11">
+      <div class="col">
         <apexchart
           class="chart"
           height="350"
@@ -51,7 +51,17 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.dashboard-kpi-card {
-  height: 100%;
+.chart {
+  svg {
+    overflow: visible;
+  }
+
+  .apexcharts-legend-marker {
+    margin-right: 12px;
+  }
+
+  .apexcharts-legend-text {
+    color: $grey-7 !important;
+  }
 }
 </style>

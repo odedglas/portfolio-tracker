@@ -1,16 +1,16 @@
 <template>
   <q-page class="row justify-center q-pa-md">
-    <div class="col-10">
-      <p class="text-h5 text-grey-7 q-mt-md">
+    <div class="col-10 dashboard-grid">
+      <p class="text-h5 q-mb-none q-mt-sm text-grey-7 dashboard-title">
         Portfolio's / {{ viewPortfolio?.title }}
       </p>
-      <div class="flex q-gutter-md">
-        <div v-for="kpi in kpis" :key="kpi.title" class="col">
-          <dashboard-kpi v-bind="kpi" />
-        </div>
+      <div v-for="(kpi, index) in kpis" :key="kpi.title" class="col">
+        <dashboard-kpi v-bind="kpi" :class="`dashboard-kpi-${index}`" />
       </div>
-
-      <holdings-donut />
+      <holdings-donut class="col-8 dashboard-holdings-donut q-mt-lg" />
+      <q-card flat bordered class="dashboard-daily-gainer q-mt-lg">
+        Daily Gainers
+      </q-card>
     </div>
   </q-page>
 </template>
@@ -91,17 +91,20 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.chart {
-  svg {
-    overflow: visible;
-  }
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(5, auto);
+  grid-column-gap: 16px;
+}
 
-  .apexcharts-legend-marker {
-    margin-right: 12px;
-  }
-
-  .apexcharts-legend-text {
-    color: $grey-7 !important;
-  }
+.dashboard-title {
+  grid-area: 1 / 1 / 2 / 4;
+}
+.dashboard-holdings-donut {
+  grid-area: 3 / 1 / 4 / 3;
+}
+.dashboard-daily-gainer {
+  grid-area: 3 / 3 / 4 / 4;
 }
 </style>
