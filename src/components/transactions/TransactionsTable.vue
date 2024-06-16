@@ -91,18 +91,12 @@
           {{ props.row.totalValue.sign }}{{ props.row.totalValue.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
-          <div
+          <profit-indicator
             v-if="props.row.profit.value && props.row.actualShares > 0"
-            class="flex column"
-            :class="props.row.profit.textClass"
-          >
-            <span
-              ><q-icon :name="props.row.profit.icon" size="sm" />{{
-                props.row.profit.percent
-              }}</span
-            >
-            <span>{{ props.row.profit.value }}</span>
-          </div>
+            :percentage="props.row.profit.percent"
+            :value="props.row.profit.value"
+            :display-as-row="false"
+          />
           <span v-else>
             --
             <q-tooltip>
@@ -183,6 +177,7 @@ import { useI18n } from 'vue-i18n';
 import { date } from 'quasar';
 import { storeToRefs } from 'pinia';
 import TickerLogo from 'components/common/TickerLogo.vue';
+import ProfitIndicator from 'components/common/ProfitIndicator.vue';
 import { useTransactionsStore } from 'src/stores/transactions';
 import { transformer } from 'src/service/transactions';
 import { Transaction } from 'src/types';
@@ -191,6 +186,7 @@ import { columns } from './columns';
 export default defineComponent({
   name: 'TransactionsTable',
   components: {
+    ProfitIndicator,
     TickerLogo,
   },
   props: {
@@ -225,13 +221,8 @@ export default defineComponent({
           price: transaction.price,
           date: date.formatDate(transaction.date, 'MM/DD/YY'),
           profit: {
-            value: profitValue ? $n(profitValue, 'decimal') : undefined,
-            textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
-            percent: $n(
-              transformer.profitPercent(profitValue, transaction),
-              'percent'
-            ),
-            icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
+            value: profitValue,
+            percent: transformer.profitPercent(profitValue, transaction),
           },
         };
       })
