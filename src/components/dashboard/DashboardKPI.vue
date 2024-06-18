@@ -90,7 +90,7 @@ export default defineComponent({
   height: 100%;
 
   .icon-wrapper {
-    background: $green-6;
+    background: lighten($primary, 15%);
     padding: 2px;
     border-radius: 4px;
   }

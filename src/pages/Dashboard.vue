@@ -10,6 +10,7 @@
       <holdings-donut class="col-8 dashboard-holdings-donut q-mt-lg" />
       <portfolio-heat-map class="dashboard-portfolio-heat-map" />
     </div>
+    <quick-add />
   </q-page>
 </template>
 
@@ -20,14 +21,14 @@ import { usePortfolioStore } from 'stores/portfolios';
 import { viewTransformer } from 'src/service/portfolio';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
 import HoldingsDonut from 'components/dashboard/HoldingsDonut.vue';
-import DailyMovers from 'components/dashboard/DailyMovers.vue';
 import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
+import QuickAdd from 'components/dashboard/QuickAdd.vue';
 
 export default defineComponent({
   name: 'DashboardPage',
   components: {
+    QuickAdd,
     PortfolioHeatMap,
-    DailyMovers,
     HoldingsDonut,
     DashboardKpi,
   },
@@ -98,6 +99,10 @@ export default defineComponent({
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(5, auto);
   grid-column-gap: 16px;
+}
+
+.dashboard-quick-add {
+  height: 40px;
 }
 
 .dashboard-title {

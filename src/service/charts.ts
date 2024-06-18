@@ -93,3 +93,96 @@ export const getHoldingsDonutChatOptions = (
     },
   };
 };
+
+export const getPortfolioHoldingsHeatMapChartOptions = (
+  formatter: Formatter
+) => {
+  const holdingsStore = useHoldingsStore();
+
+  const series = [
+    {
+      data: holdingsStore.portfolioHoldings.map((holding) => {
+        const normalizedProfitPercent =
+          holding.profit.percent * (holding.profit.value >= 0 ? 1 : -1) * 100;
+
+        return {
+          x: holding.ticker,
+          y: formatter(normalizedProfitPercent, 'fixed'),
+        };
+      }),
+    },
+  ];
+
+  return {
+    series,
+    options: {
+      legend: {
+        show: false,
+      },
+      chart: {
+        type: 'treemap',
+        height: 400,
+        toolbar: {
+          show: false,
+        },
+      },
+      dataLabels: {
+        enabled: true,
+        style: {
+          fontSize: '12px',
+          fontFamily: 'inherit',
+        },
+        formatter: function (text: string, op: { value: string }) {
+          return [text, `${op.value}%`];
+        },
+        offsetY: -4,
+      },
+      plotOptions: {
+        treemap: {
+          enableShades: false,
+          colorScale: {
+            ranges: [
+              {
+                from: -50,
+                to: 0,
+                color: '#CD363A',
+              },
+              {
+                from: 0.001,
+                to: 100,
+                color: '#52B12C',
+              },
+            ],
+          },
+        },
+      },
+      tooltip: {
+        x: {
+          show: true,
+          formatter: (dataIndex: number) => {
+            const holding = holdingsStore.portfolioHoldings[dataIndex - 1];
+
+            return holding?.name ?? '';
+          },
+        },
+        y: {
+          formatter: (
+            value: number,
+            { dataPointIndex }: { dataPointIndex: number }
+          ) => {
+            const holding = holdingsStore.portfolioHoldings[dataPointIndex];
+
+            if (!holding) {
+              return `${value}%`;
+            }
+
+            return `${value}% (${formatter(holding.profit.value, 'currency')})`;
+          },
+          title: {
+            formatter: (seriesName: string) => seriesName,
+          },
+        },
+      },
+    },
+  };
+};
