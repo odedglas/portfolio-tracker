@@ -29,9 +29,7 @@ export const useQuotesStore = defineStore('quotes', {
       );
 
       this.tickers = Array.from(new Set(Object.keys(this.tickerQuotes)));
-      const res = await stocksAPI.getQuotesChartData(this.tickers);
-
-      console.log(res);
+      await stocksAPI.getQuotesChartData(this.tickers);
 
       return this.tickerQuotes;
     },

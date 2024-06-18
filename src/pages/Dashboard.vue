@@ -8,9 +8,7 @@
         <dashboard-kpi v-bind="kpi" :class="`dashboard-kpi-${index}`" />
       </div>
       <holdings-donut class="col-8 dashboard-holdings-donut q-mt-lg" />
-      <q-card flat bordered class="dashboard-daily-gainer q-mt-lg">
-        Daily Gainers
-      </q-card>
+      <portfolio-heat-map class="dashboard-portfolio-heat-map" />
     </div>
   </q-page>
 </template>
@@ -22,10 +20,14 @@ import { usePortfolioStore } from 'stores/portfolios';
 import { viewTransformer } from 'src/service/portfolio';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
 import HoldingsDonut from 'components/dashboard/HoldingsDonut.vue';
+import DailyMovers from 'components/dashboard/DailyMovers.vue';
+import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
 
 export default defineComponent({
   name: 'DashboardPage',
   components: {
+    PortfolioHeatMap,
+    DailyMovers,
     HoldingsDonut,
     DashboardKpi,
   },
@@ -104,7 +106,7 @@ export default defineComponent({
 .dashboard-holdings-donut {
   grid-area: 3 / 1 / 4 / 3;
 }
-.dashboard-daily-gainer {
+.dashboard-portfolio-heat-map {
   grid-area: 3 / 3 / 4 / 4;
 }
 </style>

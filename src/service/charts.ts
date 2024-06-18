@@ -54,10 +54,10 @@ export const getHoldingsDonutChatOptions = (
           const holdingValue =
             holdings.find(({ name }) => name === seriesName)?.[property] ?? 0;
 
-          return `${seriesName} ${formatter(
+          return `<span>${seriesName}</span> <span class="percent">${formatter(
             holdingValue / totalValue,
             'percent'
-          )}`;
+          )}</span>`;
         },
         onItemHover: {
           highlightDataSeries: false,
@@ -70,7 +70,7 @@ export const getHoldingsDonutChatOptions = (
           fontSize: '12px',
           fontFamily: 'inherit',
           fontWeight: 'normal',
-          colors: ['#9e9e9e'],
+          colors: ['#757575'],
         },
         dropShadow: {
           enabled: false,

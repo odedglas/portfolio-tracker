@@ -90,4 +90,9 @@ export const enUsCurrency = {
     useGrouping: false,
     maximumFractionDigits: 2,
   },
+  fixed: {
+    style: 'decimal',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  },
 };

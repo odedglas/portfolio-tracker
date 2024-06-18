@@ -2,7 +2,9 @@
   <q-card flat bordered class="dashboard-kpi-card">
     <q-card-section>
       <div class="row items-center no-wrap">
-        <q-icon :name="icon" size="medium" class="text-green-8 q-mr-sm" />
+        <span class="flex q-mr-sm icon-wrapper">
+          <q-icon :name="icon" size="medium" class="text-white" />
+        </span>
         <div class="text-subtitle2 text-grey-9">{{ title }}</div>
       </div>
       <div class="flex items-center q-my-sm text-h4">
@@ -86,5 +88,11 @@ export default defineComponent({
 <style lang="scss">
 .dashboard-kpi-card {
   height: 100%;
+
+  .icon-wrapper {
+    background: $green-6;
+    padding: 2px;
+    border-radius: 4px;
+  }
 }
 </style>
