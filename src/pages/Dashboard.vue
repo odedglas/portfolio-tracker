@@ -1,7 +1,7 @@
 <template>
   <q-page class="row justify-center q-pa-md">
     <div class="col-10 dashboard-grid">
-      <p class="text-h5 q-mb-none q-mt-sm text-grey-7 dashboard-title">
+      <p class="text-h5 text-grey-7 dashboard-title">
         Portfolio's / {{ viewPortfolio?.title }}
       </p>
       <div v-for="(kpi, index) in kpis" :key="kpi.title" class="col">
@@ -100,8 +100,13 @@ export default defineComponent({
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(5, auto);
+  grid-template-rows: repeat(4, auto);
   grid-column-gap: 16px;
+  grid-template-areas:
+    'title title title'
+    'kpi kpi kpi'
+    'donut donut heatmap'
+    'daily_movers daily_movers daily_movers';
 }
 
 .dashboard-quick-add {
@@ -109,15 +114,19 @@ export default defineComponent({
 }
 
 .dashboard-title {
-  grid-area: 1 / 1 / 2 / 4;
+  grid-area: title;
 }
 .dashboard-holdings-donut {
-  grid-area: 3 / 1 / 4 / 3;
+  grid-area: donut;
 }
+.dashboard-kpi-card {
+  grid-area: kpi;
+}
+
 .dashboard-portfolio-heat-map {
-  grid-area: 3 / 3 / 4 / 4;
+  grid-area: heatmap;
 }
 .dashboard-daily-movers {
-  grid-area: 4 / 1 / 4 / 4;
+  grid-area: daily_movers;
 }
 </style>

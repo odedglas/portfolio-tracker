@@ -31,6 +31,7 @@ export const useQuotesStore = defineStore('quotes', {
       this.tickers = Array.from(new Set(Object.keys(this.tickerQuotes)));
       await stocksAPI.getQuotesChartData(this.tickers);
 
+      console.log(this.tickerQuotes);
       return this.tickerQuotes;
     },
     async addTicker(ticker: string) {

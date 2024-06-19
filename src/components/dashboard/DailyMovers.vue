@@ -5,10 +5,14 @@
       <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
     </q-card-section>
     <q-card-section>
-      <swiper :slides-per-view="6" :vertical="true" :space-between="16">
-        <swiper-slide v-for="holding in sortedHoldings" :key="holding.id">
+      <swiper :slides-per-view="7" :vertical="true" :space-between="16">
+        <swiper-slide
+          v-for="holding in sortedHoldings"
+          :key="holding.id"
+          class="daily-item-wrapper"
+        >
           <div
-            class="daily-mover-item q-pa-md flex column items-center text-center"
+            class="daily-mover-item q-pa-sm flex column items-center text-center"
           >
             <span class="flex items-center">
               <ticker-logo
@@ -21,10 +25,11 @@
                 holding.ticker
               }}</span>
             </span>
-            <span class="text-caption">{{ holding.name }}</span>
             <profit-indicator
+              class="text-caption text-bold"
               :percentage="holding.dailyChange.percent"
               :value="holding.dailyChange.value"
+              :display-as-row="false"
             />
           </div>
         </swiper-slide>
@@ -62,11 +67,12 @@ export default defineComponent({
 
 <style lang="scss">
 .daily-movers {
-  .daily-mover-item {
-    border: 1px solid $grey-9;
-    border-radius: 8px;
-    gap: 6px;
-    min-height: 70px;
+  .daily-item-wrapper {
+    .daily-mover-item {
+      border: 1px solid $grey-9;
+      border-radius: 8px;
+      gap: 4px;
+    }
   }
 }
 </style>
