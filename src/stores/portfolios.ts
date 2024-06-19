@@ -1,12 +1,22 @@
 import { defineStore } from 'pinia';
 import portfolioAPI from 'src/service/portfolio';
-import { Portfolio } from 'src/types';
+import { transformer as holdingsTransformer } from 'src/service/holdings';
+import { Deposit, Portfolio } from 'src/types';
 import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
 
 const selectedPortfolioStorageKey = 'selected_portfolio_id';
 
 let loadedOnce = false;
+
+const holdingsDefaults = {
+  shares: 0,
+  currentValue: 0,
+  profit: 0,
+  invested: 0,
+  realized: 0,
+  captialGains: 0,
+};
 
 export const usePortfolioStore = defineStore('portfolios', {
   state: (): {
@@ -22,6 +32,20 @@ export const usePortfolioStore = defineStore('portfolios', {
         (portfolio) => portfolio.id === state.selectedPortfolioId
       );
     },
+    selectedPortfolioWithHoldings(): Portfolio | undefined {
+      const selected = this.selectedPortfolio;
+      const holdingsStore = useHoldingsStore();
+
+      if (!selected) return undefined;
+
+      const holdings = holdingsStore.portfolioHoldings;
+
+      return {
+        ...selected,
+        ...holdingsDefaults,
+        ...holdingsTransformer.summary(holdings),
+      };
+    },
     portfoliosWithHoldings(state): Portfolio[] {
       const holdingsStore = useHoldingsStore();
       const portfoliosHoldingMap = holdingsStore.portfoliosHoldingsMap;
@@ -31,6 +55,7 @@ export const usePortfolioStore = defineStore('portfolios', {
 
         return {
           ...portfolio,
+          ...holdingsDefaults,
           ...portfolioHoldings,
         };
       });
@@ -78,6 +103,12 @@ export const usePortfolioStore = defineStore('portfolios', {
         (portfolio) => portfolio.id !== portfolioId
       );
 
+      if (this.portfolios.length === 0) {
+        this.selectedPortfolioId = undefined;
+        localStorage.removeItem(selectedPortfolioStorageKey);
+        return;
+      }
+
       const selectedPortfolio = this.portfolios.find(
         (portfolio) => portfolio.id === this.selectedPortfolioId
       );
@@ -98,6 +129,26 @@ export const usePortfolioStore = defineStore('portfolios', {
       );
 
       this.portfolios[index] = portfolio;
+    },
+    async updateDeposit(deposit: Deposit, index: number) {
+      const portfolio = this.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      portfolio.deposits[index] = deposit;
+
+      return portfolioAPI.update(portfolio, portfolio.id);
+    },
+    async deleteDeposit(index: number) {
+      const portfolio = this.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      portfolio.deposits.splice(index, 1);
+
+      return portfolioAPI.update(portfolio, portfolio.id);
     },
   },
 });

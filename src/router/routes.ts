@@ -6,6 +6,7 @@ export const ROUTE_PATHS = {
   MANAGE_PORTFOLIOS: '/manage-portfolios',
   TRANSACTIONS: '/transactions',
   HOLDINGS: '/holdings',
+  CASH: '/cash',
 };
 
 const routes: RouteRecordRaw[] = [
@@ -40,6 +41,10 @@ const routes: RouteRecordRaw[] = [
       {
         path: ROUTE_PATHS.MANAGE_PORTFOLIOS,
         component: () => import('pages/ManagePortfolios.vue'),
+      },
+      {
+        path: ROUTE_PATHS.CASH,
+        component: () => import('pages/CashFlow.vue'),
       },
     ],
   },

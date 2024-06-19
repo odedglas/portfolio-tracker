@@ -11,19 +11,13 @@
       <q-tr :props="props">
         <q-td key="holdings_name" :props="props">
           <div class="row items-center">
-            <img
-              v-if="props.row.logoImage"
-              width="35"
-              height="35"
-              :src="props.row.logoImage"
-              :alt="props.row.ticker"
+            <ticker-logo
+              :ticker="props.row.ticker"
+              :logoImage="props.row.logoImage"
             />
-            <div class="empty-logo-alt flex items-center justify-center" v-else>
-              <span class="ticker">{{ props.row.ticker }}</span>
-            </div>
             <div class="column q-ml-sm">
               <span class="text-body2">{{ props.row.name }}</span>
-              <span class="text-uppercase text-grey-6">{{
+              <span class="text-uppercase text-grey-7">{{
                 props.row.ticker
               }}</span>
             </div>
@@ -42,31 +36,25 @@
           {{ props.row.totalValue.value }}
         </q-td>
         <q-td key="total_profit" :props="props">
-          <div class="flex column" :class="props.row.profit.textClass">
-            <span
-              ><q-icon :name="props.row.profit.icon" size="sm" />{{
-                props.row.profit.percent
-              }}</span
-            >
-            <span>{{ props.row.profit.value }}</span>
-          </div>
+          <profit-indicator
+            :percentage="props.row.profit.percent"
+            :value="props.row.profit.value"
+            :display-as-row="false"
+          />
         </q-td>
         <q-td key="daily_change" :props="props">
-          <div class="flex column" :class="props.row.daily.textClass">
-            <span
-              ><q-icon :name="props.row.daily.icon" size="sm" />{{
-                props.row.daily.percent
-              }}</span
-            >
-            <span>{{ props.row.daily.value }}</span>
-          </div>
+          <profit-indicator
+            :percentage="props.row.daily.percent"
+            :value="props.row.daily.value"
+            :display-as-row="false"
+          />
         </q-td>
       </q-tr>
     </template>
 
     <template v-slot:bottom-row>
       <q-tr class="text-bold text-center" v-if="viewHoldings.length">
-        <q-td colspan="1">
+        <q-td colspan="1" class="text-left">
           <span>Total</span>
         </q-td>
         <q-td colspan="1">
@@ -85,7 +73,11 @@
           :class="`${summary.profit > 0 ? 'text-green-5' : 'text-red-5'}`"
           >{{ $n(summary.profit, 'decimal') }}</q-td
         >
-        <q-td colspan="1" />
+        <q-td
+          colspan="1"
+          :class="`${summary.dailyChange > 0 ? 'text-green-5' : 'text-red-5'}`"
+          >{{ $n(summary.dailyChange, 'decimal') }}</q-td
+        >
       </q-tr>
     </template>
 
@@ -111,11 +103,17 @@
 import { defineComponent, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
+import TickerLogo from 'components/common/TickerLogo.vue';
 import { useHoldingsStore } from 'src/stores/holdings';
 import { columns } from './columns';
+import ProfitIndicator from 'components/common/ProfitIndicator.vue';
 
 export default defineComponent({
   name: 'HoldingsTable',
+  components: {
+    ProfitIndicator,
+    TickerLogo,
+  },
   setup() {
     const $n = useI18n().n;
     const filter = ref('');
@@ -136,16 +134,12 @@ export default defineComponent({
             textClass: totalValue >= 0 ? 'text-green-6' : 'text-red-6',
           },
           profit: {
-            value: profitValue ? $n(profitValue, 'decimal') : undefined,
-            textClass: profitValue >= 0 ? 'text-green-6' : 'text-red-6',
-            percent: totalValue > 0 ? $n(holding.profit.percent, 'percent') : 0,
-            icon: profitValue >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
+            value: profitValue,
+            percent: totalValue > 0 ? holding.profit.percent : 0,
           },
           daily: {
-            value: $n(dailyChange.value, 'decimal'),
-            percent: $n(dailyChange.percent, 'percent'),
-            textClass: dailyChange.value >= 0 ? 'text-green-6' : 'text-red-6',
-            icon: dailyChange.value >= 0 ? 'arrow_drop_up' : 'arrow_drop_down',
+            value: dailyChange.value,
+            percent: dailyChange.percent,
           },
         };
       })

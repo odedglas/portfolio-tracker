@@ -19,15 +19,7 @@
     <template v-slot:option="{ itemProps, opt }">
       <q-item v-bind="itemProps">
         <q-item-section side>
-          <img
-            v-if="opt.logoImage"
-            :src="opt.logoImage"
-            :alt="opt.symbol"
-            width="30"
-          />
-          <div class="empty-logo-alt flex items-center justify-center" v-else>
-            <span class="ticker">{{ opt.value }}</span>
-          </div>
+          <ticker-logo :ticker="opt.value" :logo-image="opt.logoImage" />
         </q-item-section>
         <q-item-section side>
           <q-item-label>
@@ -55,6 +47,7 @@ import { defineComponent, ref, Ref, computed, PropType } from 'vue';
 import type { QSelectProps } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { getTickerData } from 'src/service/stocks';
+import TickerLogo from './TickerLogo.vue';
 
 export interface TickerOption {
   value: string;
@@ -70,6 +63,9 @@ interface TickerMeta {
 
 export default defineComponent({
   name: 'TickerSearch',
+  components: {
+    TickerLogo,
+  },
   props: {
     ticker: {
       type: String,
@@ -135,18 +131,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-.empty-logo-alt {
-  height: 35px;
-  width: 35px;
-  border-radius: 5px;
-  background-color: #f3f6f9;
-  background-size: cover;
-
-  .ticker {
-    font-size: 0.6em;
-    font-weight: 600;
-  }
-}
-</style>

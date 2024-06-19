@@ -27,10 +27,11 @@ export const transformer = {
   },
   dailyChange: (holding: Holding, quote: Quote) => {
     const dailyChangeValue = quote.regularMarketChange * holding.shares;
+    const currentValue = transformer.currentValue(holding, quote);
 
     return {
       value: dailyChangeValue,
-      percent: dailyChangeValue / transformer.currentValue(holding, quote),
+      percent: currentValue ? dailyChangeValue / currentValue : 0,
     };
   },
   summary: (holdings: HoldingWithProfits[]) =>
@@ -41,8 +42,10 @@ export const transformer = {
         acc.currentValue += holding.currentValue;
         acc.invested += holding.invested;
         acc.realized += holding.realizedProfits ?? 0;
-        acc.captialGains =
+        acc.captialGains +=
           holding.profit.value - (holding.realizedProfits ?? 0);
+        acc.dailyChange += holding.dailyChange.value;
+        acc.fees += holding?.fees ?? 0;
 
         return acc;
       },
@@ -53,6 +56,8 @@ export const transformer = {
         invested: 0,
         realized: 0,
         captialGains: 0,
+        dailyChange: 0,
+        fees: 0,
       }
     ),
 };

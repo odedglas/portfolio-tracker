@@ -11,14 +11,19 @@ export const enUsMessages = {
     no_portfolios: 'You have no portfolios created just yet!',
     manage_portfolios: 'Manage Portfolios',
   },
+  total: 'Total',
+  deposit: 'Deposit',
+  balance: 'Balance',
+  withdrawal: 'Withdrawal',
   portfolios: {
-    title: "Manage your Portfolio's",
+    title: "Manage portfolio's",
     create: 'New Portfolio',
     edit: 'Edit Portfolio',
     profit: 'Profit',
     target: 'Target',
     target_explainer: 'You are {percentage} from reaching your target 🎉',
     invested: 'Invested',
+    cash_flow: 'Cash Flow',
     kpis: {
       cash_flow: 'Cash Flow',
       holdings_value: 'Holdings Value',
@@ -30,7 +35,7 @@ export const enUsMessages = {
     empty: 'Still quiet here...',
   },
   transactions: {
-    header: 'Portfolio Transactions',
+    header: 'Transactions',
     search_ticker: 'Please enter a ticker symbol to search...',
     create: 'New Transaction',
     edit: 'Edit Transaction',
@@ -47,6 +52,13 @@ export const enUsMessages = {
     header: 'Holdings',
     no_holdings:
       'No holding are there yet, You can start by creating a Transaction',
+  },
+  dashboard: {
+    kpis: {
+      cash_flow: 'Free Cash Flow',
+      profit: 'Total Profit',
+      value: 'Current Value',
+    },
   },
   no_results: 'No results',
   cancel: 'Cancel',
@@ -77,5 +89,10 @@ export const enUsCurrency = {
     style: 'percent',
     useGrouping: false,
     maximumFractionDigits: 2,
+  },
+  fixed: {
+    style: 'decimal',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
   },
 };

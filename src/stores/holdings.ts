@@ -15,7 +15,8 @@ interface HoldingsStoreState {
 let transactionsAddListener: () => void;
 
 const calculateHoldingValue = (holding: Holding) => {
-  const lastTickerQuote = useQuotesStore().tickerQuotes[holding.ticker];
+  const tickerQuotes = useQuotesStore().tickerQuotes;
+  const lastTickerQuote = tickerQuotes[holding.ticker];
 
   const currentValue = transformer.currentValue(holding, lastTickerQuote);
   const profit = transformer.profit(holding, lastTickerQuote);
@@ -64,6 +65,7 @@ export const useHoldingsStore = defineStore('holdings', {
 
       transactionsAddListener ||= transactionsStore.$onAction(
         async (context) => {
+          const selectedPortfolioId = usePortfolioStore().selectedPortfolioId;
           const { name, args } = context;
           if (name === 'list') {
             return;
@@ -74,7 +76,9 @@ export const useHoldingsStore = defineStore('holdings', {
 
           const holding =
             this.holdings.find(
-              (holding) => holding.ticker === transaction.ticker
+              (holding) =>
+                holding.ticker === transaction.ticker &&
+                holding.portfolioId === selectedPortfolioId
             ) ?? this.create(transaction);
 
           if (name === 'remove') {

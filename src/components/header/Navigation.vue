@@ -57,7 +57,7 @@ export default defineComponent({
         props: { label: 'Portfolio' },
         component: 'q-btn',
         preventNavigation: true,
-        route: ['/transactions', '/holdings', '/events'],
+        route: ['/transactions', '/holdings', '/cash'],
         menuOptions: [
           {
             id: 'transactions',
@@ -71,7 +71,12 @@ export default defineComponent({
             icon: 'cases',
             route: '/holdings',
           },
-          { id: 'events', text: 'Events', icon: 'event', route: '/events' },
+          {
+            id: 'cash',
+            text: 'Cash Flow',
+            icon: 'attach_money',
+            route: '/cash',
+          },
         ],
       },
       {

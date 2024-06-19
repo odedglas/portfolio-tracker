@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <app-header />
-    <q-page-container>
+    <q-page-container class="bg-grey-1">
       <router-view v-slot="{ Component }">
         <transition mode="out-in" name="sub-page">
           <keep-alive>

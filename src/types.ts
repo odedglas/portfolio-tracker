@@ -2,14 +2,23 @@ import { LOGIN_META, TRANSACTIONS_TYPES } from './constants';
 
 export type LoginMode = keyof typeof LOGIN_META;
 
-interface Deposit {
+export interface Entity {
+  id: string;
+}
+
+export interface Deposit {
   date: number;
   value: number;
+  type: 'deposit' | 'withdrawal' | 'balance';
   initial?: boolean;
 }
 
-export interface Portfolio {
+export interface DepositEntity extends Deposit {
   id: string;
+  index: number;
+}
+
+export interface Portfolio extends Entity {
   owner: string;
   title: string;
   createdAt: number;
@@ -19,14 +28,15 @@ export interface Portfolio {
   profit: number;
   realized?: number;
   captialGains?: number;
+  dailyChange?: number;
+  fees?: number;
   deposits: Deposit[];
 }
 
 export type TransactionAction =
   (typeof TRANSACTIONS_TYPES)[keyof typeof TRANSACTIONS_TYPES];
 
-export interface Transaction {
-  id: string;
+export interface Transaction extends Entity {
   createdAt: number;
   action: TransactionAction;
   date: number;
@@ -42,8 +52,7 @@ export interface Transaction {
   realizedProfit?: number;
 }
 
-export interface Holding {
-  id: string;
+export interface Holding extends Entity {
   createdAt: number;
   shares: number;
   ticker: string;
@@ -61,6 +70,8 @@ export interface HoldingsSummary {
   invested: number;
   profit: number;
   currentValue: number;
+  dailyChange: number;
+  fees: number;
 }
 
 export interface HoldingWithProfits extends Holding {

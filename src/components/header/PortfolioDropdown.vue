@@ -11,7 +11,7 @@
       <q-item
         clickable
         v-close-popup
-        v-for="portfolio in portfolioStore.portfolios"
+        v-for="portfolio in portfolioStore.portfoliosWithHoldings"
         :key="portfolio.id"
         @click="() => selectPortfolio(portfolio)"
         :active="portfolio.id === portfolioStore.selectedPortfolioId"

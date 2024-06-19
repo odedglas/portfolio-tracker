@@ -1,5 +1,5 @@
 <template>
-  <q-list bordered class="rounded-borders">
+  <q-list bordered class="rounded-borders bg-white">
     <portfolio-item
       v-for="(portfolio, index) in portfolios"
       :key="portfolio.id"

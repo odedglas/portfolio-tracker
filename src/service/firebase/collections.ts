@@ -70,6 +70,10 @@ export const queries = {
     return firestoreAPI.getAll(holdingsQuery);
   },
   listPortfoliosHoldings: async (portfoliosIds: string[]) => {
+    if (!portfoliosIds.length) {
+      return [];
+    }
+
     const holdingsCollection = getCollections().holding;
 
     const holdingsQuery = query(
