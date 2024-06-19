@@ -2,8 +2,8 @@
   <div class="row items-center">
     <img
       v-if="logoImage"
-      width="35"
-      height="35"
+      :width="size"
+      :height="size"
       :src="logoImage"
       :alt="ticker"
     />
@@ -24,6 +24,7 @@ export default defineComponent({
       type: String,
       required: false,
     },
+    size: { type: Number, default: 35 },
   },
 });
 </script>
