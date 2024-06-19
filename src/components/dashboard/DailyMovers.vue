@@ -5,7 +5,7 @@
       <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
     </q-card-section>
     <q-card-section>
-      <swiper :slides-per-view="7" :vertical="true" :space-between="16">
+      <swiper :slides-per-view="9" :vertical="true" :space-between="16">
         <swiper-slide
           v-for="holding in sortedHoldings"
           :key="holding.id"
@@ -28,7 +28,6 @@
             <profit-indicator
               class="text-caption text-bold"
               :percentage="holding.dailyChange.percent"
-              :value="holding.dailyChange.value"
               :display-as-row="false"
             />
           </div>
