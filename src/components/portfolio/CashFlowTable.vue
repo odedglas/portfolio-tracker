@@ -208,7 +208,7 @@ export default defineComponent({
         deposit.date = new Date(value).getTime();
       } else if (field === 'notes') {
         deposit.notes = value as string;
-      } else  {
+      } else {
         deposit.type = value as Deposit['type'];
       }
 
