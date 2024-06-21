@@ -62,8 +62,7 @@ export const viewTransformer = {
   cashFlow(portfolio: Portfolio) {
     return (
       viewTransformer.depositsValue(portfolio) -
-      portfolio.invested -
-      (portfolio.fees ?? 0) +
+      portfolio.invested +
       viewTransformer.depositManualBalance(portfolio)
     );
   },

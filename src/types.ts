@@ -11,6 +11,7 @@ export interface Deposit {
   value: number;
   type: 'deposit' | 'withdrawal' | 'balance';
   initial?: boolean;
+  notes?: string;
 }
 
 export interface DepositEntity extends Deposit {

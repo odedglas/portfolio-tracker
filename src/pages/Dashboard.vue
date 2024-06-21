@@ -44,7 +44,7 @@ export default defineComponent({
     );
 
     const kpis = computed(() => {
-      let portfolio = viewPortfolio.value;
+      let portfolio = portfolioStore.selectedPortfolioWithHoldings;
       if (!portfolio) {
         return;
       }

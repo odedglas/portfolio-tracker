@@ -145,10 +145,7 @@ export default defineComponent({
       })
     );
 
-    const isEmpty = computed(() => viewHoldings.value.length === 0);
-
     return {
-      isEmpty,
       filter,
       columns,
       viewHoldings,
