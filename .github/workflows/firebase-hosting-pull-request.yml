@@ -33,7 +33,7 @@ jobs:
           if [[ $GITHUB_REF_NAME == 'main' ]]; then
               echo "FIREBASE_CHANNEL_ID=live" >> "$GITHUB_ENV"
           else
-              echo "FIREBASE_CHANNEL_ID=preview-$GITHUB_REF_NAME" >> "$GITHUB_ENV"
+              echo "FIREBASE_CHANNEL_ID=$GITHUB_REF_NAME" >> "$GITHUB_ENV"
           fi
 
       - name: "Print Firebase Publish ChannelId"
