@@ -17,8 +17,6 @@ const env = {
   test: 'oded',
 };
 
-console.log('Config check:', env);
-
 /**
  * The main Quasar configuration file.
  */
