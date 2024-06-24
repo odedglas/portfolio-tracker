@@ -27,6 +27,7 @@ jobs:
           name: app-build
           path: dist
           run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set environment for branch
         run: |
