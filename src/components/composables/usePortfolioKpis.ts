@@ -3,7 +3,6 @@ import { usePortfolioStore } from 'src/stores/portfolios';
 import { viewTransformer } from 'src/service/portfolio';
 import { useI18n } from 'vue-i18n';
 
-
 export const usePortfolioKpis = () => {
   const $t = useI18n().t;
   const portfolioStore = usePortfolioStore();

@@ -49,7 +49,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: ROUTE_PATHS.ANALYTICS,
-        component: () => import('pages/Analytics.vue')
+        component: () => import('pages/Analytics.vue'),
       },
     ],
   },

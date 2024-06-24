@@ -66,11 +66,9 @@ export const getQuotesChartData = cachedOperation(
       timestamp: tickerChart.timestamp.map(fromEpocNumeric),
     }));
   },
-  (tickers: string[], interval, range) => [
-      'ticker-chart-data',
-      ...tickers,
-      interval,
-      range,
-  ].filter(Boolean).join('-'),
+  (tickers: string[], interval, range) =>
+    ['ticker-chart-data', ...tickers, interval, range]
+      .filter(Boolean)
+      .join('-'),
   1000 * 60 * 60 // One hour chart data caching
 );
