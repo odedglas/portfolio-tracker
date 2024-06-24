@@ -25,6 +25,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app-build
+          path: dist
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Set environment for branch
