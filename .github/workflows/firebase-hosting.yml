@@ -17,10 +17,11 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: dist
           path: dist
+          run_id: ${{ github.event.workflow_run.id }}
 
       - name: Set environment for branch
         run: |
