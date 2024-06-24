@@ -6,3 +6,5 @@ export const firebaseConfig = {
   messagingSenderId: process.env.MESSANGING_SENDER_ID,
   appId: process.env.APP_ID,
 };
+
+console.log('************* firebase config', firebaseConfig);
