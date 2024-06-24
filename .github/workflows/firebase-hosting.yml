@@ -5,7 +5,8 @@ name: Deploy to Firebase
 
 on:
   workflow_run:
-    workflows: ["Base CI"]
+    workflows:
+      - "Base CI"
     types:
       - completed
 
