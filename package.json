@@ -1,14 +1,14 @@
 {
   "name": "portfolio-tracker",
   "version": "1.0.0",
-  "description": "Track it.",
+  "description": "Track it",
   "productName": "Portfolio Tracker",
   "author": "Oded Goldglas <oded.godglas@fiverr.com>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\"",
-    "test": "echo \"No test specified\" && exit 0",
+    "test": "node ./test.js",
     "dev": "quasar dev",
     "build": "quasar build",
     "deploy": "cd firebase && firebase deploy",

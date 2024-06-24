@@ -7,6 +7,7 @@ export const ROUTE_PATHS = {
   TRANSACTIONS: '/transactions',
   HOLDINGS: '/holdings',
   CASH: '/cash',
+  ANALYTICS: '/analytics',
 };
 
 const routes: RouteRecordRaw[] = [
@@ -45,6 +46,10 @@ const routes: RouteRecordRaw[] = [
       {
         path: ROUTE_PATHS.CASH,
         component: () => import('pages/CashFlow.vue'),
+      },
+      {
+        path: ROUTE_PATHS.ANALYTICS,
+        component: () => import('pages/Analytics.vue'),
       },
     ],
   },

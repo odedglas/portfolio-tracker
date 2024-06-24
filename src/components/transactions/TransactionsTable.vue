@@ -230,7 +230,7 @@ export default defineComponent({
 
     const totalProfit = computed(() =>
       viewTransactions.value.reduce((acc, transaction) => {
-        const profitValue = balanceMap.value[transaction.id] ?? 0;
+        const profitValue = transaction.profit.value ?? 0;
         return acc + profitValue;
       }, 0)
     );

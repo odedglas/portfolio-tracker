@@ -17,9 +17,8 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { usePortfolioStore } from 'stores/portfolios';
-import { viewTransformer } from 'src/service/portfolio';
+import { usePortfolioKpis } from 'src/components/composables/usePortfolioKpis';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
 import HoldingsDonut from 'components/dashboard/HoldingsDonut.vue';
 import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
@@ -36,57 +35,12 @@ export default defineComponent({
     DashboardKpi,
   },
   setup() {
-    const { t: $t } = useI18n();
     const portfolioStore = usePortfolioStore();
+    const { kpis } = usePortfolioKpis();
 
     const viewPortfolio = computed(
       () => portfolioStore.selectedPortfolioWithHoldings
     );
-
-    const kpis = computed(() => {
-      let portfolio = viewPortfolio.value;
-      if (!portfolio) {
-        return;
-      }
-
-      const portfolioKpis = viewTransformer.portfolioKPIS(portfolio);
-      return [
-        {
-          title: $t('dashboard.kpis.value'),
-          value: portfolio.currentValue ?? 0,
-          icon: 'balance',
-          subtitle: {
-            text: 'invested',
-            value: portfolio.invested ?? 0,
-          },
-        },
-        {
-          title: $t('dashboard.kpis.profit'),
-          value: portfolioKpis.profit.value ?? 0,
-          valuePercentage: portfolioKpis.profit.percentage,
-          showValueSign: true,
-          icon: 'trending_up',
-          subtitle: {
-            text: 'daily',
-            value: portfolioKpis.dailyChange.value,
-            percentage: portfolioKpis.dailyChange.percentage,
-            className:
-              portfolioKpis.dailyChange.value >= 0
-                ? 'text-green-5'
-                : 'text-red-5',
-          },
-        },
-        {
-          title: $t('dashboard.kpis.cash_flow'),
-          value: viewTransformer.cashFlow(portfolio),
-          icon: 'account_balance',
-          subtitle: {
-            text: 'deposited',
-            value: viewTransformer.depositsValue(portfolio),
-          },
-        },
-      ];
-    });
 
     return {
       viewPortfolio,

@@ -17,8 +17,7 @@ export const transformer = {
     const profitValue =
       transformer.currentValue(holding, quote) -
       transformer.totalValue(holding) +
-      (holding?.realizedProfits ?? 0) -
-      (holding?.fees ?? 0);
+      (holding?.realizedProfits ?? 0);
 
     return {
       value: profitValue,
@@ -27,11 +26,10 @@ export const transformer = {
   },
   dailyChange: (holding: Holding, quote: Quote) => {
     const dailyChangeValue = quote.regularMarketChange * holding.shares;
-    const currentValue = transformer.currentValue(holding, quote);
 
     return {
       value: dailyChangeValue,
-      percent: currentValue ? dailyChangeValue / currentValue : 0,
+      percent: quote.regularMarketChangePercent / 100,
     };
   },
   summary: (holdings: HoldingWithProfits[]) =>
@@ -111,6 +109,7 @@ const api = {
       0
     );
 
+    // Fees included
     holding.avgPrice = totalShares
       ? (buyTransactions.reduce(
           (acc, t) => acc + transactionTransformer.actualValue(t),
@@ -118,11 +117,13 @@ const api = {
         ) ?? 0) / totalShares
       : 0;
 
-    // Calculate invested by transactions funds (original shares)
+    // Calculate invested by transactions funds (original shares), Fees included
     holding.invested = buyTransactions.reduce(
       (acc, t) => acc + transactionTransformer.totalValue(t),
       0
     );
+
+    console.log('Holding oinvested', holding.invested);
 
     // Fees and profits would be calculated by the whole set.
     holding.fees = holdingTransactions.reduce(

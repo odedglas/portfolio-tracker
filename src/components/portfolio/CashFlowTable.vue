@@ -40,12 +40,43 @@
         </q-td>
         <q-td key="action" :props="props">
           {{ props.row.action ?? '--' }}
+          <q-popup-edit
+            :model-value="props.row.action"
+            @update:modelValue="(action: string) => updateDeposit(action, 'action', props.row)"
+            v-slot="scope"
+          >
+            <q-select
+              v-model="scope.value"
+              dense
+              :options="[
+                { label: $t('deposit'), value: 'deposit' },
+                { label: $t('withdrawal'), value: 'withdrawal' },
+                { label: $t('balance'), value: 'balance' },
+              ]"
+              @keyup.enter="scope.set"
+            />
+          </q-popup-edit>
         </q-td>
         <q-td key="value" :props="props">
           {{ $n(props.row.value, 'currency') }}
           <q-popup-edit
             :model-value="props.row.value"
             @update:modelValue="(value: number) => updateDeposit(value, 'value', props.row)"
+            v-slot="scope"
+          >
+            <q-input
+              v-model.number="scope.value"
+              dense
+              autofocus
+              @keyup.enter="scope.set"
+            />
+          </q-popup-edit>
+        </q-td>
+        <q-td key="notes" :props="props">
+          {{ props.row.notes ?? '' }}
+          <q-popup-edit
+            :model-value="props.row.notes"
+            @update:modelValue="(notes: string) => updateDeposit(notes, 'notes', props.row)"
             v-slot="scope"
           >
             <q-input
@@ -90,7 +121,7 @@ import { defineComponent, ref, computed } from 'vue';
 import { usePortfolioStore } from 'stores/portfolios';
 import { viewTransformer } from 'src/service/portfolio';
 import { date as dateUtils, type QTableProps } from 'quasar';
-import { DepositEntity } from 'src/types';
+import { Deposit, DepositEntity } from 'src/types';
 import { useI18n } from 'vue-i18n';
 
 const columns: QTableProps['columns'] = [
@@ -116,6 +147,13 @@ const columns: QTableProps['columns'] = [
     field: 'value',
     sortable: true,
     required: true,
+  },
+  {
+    name: 'notes',
+    align: 'center',
+    field: 'notes',
+    label: 'Notes',
+    sortable: false,
   },
   {
     name: 'item_actions',
@@ -161,13 +199,17 @@ export default defineComponent({
 
     const updateDeposit = (
       value: number | string,
-      field: 'value' | 'date',
+      field: 'value' | 'date' | 'notes' | 'action',
       deposit: DepositEntity
     ) => {
       if (field === 'value') {
         deposit.value = value as number;
-      } else {
+      } else if (field === 'date') {
         deposit.date = new Date(value).getTime();
+      } else if (field === 'notes') {
+        deposit.notes = value as string;
+      } else {
+        deposit.type = value as Deposit['type'];
       }
 
       emit('editDeposit', deposit);
