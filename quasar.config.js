@@ -43,10 +43,13 @@ module.exports = configure(function (/* ctx */) {
           API_KEY: process.env.API_KEY ?? dotenvConfig.API_KEY,
           AUTH_DOMAIN: process.env.AUTH_DOMAIN ?? dotenvConfig.AUTH_DOMAIN,
           PROJECT_ID: process.env.PROJECT_ID ?? dotenvConfig.PROJECT_ID,
-          STORAGE_BUCKET: process.env.STORAGE_BUCKET ?? dotenvConfig.STORAGE_BUCKET,
-          MESSAGING_SENDER_ID: process.env.MESSAGING_SENDER_ID ?? dotenvConfig.MESSAGING_SENDER_ID,
+          STORAGE_BUCKET:
+            process.env.STORAGE_BUCKET ?? dotenvConfig.STORAGE_BUCKET,
+          MESSAGING_SENDER_ID:
+            process.env.MESSAGING_SENDER_ID ?? dotenvConfig.MESSAGING_SENDER_ID,
           APP_ID: process.env.APP_ID ?? dotenvConfig.APP_ID,
-          RAPID_YAHOO_API_KEY: process.env.RAPID_YAHOO_API_KEY ?? dotenvConfig.RAPID_YAHOO_API_KEY
+          RAPID_YAHOO_API_KEY:
+            process.env.RAPID_YAHOO_API_KEY ?? dotenvConfig.RAPID_YAHOO_API_KEY,
         },
       },
 

@@ -22,6 +22,9 @@ jobs:
         with:
           node-version: '20'  # Adjust this to your project's Node.js version
 
+      - name: "Print APP_ID"
+        run: echo "APP ID $APP_ID"
+
       - name: Install dependencies
         run: npm ci
 
