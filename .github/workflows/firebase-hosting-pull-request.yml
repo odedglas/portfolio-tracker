@@ -36,12 +36,8 @@ jobs:
               echo "FIREBASE_CHANNEL_ID=preview-$GITHUB_REF_NAME" >> "$GITHUB_ENV"
           fi
 
-      - name: "Print Firebase Publish ChannelId"
-        run: echo "Firebase Channel $FIREBASE_CHANNEL_ID"
-
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PORTFOLIO_TRACKER_73341 }}'
           projectId: portfolio-tracker-73341
-          channelId: ${{ env.FIREBASE_CHANNEL_ID }}
