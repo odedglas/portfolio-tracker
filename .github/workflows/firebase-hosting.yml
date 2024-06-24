@@ -21,7 +21,7 @@ jobs:
         with:
           name: dist
           path: dist
-          run_id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Set environment for branch
         run: |
