@@ -51,12 +51,12 @@ export const getQuotes = cachedOperation(
 );
 
 export const getQuotesChartData = cachedOperation(
-  async (tickers: string[]) => {
+  async (tickers: string[], interval?: string, range?: string) => {
     const chartResult = await getRequest<StockChartResponse>(
       'market/get-spark',
       {
-        interval: '1d',
-        range: '1mo',
+        interval: interval ?? '1d',
+        range: range ?? '1mo',
         symbols: tickers.join(','),
       }
     );
@@ -66,6 +66,11 @@ export const getQuotesChartData = cachedOperation(
       timestamp: tickerChart.timestamp.map(fromEpocNumeric),
     }));
   },
-  (tickers: string[]) => `ticker-chart-data-${tickers.join('-')}`,
+  (tickers: string[], interval, range) => [
+      'ticker-chart-data',
+      ...tickers,
+      interval,
+      range,
+  ].filter(Boolean).join('-'),
   1000 * 60 * 60 // One hour chart data caching
 );

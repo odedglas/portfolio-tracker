@@ -26,11 +26,10 @@ export const transformer = {
   },
   dailyChange: (holding: Holding, quote: Quote) => {
     const dailyChangeValue = quote.regularMarketChange * holding.shares;
-    const currentValue = transformer.currentValue(holding, quote);
 
     return {
       value: dailyChangeValue,
-      percent: currentValue ? dailyChangeValue / currentValue : 0,
+      percent: quote.regularMarketChangePercent / 100,
     };
   },
   summary: (holdings: HoldingWithProfits[]) =>
