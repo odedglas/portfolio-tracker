@@ -7,4 +7,4 @@ export const firebaseConfig = {
   appId: process.env.APP_ID,
 };
 
-console.log('************* firebase config', firebaseConfig);
+console.log('************* firebase', firebaseConfig);

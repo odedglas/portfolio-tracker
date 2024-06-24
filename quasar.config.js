@@ -4,6 +4,8 @@ const { configure } = require('quasar/wrappers');
 const path = require('path');
 const dotenvConfig = require('dotenv').config().parsed;
 
+console.log('Config check:', process.env.API_KEY);
+
 /**
  * The main Quasar configuration file.
  */
