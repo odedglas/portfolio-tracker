@@ -1,17 +1,16 @@
 <template>
   <img
-    v-if="iconSrc"
+    v-if="icon"
     :style="iconStyle"
     :class="classes"
-    :src="iconSrc"
+    :src="`src/assets/dynamic/${icon}.svg`"
     @click="imageClick"
     :alt="icon"
   />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
-import { getIcon } from 'src/service/icons';
+import { defineComponent, computed } from 'vue';
 
 export default defineComponent({
   name: 'DynamicImage',
@@ -33,9 +32,6 @@ export default defineComponent({
   },
 
   setup(props) {
-    const { icon } = props;
-    const iconSrc = ref(getIcon(icon));
-
     const iconStyle = computed(() => {
       if (props.fullWidth) {
         return { width: '100%' };
@@ -50,7 +46,6 @@ export default defineComponent({
     };
 
     return {
-      iconSrc,
       iconStyle,
       imageClick,
     };

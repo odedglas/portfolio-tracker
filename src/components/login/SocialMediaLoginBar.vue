@@ -6,7 +6,7 @@
           @click="providerLogin(provider)"
           :style="{ 'background-color': provider.color }"
         >
-          <DynamicImage :icon="provider.icon" classes="social-icon" />
+          <dynamic-image :icon="provider.icon" classes="social-icon" />
         </q-btn>
       </div>
     </div>
