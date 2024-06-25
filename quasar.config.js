@@ -4,6 +4,19 @@ const { configure } = require('quasar/wrappers');
 const path = require('path');
 const dotenvConfig = require('dotenv').config().parsed;
 
+const env = {
+  API_KEY: process.env.API_KEY ?? dotenvConfig.API_KEY,
+  AUTH_DOMAIN: process.env.AUTH_DOMAIN ?? dotenvConfig.AUTH_DOMAIN,
+  PROJECT_ID: process.env.PROJECT_ID ?? dotenvConfig.PROJECT_ID,
+  STORAGE_BUCKET: process.env.STORAGE_BUCKET ?? dotenvConfig.STORAGE_BUCKET,
+  MESSAGING_SENDER_ID:
+    process.env.MESSAGING_SENDER_ID ?? dotenvConfig.MESSAGING_SENDER_ID,
+  APP_ID: process.env.APP_ID ?? dotenvConfig.APP_ID,
+  RAPID_YAHOO_API_KEY:
+    process.env.RAPID_YAHOO_API_KEY ?? dotenvConfig.RAPID_YAHOO_API_KEY,
+  test: 'oded',
+};
+
 /**
  * The main Quasar configuration file.
  */
@@ -15,7 +28,7 @@ module.exports = configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['i18n', 'axios', 'firebase', 'dynamicIcons', 'store'],
+    boot: ['i18n', 'axios', 'firebase', 'store'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss'],
@@ -39,19 +52,9 @@ module.exports = configure(function (/* ctx */) {
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         node: 'node20',
-        env: {
-          API_KEY: process.env.API_KEY ?? dotenvConfig.API_KEY,
-          AUTH_DOMAIN: process.env.AUTH_DOMAIN ?? dotenvConfig.AUTH_DOMAIN,
-          PROJECT_ID: process.env.PROJECT_ID ?? dotenvConfig.PROJECT_ID,
-          STORAGE_BUCKET:
-            process.env.STORAGE_BUCKET ?? dotenvConfig.STORAGE_BUCKET,
-          MESSAGING_SENDER_ID:
-            process.env.MESSAGING_SENDER_ID ?? dotenvConfig.MESSAGING_SENDER_ID,
-          APP_ID: process.env.APP_ID ?? dotenvConfig.APP_ID,
-          RAPID_YAHOO_API_KEY:
-            process.env.RAPID_YAHOO_API_KEY ?? dotenvConfig.RAPID_YAHOO_API_KEY,
-        },
       },
+
+      env,
 
       vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
@@ -62,7 +65,6 @@ module.exports = configure(function (/* ctx */) {
 
       // publicPath: '/',
       // analyze: true,
-      env: require('dotenv').config().parsed,
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,

@@ -123,8 +123,6 @@ const api = {
       0
     );
 
-    console.log('Holding oinvested', holding.invested);
-
     // Fees and profits would be calculated by the whole set.
     holding.fees = holdingTransactions.reduce(
       (acc, t) => acc + (t.fees ?? 0),
