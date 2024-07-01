@@ -8,7 +8,7 @@
         </div>
       </div>
 
-      <portfolio-performance/>
+      <portfolio-performance />
     </div>
   </q-page>
 </template>
@@ -23,7 +23,7 @@ export default defineComponent({
   name: 'AnalyticsPage',
   components: {
     PortfolioPerformance,
-    DashboardKpi
+    DashboardKpi,
   },
   setup() {
     const { kpis } = usePortfolioKpis();

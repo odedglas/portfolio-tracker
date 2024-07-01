@@ -20,13 +20,15 @@ export const manualPortfolioTracker = onRequest(
   async (request, response) => {
     await portfolioHistoryTracker();
     response.send('Hello from Firebase!');
-  });
+  }
+);
 
-export const portfolioScheduler = onSchedule('every 2 minutes', async (event) => {
-  console.log('Event called', { event });
-  logger.info('Scheduled Function', { timestamp: Date.now(), event });
-  portfolioHistoryTracker();
-  return;
-});
-;
-
+export const portfolioScheduler = onSchedule(
+  'every 2 minutes',
+  async (event) => {
+    console.log('Event called', { event });
+    logger.info('Scheduled Function', { timestamp: Date.now(), event });
+    portfolioHistoryTracker();
+    return;
+  }
+);

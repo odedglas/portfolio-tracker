@@ -9,8 +9,5 @@
     "target": "es2017"
   },
   "compileOnSave": true,
-  "include": [
-    "src",
-    "../shared/types.ts"
-  ]
+  "include": ["src", "../shared/types.ts"]
 }

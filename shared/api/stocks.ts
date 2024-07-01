@@ -8,7 +8,11 @@ const axiosInstance = axios.create({
   },
 });
 
-const getRequest = async <Resolved>(url: string, params: object, httpsAgent?: AxiosRequestConfig['httpsAgent']) => {
+const getRequest = async <Resolved>(
+  url: string,
+  params: object,
+  httpsAgent?: AxiosRequestConfig['httpsAgent']
+) => {
   const { data } = await axiosInstance.request<Resolved>({
     method: 'GET',
     url,
@@ -20,5 +24,5 @@ const getRequest = async <Resolved>(url: string, params: object, httpsAgent?: Ax
 };
 
 export const stocksClient = {
-  getRequest
+  getRequest,
 };

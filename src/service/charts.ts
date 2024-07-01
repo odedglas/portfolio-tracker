@@ -232,17 +232,17 @@ export const getPortfolioPerformanceChart = (
         zoom: {
           type: 'x',
           enabled: true,
-          autoScaleYaxis: true
+          autoScaleYaxis: true,
         },
         toolbar: {
           show: false,
         },
         events: {
-          beforeZoom: onZoom
-        }
+          beforeZoom: onZoom,
+        },
       },
       dataLabels: {
-        enabled: false
+        enabled: false,
       },
       markers: {
         size: 0,
@@ -254,7 +254,7 @@ export const getPortfolioPerformanceChart = (
           inverseColors: false,
           opacityFrom: 0.5,
           opacityTo: 0,
-          stops: [0, 90, 100]
+          stops: [0, 90, 100],
         },
       },
       xaxis: {
@@ -262,8 +262,7 @@ export const getPortfolioPerformanceChart = (
       },
       tooltip: {
         shared: true,
-
-      }
+      },
     },
-  }
-}
+  };
+};

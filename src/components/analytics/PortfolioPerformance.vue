@@ -6,9 +6,7 @@
           <q-icon name="query_stats" class="text-grey-6 q-mr-sm" size="sm" />
           <p class="text-h6 text-grey-7 q-mb-none">Portfolio performance</p>
         </div>
-        <q-btn @click="resetChart" v-if="showResetZoom">
-          Reset
-        </q-btn>
+        <q-btn @click="resetChart" v-if="showResetZoom"> Reset </q-btn>
       </div>
     </q-card-section>
     <q-card-section>
@@ -44,7 +42,7 @@ export default defineComponent({
     const chartRef: Ref = ref(undefined);
     const benchmarkData = ref<BenchmarkData[]>([]);
 
-    onMounted(async() => {
+    onMounted(async () => {
       const spyChart = await getQuotesChartData(['SPY', 'QQQ']);
 
       benchmarkData.value = Object.entries(spyChart).map(([key, value]) => {
@@ -55,7 +53,7 @@ export default defineComponent({
               x: value.timestamp[index],
               y: close,
             };
-          })
+          }),
         };
       });
     });
@@ -63,18 +61,17 @@ export default defineComponent({
     const chartData = computed(() =>
       getPortfolioPerformanceChart(benchmarkData.value, () => {
         if (!showResetZoom.value) {
-          showResetZoom.value = true
+          showResetZoom.value = true;
         }
       })
     );
-
 
     const resetChart = () => {
       const firstSeries = benchmarkData.value[0];
 
       chartRef.value.zoomX(
         firstSeries.data[0].x,
-        firstSeries.data[firstSeries.data.length - 1].x,
+        firstSeries.data[firstSeries.data.length - 1].x
       );
 
       showResetZoom.value = false;
