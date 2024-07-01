@@ -1,11 +1,10 @@
-import { Holding, HoldingWithProfits, Transaction } from 'src/types';
+import { Quote, Holding, HoldingWithProfits, Transaction } from 'shared/types';
 import {
   getCollections,
   firestoreAPI,
   queries,
 } from 'src/service/firebase/collections';
 import { transformer as transactionTransformer } from 'src/service/transactions';
-import { Quote } from 'src/service/stocks';
 
 const holdingsCollection = () => getCollections().holding;
 

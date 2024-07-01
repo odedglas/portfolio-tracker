@@ -1,4 +1,4 @@
-import { Holding, Portfolio, Transaction } from 'src/types';
+import { Holding, Portfolio, Transaction } from 'app/shared/types';
 
 export interface AppCollections {
   portfolios: Portfolio;

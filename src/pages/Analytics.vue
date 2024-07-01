@@ -7,6 +7,8 @@
           <dashboard-kpi v-bind="kpi" />
         </div>
       </div>
+
+      <portfolio-performance/>
     </div>
   </q-page>
 </template>
@@ -15,11 +17,13 @@
 import { defineComponent } from 'vue';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
 import { usePortfolioKpis } from 'components/composables/usePortfolioKpis';
+import PortfolioPerformance from 'components/analytics/PortfolioPerformance.vue';
 
 export default defineComponent({
   name: 'AnalyticsPage',
   components: {
-    DashboardKpi,
+    PortfolioPerformance,
+    DashboardKpi
   },
   setup() {
     const { kpis } = usePortfolioKpis();

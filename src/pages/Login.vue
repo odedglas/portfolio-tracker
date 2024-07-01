@@ -17,8 +17,8 @@ import { defineComponent, ref, Ref, computed } from 'vue';
 import LoginForm from 'src/components/login/LoginForm.vue';
 import SocialMediaLoginBar from 'src/components/login/SocialMediaLoginBar.vue';
 import SignInOutNav from 'src/components/login/SignInOutNav.vue';
-import { LOGIN_META } from 'src/constants';
-import { LoginMode } from 'src/types';
+import { LOGIN_META } from 'app/shared/constants';
+import { LoginMode } from 'app/shared/types';
 
 export default defineComponent({
   name: 'LoginPage',

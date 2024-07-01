@@ -180,7 +180,7 @@ import TickerLogo from 'components/common/TickerLogo.vue';
 import ProfitIndicator from 'components/common/ProfitIndicator.vue';
 import { useTransactionsStore } from 'src/stores/transactions';
 import { transformer } from 'src/service/transactions';
-import { Transaction } from 'src/types';
+import { Transaction } from 'app/shared/types';
 import { columns } from './columns';
 
 export default defineComponent({

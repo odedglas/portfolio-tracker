@@ -1,10 +1,10 @@
-import { Transaction } from 'src/types';
+import { Transaction } from 'app/shared/types';
 import {
   getCollections,
   firestoreAPI,
   queries,
 } from 'src/service/firebase/collections';
-import { TRANSACTIONS_TYPES } from 'src/constants';
+import { TRANSACTIONS_TYPES } from 'app/shared/constants';
 
 const transactionsCollection = () => getCollections().transaction;
 

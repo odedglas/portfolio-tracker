@@ -1,4 +1,4 @@
-import { LOGIN_META, TRANSACTIONS_TYPES } from './constants';
+import { LOGIN_META, TRANSACTIONS_TYPES } from '../constants';
 
 export type LoginMode = keyof typeof LOGIN_META;
 

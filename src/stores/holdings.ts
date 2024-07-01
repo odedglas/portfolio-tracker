@@ -4,7 +4,7 @@ import holdingsAPI, { transformer } from 'src/service/holdings';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useTransactionsStore } from 'stores/transactions';
 import { useQuotesStore } from 'stores/quotes';
-import { Holding, Transaction, HoldingsSummary } from 'src/types';
+import { Holding, Transaction, HoldingsSummary } from 'app/shared/types';
 
 interface HoldingsStoreState {
   holdings: Holding[];

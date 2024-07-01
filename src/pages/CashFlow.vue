@@ -16,7 +16,7 @@
 import { defineComponent } from 'vue';
 import CashFlowTable from 'components/portfolio/CashFlowTable.vue';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
-import { DepositEntity } from 'src/types';
+import { DepositEntity } from 'app/shared/types';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useLoadingStore } from 'stores/loading';
 

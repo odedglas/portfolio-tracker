@@ -7,6 +7,7 @@
     "./dist",
     "./.quasar",
     "./node_modules",
-    "./quasar.config.*.temporary.compiled*"
+    "./quasar.config.*.temporary.compiled*",
+    "./functions"
   ]
 }

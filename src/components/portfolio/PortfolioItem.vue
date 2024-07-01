@@ -127,7 +127,7 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, onMounted, computed } from 'vue';
 import { viewTransformer } from 'src/service/portfolio';
-import { Portfolio } from 'src/types';
+import { Portfolio } from 'app/shared/types';
 
 const positiveProfit = {
   icon: 'add',

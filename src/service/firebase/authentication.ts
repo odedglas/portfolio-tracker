@@ -10,7 +10,7 @@ import {
   User,
 } from 'firebase/auth';
 import { useLoadingStore } from 'stores/loading';
-import { FIREBASE_LOGIN_PROVIDERS } from 'src/constants';
+import { FIREBASE_LOGIN_PROVIDERS } from 'app/shared/constants';
 import { auth } from './core';
 
 const AuthenticationProviders = {

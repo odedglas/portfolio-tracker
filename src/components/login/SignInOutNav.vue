@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { LOGIN_META } from 'src/constants';
+import { LOGIN_META } from 'app/shared/constants';
 
 export default defineComponent({
   name: 'SignInOutLink',

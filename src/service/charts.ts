@@ -1,5 +1,7 @@
-import { HoldingWithProfits } from 'src/types';
+import { HoldingWithProfits } from 'app/shared/types';
 import { useHoldingsStore } from 'stores/holdings';
+
+const fontFamily = 'inherit';
 
 const colorPallet = [
   '#EC407A',
@@ -46,7 +48,7 @@ export const getHoldingsDonutChatOptions = (
       labels: holdings.map(({ name }) => name),
       legend: {
         fontSize: 14,
-        fontFamily: 'inherit',
+        fontFamily,
         itemMargin: {
           vertical: 6,
         },
@@ -68,7 +70,7 @@ export const getHoldingsDonutChatOptions = (
         enabled: true,
         style: {
           fontSize: '12px',
-          fontFamily: 'inherit',
+          fontFamily,
           fontWeight: 'normal',
           colors: ['#757575'],
         },
@@ -130,7 +132,7 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
         enabled: true,
         style: {
           fontSize: '12px',
-          fontFamily: 'inherit',
+          fontFamily,
         },
         formatter: function (text: string, op: { value: string }) {
           return [text, `${op.value}%`];
@@ -144,13 +146,38 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
             ranges: [
               {
                 from: -50,
-                to: 0,
-                color: '#CD363A',
+                to: -6,
+                color: 'rgb(197, 69, 56)',
               },
               {
-                from: 0.001,
+                from: -6,
+                to: -3,
+                color: 'rgba(238, 81, 82, 0.92)',
+              },
+              {
+                from: -3,
+                to: 0,
+                color: 'rgb(247, 124, 128)',
+              },
+              {
+                from: 0,
+                to: 0,
+                color: 'rgb(193, 196, 205)',
+              },
+              {
+                from: 0,
+                to: 3,
+                color: 'rgba(46, 169, 161, 0.55)',
+              },
+              {
+                from: 3,
+                to: 6,
+                color: 'rgb(27, 197, 189)',
+              },
+              {
+                from: 6,
                 to: 100,
-                color: '#52B12C',
+                color: 'rgb(46, 169, 161)',
               },
             ],
           },
@@ -186,3 +213,57 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
     },
   };
 };
+
+export type BenchmarkData = {
+  name: string;
+  data: { x: number; y: number }[];
+};
+
+export const getPortfolioPerformanceChart = (
+  benchmarkData: BenchmarkData[],
+  onZoom: () => void
+) => {
+  return {
+    series: benchmarkData,
+    options: {
+      chart: {
+        type: 'area',
+        stacked: false,
+        zoom: {
+          type: 'x',
+          enabled: true,
+          autoScaleYaxis: true
+        },
+        toolbar: {
+          show: false,
+        },
+        events: {
+          beforeZoom: onZoom
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      markers: {
+        size: 0,
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          inverseColors: false,
+          opacityFrom: 0.5,
+          opacityTo: 0,
+          stops: [0, 90, 100]
+        },
+      },
+      xaxis: {
+        type: 'datetime',
+      },
+      tooltip: {
+        shared: true,
+
+      }
+    },
+  }
+}

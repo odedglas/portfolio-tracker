@@ -1,4 +1,4 @@
-import { Portfolio } from 'src/types';
+import { Portfolio } from 'app/shared/types';
 import {
   getCollections,
   firestoreAPI,

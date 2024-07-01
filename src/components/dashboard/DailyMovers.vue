@@ -48,7 +48,7 @@ import TickerLogo from 'components/common/TickerLogo.vue';
 import 'swiper/css';
 import ProfitIndicator from 'components/common/ProfitIndicator.vue';
 import { useQuotesStore } from 'stores/quotes';
-import { Holding } from 'src/types';
+import { Holding } from 'app/shared/types';
 export default defineComponent({
   name: 'DailyMovers',
   components: { ProfitIndicator, TickerLogo, Swiper, SwiperSlide },
