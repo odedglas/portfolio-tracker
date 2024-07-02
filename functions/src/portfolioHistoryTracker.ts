@@ -11,10 +11,12 @@ import { Holding } from '../../shared/types';
  */
 export const portfolioHistoryTracker = async () => {
   const now = Date.now();
-  const tickers = ['SPY', 'FVRR', 'QQQ'];
+  logger.info('Portfolio History Tracker Start', { timestamp: now });
 
   const holdings = await getCollection<Holding>('holdings');
-  const tickerQuotes = await getTickersQuotes(tickers);
+
+  const holdingTickers = holdings.map((holding) => holding.ticker);
+  const tickerQuotes = await getTickersQuotes(holdingTickers);
 
   console.log('Holdings', holdings);
   console.log('Tickers Quote', tickerQuotes);

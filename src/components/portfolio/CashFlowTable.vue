@@ -119,7 +119,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import { usePortfolioStore } from 'stores/portfolios';
-import { viewTransformer } from 'src/service/portfolio';
+import { portfoliosTransformer } from 'app/shared/transformers';
 import { date as dateUtils, type QTableProps } from 'quasar';
 import { Deposit, DepositEntity } from 'app/shared/types';
 import { useI18n } from 'vue-i18n';
@@ -174,7 +174,7 @@ export default defineComponent({
       const portfolio = portfolioStore.selectedPortfolio;
       if (!portfolio) return 0;
 
-      return viewTransformer.cashFlow(portfolio);
+      return portfoliosTransformer.cashFlow(portfolio);
     });
 
     const deposits = computed(() => {
