@@ -34,6 +34,17 @@ export interface Portfolio extends Entity {
   deposits: Deposit[];
 }
 
+export interface PortfolioHistory extends Entity {
+  portfolioId: string;
+  date: number;
+  invested: number;
+  profit: number;
+  realized?: number;
+  captialGains?: number;
+  dailyChange?: number;
+  fees?: number;
+}
+
 export type TransactionAction =
   (typeof TRANSACTIONS_TYPES)[keyof typeof TRANSACTIONS_TYPES];
 

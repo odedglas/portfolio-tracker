@@ -1,4 +1,3 @@
-const base = require('../.eslintrc.cjs');
 module.exports = {
   root: true,
   env: {
