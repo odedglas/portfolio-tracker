@@ -16,7 +16,7 @@ export const portfolioHistoryTracker = async () => {
   const holdings = await getCollection<Holding>('holdings');
   const tickerQuotes = await getTickersQuotes(tickers);
 
-  console.log('Holdings', holdings)
+  console.log('Holdings', holdings);
   console.log('Tickers Quote', tickerQuotes);
 
   // For each holding, calculate it's "withProfits" entity.
@@ -25,5 +25,7 @@ export const portfolioHistoryTracker = async () => {
 
   // For each portfolio, create a daily_history record
 
-  logger.info('Portfolio History Tracker Done', { timestamp: Date.now() - now });
+  logger.info('Portfolio History Tracker Done', {
+    timestamp: Date.now() - now,
+  });
 };

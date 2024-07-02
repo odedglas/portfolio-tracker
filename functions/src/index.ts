@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin'
+import * as admin from 'firebase-admin';
 import { onRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
