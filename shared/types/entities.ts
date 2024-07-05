@@ -34,14 +34,18 @@ export interface Portfolio extends Entity {
   deposits: Deposit[];
 }
 
-export interface PortfolioHistory extends Entity {
+export interface PortfolioHistory {
   portfolioId: string;
   date: number;
   invested: number;
+  deposited: number;
+  cashFlow: number;
   profit: number;
+  profitPercent: number;
   realized?: number;
   captialGains?: number;
   dailyChange?: number;
+  dailyChangePercent?: number;
   fees?: number;
 }
 

@@ -1,7 +1,17 @@
 import * as logger from 'firebase-functions/logger';
 import { getTickersQuotes } from './utils/getTickersQuotes';
-import { getCollection } from './utils/getCollection';
-import { Holding } from '../../shared/types';
+import { getCollection, saveDocument } from './utils/getCollection';
+import {
+  Holding,
+  HoldingWithProfits,
+  Portfolio,
+  PortfolioHistory,
+  Quote,
+} from '../../shared/types';
+import {
+  holdingsTransformer,
+  portfoliosTransformer,
+} from '../../shared/transformers';
 
 /**
  * 1. Get all Portfolios
@@ -13,19 +23,59 @@ export const portfolioHistoryTracker = async () => {
   const now = Date.now();
   logger.info('Portfolio History Tracker Start', { timestamp: now });
 
+  const portfolios = await getCollection<Portfolio>('portfolios');
   const holdings = await getCollection<Holding>('holdings');
 
   const holdingTickers = holdings.map((holding) => holding.ticker);
   const tickerQuotes = await getTickersQuotes(holdingTickers);
 
-  console.log('Holdings', holdings);
-  console.log('Tickers Quote', tickerQuotes);
+  const tickerQuotesMap: Record<string, Quote> = tickerQuotes.reduce(
+    (acc, quote) => ({
+      ...acc,
+      [quote.symbol]: quote,
+    }),
+    {}
+  );
 
   // For each holding, calculate it's "withProfits" entity.
+  const holdingsWithProfits = holdings.map((holding) =>
+    holdingsTransformer.withProfits(holding, tickerQuotesMap)
+  );
 
-  // Group by portfolio and get it's summary - This will grant us Portfolio level profits/changes.
+  // Group holdings by portfolio
+  const portfolioHoldings = holdingsWithProfits.reduce((acc, holding) => {
+    acc[holding.portfolioId] ||= [];
 
-  // For each portfolio, create a daily_history record
+    acc[holding.portfolioId].push(holding);
+
+    return acc;
+  }, {} as Record<string, HoldingWithProfits[]>);
+
+  // Calculate each portfolio its own KPI's.
+  const historyRecords: PortfolioHistory[] = portfolios.map((portfolio) => {
+    const portfolioSummary = holdingsTransformer.summary(
+      portfolioHoldings[portfolio.id] || []
+    );
+    const portfolioWithHoldings = {
+      ...portfolio,
+      ...portfolioSummary,
+    };
+
+    const kpis = portfoliosTransformer.portfolioKPIS(portfolioWithHoldings);
+
+    return {
+      ...portfolioSummary,
+      date: Date.now(),
+      portfolioId: portfolio.id,
+      profitPercent: kpis.profit.percentage,
+      dailyChangePercent: kpis.dailyChange.percentage,
+      deposited: portfoliosTransformer.depositsValue(portfolioWithHoldings),
+      cashFlow: portfoliosTransformer.cashFlow(portfolioWithHoldings),
+    };
+  });
+
+  // Saving history records.
+  await saveDocument<PortfolioHistory>('portfolioHistory', historyRecords);
 
   logger.info('Portfolio History Tracker Done', {
     timestamp: Date.now() - now,

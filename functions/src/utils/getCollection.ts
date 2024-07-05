@@ -9,3 +9,14 @@ export const getCollection = async <Entity>(
 
   return querySnapshot.docs.map((doc) => doc.data() as Entity);
 };
+
+export const saveDocument = async <Entity extends object>(
+  collection: AppCollectionsNames,
+  entities: Entity[]
+) => {
+  const collectionRef = getFirestore().collection(collection);
+
+  entities.forEach(async (entity) => {
+    await collectionRef.add(entity);
+  });
+};
