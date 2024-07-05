@@ -7,7 +7,7 @@ admin.initializeApp();
 
 export const portfolioScheduler = onSchedule(
   {
-    schedule: 'At 00:00',
+    schedule: 'every day 00:00',
     secrets: ['RAPID_YAHOO_API_KEY'],
   },
   async (event) => {
