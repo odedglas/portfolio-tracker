@@ -1,43 +1,12 @@
-import { Transaction } from 'src/types';
+import { Transaction } from 'app/shared/types';
+import { transactionsTransformer } from 'app/shared/transformers';
 import {
   getCollections,
   firestoreAPI,
   queries,
 } from 'src/service/firebase/collections';
-import { TRANSACTIONS_TYPES } from 'src/constants';
 
 const transactionsCollection = () => getCollections().transaction;
-
-export const transformer = {
-  isBuy: (transaction: Transaction) =>
-    transaction.action === TRANSACTIONS_TYPES.BUY,
-  summary: (transactions: Transaction[]) =>
-    transactions.reduce(
-      (summary, transaction) => {
-        const transactionValue = transaction.shares * transaction.price;
-
-        summary[transaction.action] += transactionValue;
-        summary.fees += transaction.fees || 0;
-
-        return summary;
-      },
-      { buy: 0, sell: 0, fees: 0 }
-    ),
-  totalValue: (transaction: Transaction) =>
-    transaction.shares * transaction.price + (transaction.fees ?? 0),
-  actualValue: (transaction: Transaction) =>
-    transaction.actualShares * transaction.price + (transaction.fees ?? 0),
-  profitPercent: (profit: number, transaction: Transaction) => {
-    const actualValue = transformer.actualValue(transaction);
-
-    return actualValue
-      ? Math.abs(
-          profit /
-            (transaction?.paidPrice ?? transformer.actualValue(transaction))
-        )
-      : 0;
-  },
-};
 
 const api = {
   list: queries.listPortfolioTransactions,
@@ -82,7 +51,10 @@ const api = {
   ) => {
     const available = [...transactions]
       .reverse()
-      .filter((t) => transformer.isBuy(t) && t.ticker === transaction.ticker);
+      .filter(
+        (t) =>
+          transactionsTransformer.isBuy(t) && t.ticker === transaction.ticker
+      );
 
     let remainingShares = transaction.actualShares;
     let realizedProfitOrLoss = 0;

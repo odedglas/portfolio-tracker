@@ -1,7 +1,7 @@
 import { ref, UnwrapRef } from 'vue';
 import { useAreYouSure } from './useAreYouSureDialog';
 import { useLoadingStore } from 'stores/loading';
-import { Entity } from 'src/types';
+import { Entity } from 'app/shared/types';
 
 interface UseEditableEntityPageProps<T> {
   deleteModal: {

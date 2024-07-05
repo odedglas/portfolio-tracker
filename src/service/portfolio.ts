@@ -1,4 +1,4 @@
-import { Portfolio } from 'src/types';
+import { Portfolio } from 'app/shared/types';
 import {
   getCollections,
   firestoreAPI,
@@ -43,52 +43,6 @@ const api = {
   // TODO - Deletion should clean all portfolio related entities such as Transactions / Holdings.
   delete: async (portfolioId: string) =>
     firestoreAPI.deleteDocument(portfolioId, portfolioCollection()),
-};
-
-export const viewTransformer = {
-  initialDeposit(portfolio: Portfolio) {
-    return portfolio.deposits.find((deposit) => deposit.initial)?.value ?? 0;
-  },
-  depositsValue(portfolio: Portfolio) {
-    return portfolio.deposits
-      .filter((d) => d.type !== 'balance')
-      .reduce((amount, deposit) => amount + deposit.value, 0);
-  },
-  depositManualBalance(portfolio: Portfolio) {
-    return portfolio.deposits
-      .filter((d) => d.type === 'balance')
-      .reduce((amount, deposit) => amount + deposit.value, 0);
-  },
-  cashFlow(portfolio: Portfolio) {
-    return (
-      viewTransformer.depositsValue(portfolio) -
-      portfolio.invested +
-      viewTransformer.depositManualBalance(portfolio)
-    );
-  },
-  portfolioKPIS(portfolio: Portfolio) {
-    const depositsValue = viewTransformer.depositsValue(portfolio);
-    const cashFlow = viewTransformer.cashFlow(portfolio);
-
-    const target = {
-      value: portfolio.target,
-      percentage: (portfolio.currentValue + cashFlow) / portfolio.target,
-    };
-
-    const profit = {
-      value: portfolio.profit,
-      percentage: portfolio.invested ? portfolio.profit / depositsValue : 0,
-    };
-
-    const dailyChange = {
-      value: portfolio.dailyChange ?? 0,
-      percentage: portfolio.dailyChange
-        ? portfolio.dailyChange / depositsValue
-        : 0,
-    };
-
-    return { target, profit, dailyChange };
-  },
 };
 
 export default api;

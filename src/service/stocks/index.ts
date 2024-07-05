@@ -27,5 +27,4 @@ export const getTickerData = async (ticker: string) => {
   }));
 };
 
-export * from './schema';
 export { getQuotes, getQuotesChartData };

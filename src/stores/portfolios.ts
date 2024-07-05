@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
+import { holdingsTransformer } from 'app/shared/transformers';
 import portfolioAPI from 'src/service/portfolio';
-import { transformer as holdingsTransformer } from 'src/service/holdings';
-import { Deposit, Portfolio } from 'src/types';
+import { Deposit, Portfolio } from 'app/shared/types';
 import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
 

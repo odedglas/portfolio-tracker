@@ -179,8 +179,8 @@ import { storeToRefs } from 'pinia';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import ProfitIndicator from 'components/common/ProfitIndicator.vue';
 import { useTransactionsStore } from 'src/stores/transactions';
-import { transformer } from 'src/service/transactions';
-import { Transaction } from 'src/types';
+import { transactionsTransformer } from 'app/shared/transformers';
+import { Transaction } from 'app/shared/types';
 import { columns } from './columns';
 
 export default defineComponent({
@@ -206,9 +206,10 @@ export default defineComponent({
 
     const viewTransactions = computed(() =>
       transactions.value.map((transaction) => {
-        const isBuyAction = transformer.isBuy(transaction);
+        const isBuyAction = transactionsTransformer.isBuy(transaction);
         const profitValue = balanceMap.value[transaction.id] ?? 0;
-        const transactionValue = transformer.totalValue(transaction);
+        const transactionValue =
+          transactionsTransformer.totalValue(transaction);
 
         return {
           ...transaction,
@@ -222,7 +223,10 @@ export default defineComponent({
           date: date.formatDate(transaction.date, 'MM/DD/YY'),
           profit: {
             value: profitValue,
-            percent: transformer.profitPercent(profitValue, transaction),
+            percent: transactionsTransformer.profitPercent(
+              profitValue,
+              transaction
+            ),
           },
         };
       })

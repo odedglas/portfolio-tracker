@@ -17,7 +17,7 @@
 import { defineComponent } from 'vue';
 import { useQuasar } from 'quasar';
 import { authentication } from 'src/service/firebase';
-import { FIREBASE_LOGIN_PROVIDERS } from 'src/constants';
+import { FIREBASE_LOGIN_PROVIDERS } from 'app/shared/constants';
 import DynamicImage from '../common/DynamicImage.vue';
 
 const authProviders = [

@@ -1,6 +1,6 @@
 import { computed } from 'vue';
+import { portfoliosTransformer } from 'app/shared/transformers';
 import { usePortfolioStore } from 'src/stores/portfolios';
-import { viewTransformer } from 'src/service/portfolio';
 import { useI18n } from 'vue-i18n';
 
 export const usePortfolioKpis = () => {
@@ -13,7 +13,7 @@ export const usePortfolioKpis = () => {
       return;
     }
 
-    const portfolioKpis = viewTransformer.portfolioKPIS(portfolio);
+    const portfolioKpis = portfoliosTransformer.portfolioKPIS(portfolio);
     return [
       {
         title: $t('dashboard.kpis.value'),
@@ -42,11 +42,11 @@ export const usePortfolioKpis = () => {
       },
       {
         title: $t('dashboard.kpis.cash_flow'),
-        value: viewTransformer.cashFlow(portfolio),
+        value: portfoliosTransformer.cashFlow(portfolio),
         icon: 'account_balance',
         subtitle: {
           text: 'deposited',
-          value: viewTransformer.depositsValue(portfolio),
+          value: portfoliosTransformer.depositsValue(portfolio),
         },
       },
     ];

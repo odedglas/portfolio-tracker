@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { Portfolio } from 'src/types';
+import { Portfolio } from 'app/shared/types';
 import PortfolioItem from './PortfolioItem.vue';
 
 export default defineComponent({

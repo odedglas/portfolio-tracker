@@ -62,7 +62,7 @@ import portfolioAPI from 'src/service/portfolio';
 import PortfolioList from 'src/components/portfolio/PortfolioList.vue';
 import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
-import { Portfolio } from 'src/types';
+import { Portfolio } from 'app/shared/types';
 
 export default defineComponent({
   name: 'ManagePortfoliosPage',

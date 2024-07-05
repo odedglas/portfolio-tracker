@@ -140,8 +140,8 @@ import { usePortfolioStore } from 'stores/portfolios';
 import { useTransactionsStore } from 'stores/transactions';
 import { useLoadingStore } from 'stores/loading';
 import { useQuotesStore } from 'stores/quotes';
-import { Transaction } from 'src/types';
-import { TRANSACTIONS_TYPES } from 'src/constants';
+import { Transaction } from 'app/shared/types';
+import { TRANSACTIONS_TYPES } from 'app/shared/constants';
 import TickerSearch, { TickerOption } from '../common/TickerSearch.vue';
 
 const emptyTransaction = (): Transaction => {

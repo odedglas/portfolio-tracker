@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
+import type { Quote } from 'app/shared/types';
 import * as stocksAPI from 'src/service/stocks';
-import type { Quote } from 'src/service/stocks';
 
 interface QuotesState {
   tickerQuotes: Record<string, Quote>;

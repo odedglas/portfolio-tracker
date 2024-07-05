@@ -14,7 +14,6 @@ const env = {
   APP_ID: process.env.APP_ID ?? dotenvConfig.APP_ID,
   RAPID_YAHOO_API_KEY:
     process.env.RAPID_YAHOO_API_KEY ?? dotenvConfig.RAPID_YAHOO_API_KEY,
-  test: 'oded',
 };
 
 /**

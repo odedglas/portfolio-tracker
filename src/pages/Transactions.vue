@@ -46,7 +46,7 @@ import { useTransactionsStore } from 'src/stores/transactions';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
 import TransactionsTable from 'src/components/transactions/TransactionsTable.vue';
 import TransactionDialog from 'src/components/transactions/TransactionDialog.vue';
-import { Transaction } from 'src/types';
+import { Transaction } from 'app/shared/types';
 
 export default defineComponent({
   name: 'TransactionsPage',

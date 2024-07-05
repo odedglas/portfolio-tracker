@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
-import transactionsAPI, { transformer } from 'src/service/transactions';
-import { Transaction } from 'src/types';
+import { transactionsTransformer as transformer } from 'app/shared/transformers';
+import transactionsAPI from 'src/service/transactions';
+import { Transaction } from 'app/shared/types';
 import { useQuotesStore } from 'stores/quotes';
 
 interface TransactionsStoreState {

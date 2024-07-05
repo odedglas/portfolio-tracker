@@ -69,7 +69,7 @@ import { defineComponent, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePortfolioStore } from 'stores/portfolios';
 import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
-import { Portfolio } from 'src/types';
+import { Portfolio } from 'app/shared/types';
 
 export default defineComponent({
   name: 'PortfolioDropdown',

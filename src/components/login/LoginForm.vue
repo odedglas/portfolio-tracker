@@ -49,7 +49,7 @@
 import { defineComponent, ref, PropType } from 'vue';
 import { useQuasar } from 'quasar';
 import { authentication } from 'src/service/firebase';
-import { LOGIN_META } from 'src/constants';
+import { LOGIN_META } from 'app/shared/constants';
 
 export default defineComponent({
   name: 'LoginForm',

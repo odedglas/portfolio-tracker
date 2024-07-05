@@ -126,8 +126,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType, ref, onMounted, computed } from 'vue';
-import { viewTransformer } from 'src/service/portfolio';
-import { Portfolio } from 'src/types';
+import { portfoliosTransformer } from 'app/shared/transformers';
+import { Portfolio } from 'app/shared/types';
 
 const positiveProfit = {
   icon: 'add',
@@ -159,11 +159,11 @@ export default defineComponent({
     // TODO - Better UI X.x. Portfolios to cards / Target success indicator
     const viewPortfolio = computed(() => ({
       ...props.portfolio,
-      initialDeposit: viewTransformer.initialDeposit(props.portfolio),
-      cashFlow: viewTransformer.cashFlow(props.portfolio),
-      depositValue: viewTransformer.depositsValue(props.portfolio),
+      initialDeposit: portfoliosTransformer.initialDeposit(props.portfolio),
+      cashFlow: portfoliosTransformer.cashFlow(props.portfolio),
+      depositValue: portfoliosTransformer.depositsValue(props.portfolio),
       profitMeta: portfolio.profit >= 0 ? positiveProfit : negativeProfit,
-      kpis: viewTransformer.portfolioKPIS(props.portfolio),
+      kpis: portfoliosTransformer.portfolioKPIS(props.portfolio),
     }));
 
     const { portfolio } = props;

@@ -11,9 +11,9 @@ import {
   setDoc,
   deleteDoc,
 } from 'firebase/firestore';
+import { AppCollections, AppCollectionsNames } from 'app/shared/types';
 import { firestore } from './core';
 import { authentication } from './authentication';
-import { AppCollections, AppCollectionsNames } from './types';
 
 const createCollection = <CollectionName extends AppCollectionsNames>(
   collectionName: CollectionName

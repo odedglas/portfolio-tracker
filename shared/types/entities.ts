@@ -1,4 +1,4 @@
-import { LOGIN_META, TRANSACTIONS_TYPES } from './constants';
+import { LOGIN_META, TRANSACTIONS_TYPES } from '../constants';
 
 export type LoginMode = keyof typeof LOGIN_META;
 
@@ -32,6 +32,21 @@ export interface Portfolio extends Entity {
   dailyChange?: number;
   fees?: number;
   deposits: Deposit[];
+}
+
+export interface PortfolioHistory {
+  portfolioId: string;
+  date: number;
+  invested: number;
+  deposited: number;
+  cashFlow: number;
+  profit: number;
+  profitPercent: number;
+  realized?: number;
+  captialGains?: number;
+  dailyChange?: number;
+  dailyChangePercent?: number;
+  fees?: number;
 }
 
 export type TransactionAction =

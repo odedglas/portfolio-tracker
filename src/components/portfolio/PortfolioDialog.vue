@@ -80,8 +80,8 @@
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
 import { useLoadingStore } from 'stores/loading';
 import { usePortfolioStore } from 'src/stores/portfolios';
-import portfolioAPI, { viewTransformer } from 'src/service/portfolio';
-import { Portfolio } from 'src/types';
+import portfolioAPI from 'src/service/portfolio';
+import { Portfolio } from 'app/shared/types';
 
 const emptyPortfolioTemplate = (): Portfolio => ({
   id: '',
@@ -174,7 +174,6 @@ export default defineComponent({
       isNew,
       initialDeposit,
       localPortfolio,
-      viewTransformer,
       setLocalPortfolio,
       submitForm,
     };
