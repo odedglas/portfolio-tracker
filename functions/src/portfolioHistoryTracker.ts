@@ -71,6 +71,7 @@ export const portfolioHistoryTracker = async () => {
       dailyChangePercent: kpis.dailyChange.percentage,
       deposited: portfoliosTransformer.depositsValue(portfolioWithHoldings),
       cashFlow: portfoliosTransformer.cashFlow(portfolioWithHoldings),
+      // TODO - Add sectors profits
     };
   });
 

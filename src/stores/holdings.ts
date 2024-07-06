@@ -17,21 +17,8 @@ let transactionsAddListener: () => void;
 
 const calculateHoldingValue = (holding: Holding) => {
   const tickerQuotes = useQuotesStore().tickerQuotes;
-  const lastTickerQuote = tickerQuotes[holding.ticker];
 
-  const currentValue = holdingsTransformer.currentValue(
-    holding,
-    lastTickerQuote
-  );
-  const profit = holdingsTransformer.profit(holding, lastTickerQuote);
-  const dailyChange = holdingsTransformer.dailyChange(holding, lastTickerQuote);
-
-  return {
-    ...holding,
-    currentValue,
-    profit,
-    dailyChange,
-  };
+  return holdingsTransformer.withProfits(holding, tickerQuotes);
 };
 
 export const useHoldingsStore = defineStore('holdings', {

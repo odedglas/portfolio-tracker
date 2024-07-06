@@ -75,6 +75,7 @@
         >
         <q-td
           colspan="1"
+          v-if="summary.dailyChange"
           :class="`${summary.dailyChange > 0 ? 'text-green-5' : 'text-red-5'}`"
           >{{ $n(summary.dailyChange, 'decimal') }}</q-td
         >

@@ -1,4 +1,4 @@
-import { Holding, HoldingWithProfits, Quote } from '../types';
+import { Holding, HoldingsSummary, HoldingWithProfits, Quote } from '../types';
 
 export const holdingsTransformer = {
   currentValue: (holding: Holding, quote: Quote) =>
@@ -46,7 +46,7 @@ export const holdingsTransformer = {
       dailyChange,
     };
   },
-  summary: (holdings: HoldingWithProfits[]) =>
+  summary: (holdings: HoldingWithProfits[]): HoldingsSummary =>
     holdings.reduce(
       (acc, holding) => {
         acc.shares += holding.shares;
