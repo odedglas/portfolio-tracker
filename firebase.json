@@ -24,7 +24,7 @@
         "firebase-debug.*.log",
         "*.local"
       ],
-      "predeploy": "npm run build"
+      "predeploy": "rm -rf ./lib && npm run build"
     }
   ]
 }
