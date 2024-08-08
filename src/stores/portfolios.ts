@@ -23,7 +23,7 @@ export const usePortfolioStore = defineStore('portfolios', {
   state: (): {
     portfolios: Portfolio[];
     selectedPortfolioId: string | undefined;
-    history: PortfolioHistory[]
+    history: PortfolioHistory[];
   } => ({
     portfolios: [],
     history: [],
@@ -72,8 +72,9 @@ export const usePortfolioStore = defineStore('portfolios', {
       this.selectedPortfolioId = portfolioId;
 
       // TODO - This should trigger orchestrator "refresh" action.
-      this.history = (await queries.getPortfolioHistory(portfolioId))
-        .sort((a, b) => a.date - b.date);
+      this.history = (await queries.getPortfolioHistory(portfolioId)).sort(
+        (a, b) => a.date - b.date
+      );
       await transactionsStore.list(portfolioId);
     },
     async list() {

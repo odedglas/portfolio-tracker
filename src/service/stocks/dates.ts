@@ -15,7 +15,7 @@ export const buildDateRange = (from: Date, to: Date) => {
     current = tomorrow(current);
   }
   return range;
-}
+};
 
 export const tomorrow = (date: Date) => DateAPI.addToDate(date, { days: 1 });
 

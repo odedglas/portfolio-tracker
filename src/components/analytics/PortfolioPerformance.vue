@@ -74,20 +74,21 @@ export default defineComponent({
 
     // TODO - Should depend on time filter + History itself potentially.
     const chartData = computed(() =>
-      getPortfolioPerformanceChart(portfolioStore.history, benchmarkData.value, () => {
-        if (!showResetZoom.value) {
-          showResetZoom.value = true;
+      getPortfolioPerformanceChart(
+        portfolioStore.history,
+        benchmarkData.value,
+        () => {
+          if (!showResetZoom.value) {
+            showResetZoom.value = true;
+          }
         }
-      }),
+      )
     );
 
     const resetChart = () => {
       const history = portfolioStore.history;
 
-      chartRef.value.zoomX(
-        history[0].date,
-        history[history.length - 1].date
-      );
+      chartRef.value.zoomX(history[0].date, history[history.length - 1].date);
 
       showResetZoom.value = false;
     };
