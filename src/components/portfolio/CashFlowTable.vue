@@ -185,7 +185,7 @@ export default defineComponent({
         (portfolioDeposit, index) => ({
           ...portfolioDeposit,
           index,
-          action: $t(portfolioDeposit.type),
+          action: portfolioDeposit.type ? $t(portfolioDeposit.type) : '',
         })
       );
 
@@ -202,6 +202,7 @@ export default defineComponent({
       field: 'value' | 'date' | 'notes' | 'action',
       deposit: DepositEntity
     ) => {
+      debugger;
       if (field === 'value') {
         deposit.value = value as number;
       } else if (field === 'date') {
