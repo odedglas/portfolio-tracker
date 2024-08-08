@@ -1,5 +1,6 @@
-import { HoldingWithProfits } from 'app/shared/types';
+import { HoldingWithProfits, PortfolioHistory, StockChartResponse } from 'app/shared/types';
 import { useHoldingsStore } from 'stores/holdings';
+import { buildDateRange, midDay, startOfDay } from 'src/service/stocks/dates';
 
 const fontFamily = 'inherit';
 
@@ -214,17 +215,45 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
   };
 };
 
-export type BenchmarkData = {
-  name: string;
-  data: { x: number; y: number }[];
+const normalizePerformanceData = (portfolioHistory: PortfolioHistory[], benchmarks: StockChartResponse) => {
+  const seriesStartDate = new Date(Math.min(
+    ...portfolioHistory.map((history) => history.date)
+  ));
+
+  const seriesEndDate = new Date(Math.max(
+    ...portfolioHistory.map((history) => history.date)
+  ));
+
+  const seriesTimeRange = buildDateRange(seriesStartDate, seriesEndDate);
+
+  const normalizedBenchmarks = Object.entries(benchmarks).map(([key, value]) => {
+    return {
+      name: key,
+      data: value.close.map((close: number, index: number) => {
+        return {
+          x: startOfDay(new Date(value.timestamp[index])),
+          y: close,
+        };
+      }),
+    };
+  });
+
+  return normalizedBenchmarks;
 };
 
+
 export const getPortfolioPerformanceChart = (
-  benchmarkData: BenchmarkData[],
+  portfolioHistory: PortfolioHistory[],
+  benchmarks: StockChartResponse,
   onZoom: () => void
 ) => {
+  console.log('Portfolio History:', portfolioHistory, benchmarks);
+  /*console.log('Normalized', normalizePerformanceData(portfolioHistory, benchmarks))*/
+
+  const series = normalizePerformanceData(portfolioHistory, benchmarks);
+
   return {
-    series: benchmarkData,
+    series,
     options: {
       chart: {
         type: 'area',

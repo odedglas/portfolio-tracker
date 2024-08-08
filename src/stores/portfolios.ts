@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
 import { holdingsTransformer } from 'app/shared/transformers';
 import portfolioAPI from 'src/service/portfolio';
-import { Deposit, Portfolio } from 'app/shared/types';
+import { Deposit, Portfolio, PortfolioHistory } from 'app/shared/types';
 import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
+import { queries } from 'src/service/firebase/collections';
 
 const selectedPortfolioStorageKey = 'selected_portfolio_id';
 
@@ -22,8 +23,10 @@ export const usePortfolioStore = defineStore('portfolios', {
   state: (): {
     portfolios: Portfolio[];
     selectedPortfolioId: string | undefined;
+    history: PortfolioHistory[]
   } => ({
     portfolios: [],
+    history: [],
     selectedPortfolioId: undefined,
   }),
   getters: {
@@ -68,6 +71,9 @@ export const usePortfolioStore = defineStore('portfolios', {
 
       this.selectedPortfolioId = portfolioId;
 
+      // TODO - This should trigger orchestrator "refresh" action.
+      this.history = (await queries.getPortfolioHistory(portfolioId))
+        .sort((a, b) => a.date - b.date);
       await transactionsStore.list(portfolioId);
     },
     async list() {

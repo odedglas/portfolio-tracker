@@ -39,7 +39,9 @@
 import { computed, defineComponent, Ref, ref, watch } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { getPortfolioPerformanceChart } from 'src/service/charts';
+import { StockChartResponse } from 'app/shared/types';
 import { getQuotesChartData } from 'src/service/stocks';
+import { usePortfolioStore } from 'stores/portfolios';
 
 type BenchmarkData = {
   name: string;
@@ -55,45 +57,36 @@ export default defineComponent({
     const showResetZoom = ref(false);
     const chartRef: Ref = ref(undefined);
     const selectedBenchmark: Ref<string[]> = ref(['SPY']);
-    const benchmarkData = ref<BenchmarkData[]>([]);
+    const benchmarkData = ref<StockChartResponse>({});
+
+    const portfolioStore = usePortfolioStore();
 
     const setBenchmarkData = async (tickers: string[]) => {
       if (!tickers.length) {
-        benchmarkData.value = [];
+        benchmarkData.value = {};
         return;
       }
 
-      const series = await getQuotesChartData(tickers);
-
-      benchmarkData.value = Object.entries(series).map(([key, value]) => {
-        return {
-          name: key,
-          data: value.close.map((close: number, index: number) => {
-            return {
-              x: value.timestamp[index],
-              y: close,
-            };
-          }),
-        };
-      });
+      benchmarkData.value = await getQuotesChartData(tickers);
     };
 
     watch(selectedBenchmark, setBenchmarkData, { immediate: true });
 
+    // TODO - Should depend on time filter + History itself potentially.
     const chartData = computed(() =>
-      getPortfolioPerformanceChart(benchmarkData.value, () => {
+      getPortfolioPerformanceChart(portfolioStore.history, benchmarkData.value, () => {
         if (!showResetZoom.value) {
           showResetZoom.value = true;
         }
-      })
+      }),
     );
 
     const resetChart = () => {
-      const firstSeries = benchmarkData.value[0];
+      const history = portfolioStore.history;
 
       chartRef.value.zoomX(
-        firstSeries.data[0].x,
-        firstSeries.data[firstSeries.data.length - 1].x
+        history[0].date,
+        history[history.length - 1].date
       );
 
       showResetZoom.value = false;
