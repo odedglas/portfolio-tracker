@@ -42,7 +42,9 @@
           {{ props.row.action ?? '--' }}
           <q-popup-edit
             :model-value="props.row.action"
-            @update:modelValue="(action) => updateDeposit(action.value, 'action', props.row)"
+            @update:modelValue="
+              (action) => updateDeposit(action.value, 'action', props.row)
+            "
             v-slot="scope"
           >
             <q-select

@@ -20,4 +20,3 @@ export const COLOR_PALLET = [
   '#BDBDBD',
   '#78909C',
 ];
-

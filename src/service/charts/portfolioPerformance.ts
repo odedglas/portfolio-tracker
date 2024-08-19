@@ -8,7 +8,10 @@ import { ChartSeries, Formatter } from './base';
  * @param series
  * @param timeRange
  */
-const normalizeSeriesTimePeriod = (series: ChartSeries, timeRange: number[]) => {
+const normalizeSeriesTimePeriod = (
+  series: ChartSeries,
+  timeRange: number[]
+) => {
   const seriesData = series.data;
   let matchIndex = 0;
   const normalizedData = timeRange.map((periodDate) => {
@@ -27,14 +30,14 @@ const normalizeSeriesTimePeriod = (series: ChartSeries, timeRange: number[]) => 
     const normalizedDate = midDay(new Date(periodDate));
     const normalizedValue = seriesData[nextDataPointIndex - 1]?.y ?? 0;
 
-    return { x: normalizedDate , y: normalizedValue };
+    return { x: normalizedDate, y: normalizedValue };
   });
 
   return {
     ...series,
     data: normalizedData,
   };
-}
+};
 
 /**
  * Normalizes a given benchmark data with portfolio history items, each deposit change will be considered
@@ -42,15 +45,21 @@ const normalizeSeriesTimePeriod = (series: ChartSeries, timeRange: number[]) => 
  * @param series
  * @param portfolioHistory
  */
-const normalizeBenchmarkValue = (series: ChartSeries, portfolioHistory: PortfolioHistory[]) => {
-  let lastDeposit = 0, currentShares = 0;
+const normalizeBenchmarkValue = (
+  series: ChartSeries,
+  portfolioHistory: PortfolioHistory[]
+) => {
+  let lastDeposit = 0,
+    currentShares = 0;
 
   if (!portfolioHistory.length) {
     return series;
   }
 
   series.data = series.data.map((point, index) => {
-    const currentDeposit = lastDeposit ? portfolioHistory[index]?.deposited : portfolioHistory[index].currentValue;
+    const currentDeposit = lastDeposit
+      ? portfolioHistory[index]?.deposited
+      : portfolioHistory[index].currentValue;
 
     if (currentDeposit > lastDeposit) {
       currentShares += (currentDeposit - lastDeposit) / point.y;
@@ -72,22 +81,25 @@ const normalizePerformanceData = (
 ) => {
   const periodTimeRange = buildDateRangeFromToday();
 
-  const periodHistoryItems = portfolioHistory.filter(
-    (history) => periodTimeRange.includes(midDay(new Date(history.date)).getTime())
+  const periodHistoryItems = portfolioHistory.filter((history) =>
+    periodTimeRange.includes(midDay(new Date(history.date)).getTime())
   );
 
-  const portfolioHistorySeries = normalizeSeriesTimePeriod({
-    name: 'Portfolio',
-    data: periodHistoryItems.map((history) => {
-      return {
-        x: midDay(new Date(history.date)),
-        y: history.currentValue,
-      };
-    })
-  }, periodTimeRange);
+  const portfolioHistorySeries = normalizeSeriesTimePeriod(
+    {
+      name: 'Portfolio',
+      data: periodHistoryItems.map((history) => {
+        return {
+          x: midDay(new Date(history.date)),
+          y: history.currentValue,
+        };
+      }),
+    },
+    periodTimeRange
+  );
 
-  const benchmarksSeries = Object.entries(benchmarks).map(
-    ([key, value]) => {
+  const benchmarksSeries = Object.entries(benchmarks)
+    .map(([key, value]) => {
       return {
         name: key,
         data: value.close.map((close: number, index: number) => {
@@ -97,14 +109,13 @@ const normalizePerformanceData = (
           };
         }),
       };
-    }
-  )
+    })
     .filter((series) => series.data.length > 1)
     .map((series) => normalizeSeriesTimePeriod(series, periodTimeRange))
     .map((series) => normalizeBenchmarkValue(series, periodHistoryItems));
 
   // Ensuring each series includes data point for each day in the period time.
-  return [portfolioHistorySeries, ...benchmarksSeries]
+  return [portfolioHistorySeries, ...benchmarksSeries];
 };
 
 export const getPortfolioPerformanceChart = (
@@ -141,7 +152,7 @@ export const getPortfolioPerformanceChart = (
         curve: 'straight',
         width: 2,
       },
-/*      markers: {
+      /*      markers: {
         discrete: [{
           seriesIndex: 0,
           dataPointIndex: 5,

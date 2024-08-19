@@ -3,7 +3,8 @@ import { date as DateAPI } from 'quasar';
 export const startOfDay = (date: Date, startHours = 0) =>
   DateAPI.addToDate(DateAPI.startOfDate(date, 'day'), { hours: startHours });
 
-const yesterday = (date: Date = new Date()) => DateAPI.subtractFromDate(date, { days: 1 });
+const yesterday = (date: Date = new Date()) =>
+  DateAPI.subtractFromDate(date, { days: 1 });
 
 export const midDay = (date: Date) => startOfDay(date, 12);
 export const endOfDay = (date: Date) => startOfDay(date, 23.99);
@@ -19,13 +20,12 @@ export const buildDateRange = (from: Date, to: Date, daysInterval = 1) => {
   return range;
 };
 
-export const buildDateRangeFromToday = (days= 30) => {
+export const buildDateRangeFromToday = (days = 30) => {
   const periodEnd = midDay(yesterday());
   const periodStart = DateAPI.subtractFromDate(periodEnd, { days });
 
-  return buildDateRange(periodStart, periodEnd)
-    .map((date) => date.getTime());
-}
+  return buildDateRange(periodStart, periodEnd).map((date) => date.getTime());
+};
 
 export const tomorrow = (date: Date) => DateAPI.addToDate(date, { days: 1 });
 
