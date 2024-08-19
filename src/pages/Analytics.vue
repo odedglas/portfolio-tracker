@@ -1,6 +1,6 @@
 <template>
   <q-page class="row justify-center q-pa-md">
-    <div class="col-10 column">
+    <div class="col-9 column">
       <p class="text-h5 text-grey-7 dashboard-title">Analytics</p>
       <div class="flex q-gutter-md">
         <div v-for="kpi in kpis" :key="kpi.title" class="col">

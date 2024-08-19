@@ -42,7 +42,7 @@
           {{ props.row.action ?? '--' }}
           <q-popup-edit
             :model-value="props.row.action"
-            @update:modelValue="(action: string) => updateDeposit(action, 'action', props.row)"
+            @update:modelValue="(action) => updateDeposit(action.value, 'action', props.row)"
             v-slot="scope"
           >
             <q-select
@@ -198,15 +198,14 @@ export default defineComponent({
       dateUtils.formatDate(date, 'YYYY-MM-DD');
 
     const updateDeposit = (
-      value: number | string,
+      value: number | string | { value: string; label: string },
       field: 'value' | 'date' | 'notes' | 'action',
       deposit: DepositEntity
     ) => {
-      debugger;
       if (field === 'value') {
         deposit.value = value as number;
       } else if (field === 'date') {
-        deposit.date = new Date(value).getTime();
+        deposit.date = new Date(value as string).getTime();
       } else if (field === 'notes') {
         deposit.notes = value as string;
       } else {

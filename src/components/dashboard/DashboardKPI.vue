@@ -9,7 +9,11 @@
       </div>
       <div class="flex items-center q-my-sm text-h4">
         <span>
-          {{ showValueSign ? `${valueSign} ${$n(Math.abs(value), 'decimal')}` : $n(value, 'decimal') }}
+          {{
+            showValueSign
+              ? `${valueSign} ${$n(Math.abs(value), 'decimal')}`
+              : $n(value, 'decimal')
+          }}
         </span>
         <profit-indicator
           v-if="valuePercentage"

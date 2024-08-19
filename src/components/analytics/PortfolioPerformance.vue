@@ -42,11 +42,7 @@ import { getPortfolioPerformanceChart } from 'src/service/charts';
 import { StockChartResponse } from 'app/shared/types';
 import { getQuotesChartData } from 'src/service/stocks';
 import { usePortfolioStore } from 'stores/portfolios';
-
-type BenchmarkData = {
-  name: string;
-  data: { x: number; y: number }[];
-};
+import { useI18n } from 'vue-i18n';
 
 export default defineComponent({
   name: 'PortfolioPerformance',
@@ -59,6 +55,7 @@ export default defineComponent({
     const selectedBenchmark: Ref<string[]> = ref(['SPY']);
     const benchmarkData = ref<StockChartResponse>({});
 
+    const $n = useI18n().n;
     const portfolioStore = usePortfolioStore();
 
     const setBenchmarkData = async (tickers: string[]) => {
@@ -72,11 +69,11 @@ export default defineComponent({
 
     watch(selectedBenchmark, setBenchmarkData, { immediate: true });
 
-    // TODO - Should depend on time filter + History itself potentially.
     const chartData = computed(() =>
       getPortfolioPerformanceChart(
         portfolioStore.history,
         benchmarkData.value,
+        $n,
         () => {
           if (!showResetZoom.value) {
             showResetZoom.value = true;
