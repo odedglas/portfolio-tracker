@@ -14,7 +14,8 @@ const normalizeSeriesTimePeriod = (
   timeRange: number[]
 ) => {
   const seriesData = series.data;
-  let matchIndex = 0, lastKnownValue = 0;
+  let matchIndex = 0,
+    lastKnownValue = 0;
 
   const normalizedData = timeRange.map((periodDate) => {
     const seriesDataPoint = seriesData[matchIndex];
@@ -32,7 +33,8 @@ const normalizeSeriesTimePeriod = (
     matchIndex = nextDataPointIndex;
 
     const normalizedDate = midDay(new Date(periodDate));
-    const normalizedValue = seriesData[nextDataPointIndex - 1]?.y ?? lastKnownValue;
+    const normalizedValue =
+      seriesData[nextDataPointIndex - 1]?.y ?? lastKnownValue;
 
     lastKnownValue = normalizedValue;
 
@@ -88,7 +90,7 @@ const normalizePerformanceData = (
   );
 
   if (!periodHistoryItems.length) {
-    return []
+    return [];
   }
 
   const portfolioHistorySeries = normalizeSeriesTimePeriod(
@@ -147,7 +149,7 @@ export const getPortfolioPerformanceChart = (
           show: false,
         },
         animations: {
-          speed: 100
+          speed: 100,
         },
         events: {
           beforeZoom: onZoom,
@@ -158,9 +160,9 @@ export const getPortfolioPerformanceChart = (
         offsetY: 8,
       },
       markers: {
-        size: 0
+        size: 0,
       },
-/*      annotations: {
+      /*      annotations: {
         points: [{
           id: 'test-annot',
           x: series[0]?.data[0]?.x?.getTime(),
@@ -208,13 +210,13 @@ export const getPortfolioPerformanceChart = (
       },
       xaxis: {
         axisTicks: {
-          show: false
+          show: false,
         },
         axisBorder: {
-          show: false
+          show: false,
         },
         tooltip: {
-          enabled: false
+          enabled: false,
         },
         type: 'datetime',
         convertedCatToNumeric: false,
@@ -222,13 +224,15 @@ export const getPortfolioPerformanceChart = (
       yaxis: {
         forceNiceScale: true,
         labels: {
-          formatter: (value: number) => value ? `${(value / 1000).toFixed(0)}K` : value,
+          formatter: (value: number) =>
+            value ? `${(value / 1000).toFixed(0)}K` : value,
         },
       },
       tooltip: {
         shared: true,
         y: {
-          formatter: (value: number) => value ? formatter(value, 'decimal') : value,
+          formatter: (value: number) =>
+            value ? formatter(value, 'decimal') : value,
         },
         marker: {
           show: true,
@@ -237,4 +241,3 @@ export const getPortfolioPerformanceChart = (
     },
   };
 };
-

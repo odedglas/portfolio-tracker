@@ -4,10 +4,14 @@
       <div class="flex justify-between">
         <div class="flex items-center q-mr-sm">
           <q-icon name="query_stats" class="text-grey-6 q-mr-sm" size="sm" />
-          <p class="text-h6 text-grey-7 q-mb-none">{{ $t('charts.portfolio_performance') }}</p>
+          <p class="text-h6 text-grey-7 q-mb-none">
+            {{ $t('charts.portfolio_performance') }}
+          </p>
         </div>
         <div class="flex items-center q-gutter-md">
-          <p class="text-body2 text-grey-7 q-mb-none">{{$t('charts.benchmarks')}}:</p>
+          <p class="text-body2 text-grey-7 q-mb-none">
+            {{ $t('charts.benchmarks') }}:
+          </p>
           <q-select
             v-model="selectedBenchmark"
             dense
@@ -17,7 +21,9 @@
         </div>
       </div>
       <div class="flex items-center q-gutter-md">
-        <q-btn @click="resetChart" v-if="showResetZoom" flat>{{$t('reset')}}</q-btn>
+        <q-btn @click="resetChart" v-if="showResetZoom" flat>{{
+          $t('reset')
+        }}</q-btn>
       </div>
     </q-card-section>
     <q-card-section>
@@ -41,7 +47,7 @@ import { getQuotesChartData } from 'src/service/stocks';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useI18n } from 'vue-i18n';
 
-type Option = { label: string, value: string };
+type Option = { label: string; value: string };
 
 const benchmarkOptions: Option[] = [
   { label: 'S&P 500', value: 'SPY' },
@@ -64,7 +70,9 @@ export default defineComponent({
     const portfolioStore = usePortfolioStore();
 
     const setBenchmarkData = async (tickers: Option[]) => {
-      benchmarkData.value = await getQuotesChartData(tickers.map(ticker => ticker.value));
+      benchmarkData.value = await getQuotesChartData(
+        tickers.map((ticker) => ticker.value)
+      );
     };
 
     watch(selectedBenchmark, setBenchmarkData, { immediate: true });

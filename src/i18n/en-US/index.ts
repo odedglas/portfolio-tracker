@@ -73,7 +73,7 @@ export const enUsMessages = {
   delete: 'Delete',
   yes: 'Yes',
   no: 'No',
-  reset: 'Reset'
+  reset: 'Reset',
 };
 
 export const enUsCurrency = {

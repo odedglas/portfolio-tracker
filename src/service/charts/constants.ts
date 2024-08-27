@@ -26,4 +26,4 @@ export const SERIES_COLORS_PALLET = [
   '#26A69A',
   '#FFA726',
   '#8D6E63',
-]
+];

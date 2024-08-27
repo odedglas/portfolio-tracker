@@ -38,7 +38,5 @@ export default defineComponent({
 <style lang="scss">
 .analytics-kpis-wrapper {
   gap: 16px;
-
 }
-
 </style>
