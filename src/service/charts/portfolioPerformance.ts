@@ -1,4 +1,4 @@
-import { buildDateRangeFromToday, midDay } from 'src/service/stocks/dates';
+import { midDay } from 'src/service/stocks/dates';
 import { PortfolioHistory, StockChartResponse } from 'app/shared/types';
 import { ChartSeries, Formatter } from './base';
 import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
@@ -81,10 +81,9 @@ const normalizeBenchmarkValue = (
 
 const normalizePerformanceData = (
   portfolioHistory: PortfolioHistory[],
-  benchmarks: StockChartResponse
+  benchmarks: StockChartResponse,
+  periodTimeRange: number[]
 ) => {
-  const periodTimeRange = buildDateRangeFromToday();
-
   const periodHistoryItems = portfolioHistory.filter((history) =>
     periodTimeRange.includes(midDay(new Date(history.date)).getTime())
   );
@@ -129,10 +128,18 @@ const normalizePerformanceData = (
 export const getPortfolioPerformanceChart = (
   portfolioHistory: PortfolioHistory[],
   benchmarks: StockChartResponse,
+  periodTimeRange: number[],
   formatter: Formatter,
-  onZoom: () => void
+  onZoom: (
+    ctx: unknown,
+    values: { xaxis: { min: number; max: number } }
+  ) => void
 ) => {
-  const series = normalizePerformanceData(portfolioHistory, benchmarks);
+  const series = normalizePerformanceData(
+    portfolioHistory,
+    benchmarks,
+    periodTimeRange
+  );
 
   return {
     series,

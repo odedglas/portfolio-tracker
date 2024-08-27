@@ -3,9 +3,12 @@
     <div class="col-10 column">
       <p class="text-h5 text-grey-7 dashboard-title">Analytics</p>
       <div class="flex analytics-kpis-wrapper">
-        <div v-for="kpi in kpis" :key="kpi.title" class="col">
-          <dashboard-kpi v-bind="kpi" />
-        </div>
+        <dashboard-kpi
+          v-for="kpi in kpis"
+          :key="kpi.title"
+          v-bind="kpi"
+          class="col"
+        />
       </div>
 
       <portfolio-performance />

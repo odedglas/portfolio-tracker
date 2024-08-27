@@ -20,13 +20,55 @@
           />
         </div>
       </div>
-      <div class="flex items-center q-gutter-md">
-        <q-btn @click="resetChart" v-if="showResetZoom" flat>{{
-          $t('reset')
-        }}</q-btn>
+      <div
+        class="flex items-center q-gutter-md q-my-xs text-grey-8 justify-between text-caption"
+      >
+        <div>
+          <q-btn
+            v-for="option in timeRangeOptions"
+            :key="option.value"
+            :class="
+              selectedTimeRangeOption.value === option.value ? 'active' : ''
+            "
+            @click="() => selectTimeRange(option)"
+            round
+            flat
+            size="sm"
+          >
+            {{ option.label }}
+          </q-btn>
+          <q-btn
+            @click="resetChart"
+            v-if="showResetZoom"
+            flat
+            no-caps
+            size="sm"
+            color="primary"
+            icon="zoom_out_map"
+            >{{ $t('zoom_out') }}</q-btn
+          >
+        </div>
+        <div class="q-px-md flex items-center">
+          <div class="flex">
+            <span
+              v-for="(totalValue, index) in seriesTotalValues"
+              :key="index"
+              class="q-mx-sm flex items-center"
+            >
+              <span class="data-label q-mr-sm" :style="totalValue.style" />
+              <numeric-value :value="totalValue.value" />
+              <q-tooltip>
+                {{ totalValue.name }}
+              </q-tooltip>
+            </span>
+          </div>
+          <q-item-label>
+            {{ timeRangeText }}
+          </q-item-label>
+        </div>
       </div>
     </q-card-section>
-    <q-card-section>
+    <q-card-section class="q-pt-none">
       <apexchart
         ref="chartRef"
         height="500"
@@ -40,14 +82,21 @@
 
 <script lang="ts">
 import { computed, defineComponent, Ref, ref, watch } from 'vue';
+import { date as DateAPI } from 'quasar';
 import VueApexCharts from 'vue3-apexcharts';
 import { getPortfolioPerformanceChart } from 'src/service/charts';
 import { StockChartResponse } from 'app/shared/types';
 import { getQuotesChartData } from 'src/service/stocks';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useI18n } from 'vue-i18n';
+import {
+  buildDateRangeFromToday,
+  yearToDateDays,
+} from 'src/service/stocks/dates';
+import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
+import NumericValue from 'components/common/NumericValue.vue';
 
-type Option = { label: string; value: string };
+type Option = { label: string; value: string; [key: string]: unknown };
 
 const benchmarkOptions: Option[] = [
   { label: 'S&P 500', value: 'SPY' },
@@ -55,9 +104,20 @@ const benchmarkOptions: Option[] = [
   { label: 'RUSSEL 2000', value: 'IWM' },
 ];
 
+const timeRangeOptions: Option[] = [
+  { label: '7d', value: '5d', days: 7 },
+  { label: '1m', value: '1m', days: 30 },
+  { label: '3m', value: '3m', days: 90 },
+  { label: '6m', value: '6m', days: 180 },
+  { label: 'YTD', value: 'ytd', days: yearToDateDays() },
+  { label: '1y', value: '1y', days: 365 },
+  { label: '5y', value: '5y', days: 365 * 5 },
+];
+
 export default defineComponent({
   name: 'PortfolioPerformance',
   components: {
+    NumericValue,
     apexchart: VueApexCharts,
   },
   setup() {
@@ -65,9 +125,24 @@ export default defineComponent({
     const chartRef: Ref = ref(undefined);
     const selectedBenchmark: Ref<Option[]> = ref([benchmarkOptions[0]]);
     const benchmarkData = ref<StockChartResponse>({});
+    const selectedTimeRangeOption = ref<Option>(timeRangeOptions[2]);
 
     const $n = useI18n().n;
     const portfolioStore = usePortfolioStore();
+
+    const periodTimeRange = computed(() => {
+      const portfolioHistoryStartDate = portfolioStore.history[0]?.date;
+
+      if (!portfolioHistoryStartDate) {
+        return [];
+      }
+
+      const days = selectedTimeRangeOption.value.days;
+
+      return buildDateRangeFromToday(days as number).filter(
+        (date) => date >= portfolioHistoryStartDate
+      );
+    });
 
     const setBenchmarkData = async (tickerOptions: Option[]) => {
       benchmarkData.value = await getQuotesChartData(
@@ -81,6 +156,7 @@ export default defineComponent({
       getPortfolioPerformanceChart(
         portfolioStore.history,
         benchmarkData.value,
+        periodTimeRange.value,
         $n,
         () => {
           if (!showResetZoom.value) {
@@ -91,26 +167,83 @@ export default defineComponent({
     );
 
     const resetChart = () => {
-      const history = portfolioStore.history;
-
-      chartRef.value.zoomX(history[0].date, history[history.length - 1].date);
+      chartRef.value.zoomX(
+        periodTimeRange.value[0],
+        periodTimeRange.value[periodTimeRange.value.length - 1]
+      );
 
       showResetZoom.value = false;
     };
+
+    const selectTimeRange = (range: Option) => {
+      selectedTimeRangeOption.value =
+        timeRangeOptions.find((option) => option.value === range.value) ??
+        timeRangeOptions[0];
+    };
+
+    const timeRangeText = computed(() => {
+      const start = periodTimeRange.value[0];
+      const end = periodTimeRange.value[periodTimeRange.value.length - 1];
+
+      return `${DateAPI.formatDate(start, 'MMM D, YY')} - ${DateAPI.formatDate(
+        end,
+        'MMM D, YY'
+      )}`;
+    });
+
+    const seriesTotalValues = computed(() => {
+      const series = chartData.value.series;
+
+      return series.map((serie, index) => ({
+        value: serie.data[serie.data.length - 1].y - serie.data[0].y,
+        name: serie.name,
+        style: {
+          background: SERIES_COLORS_PALLET[index],
+          color: SERIES_COLORS_PALLET[index],
+        },
+      }));
+    });
 
     return {
       showResetZoom,
       benchmarkOptions,
       resetChart,
+      timeRangeOptions,
+      selectedTimeRangeOption,
       selectedBenchmark,
       chartRef,
       chartData,
+      selectTimeRange,
+      timeRangeText,
+      seriesTotalValues,
     };
   },
 });
 </script>
 
 <style lang="scss">
+.portfolio-performance-card {
+  .q-btn.active {
+    color: $blue-6;
+
+    .q-focus-helper {
+      background: currentColor;
+      opacity: 0.15;
+    }
+  }
+
+  .data-label {
+    height: 12px;
+    width: 12px;
+    left: 0;
+    top: 0;
+    border-width: 0;
+    border-color: rgb(255, 255, 255);
+    border-radius: 12px;
+    display: inline-block;
+  }
+}
+
 .holdings-heat-map {
   svg {
     transform: translate(8px, 0) !important;

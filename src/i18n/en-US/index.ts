@@ -74,6 +74,7 @@ export const enUsMessages = {
   yes: 'Yes',
   no: 'No',
   reset: 'Reset',
+  zoom_out: 'Zoom out',
 };
 
 export const enUsCurrency = {

@@ -98,10 +98,8 @@
             :display-as-row="false"
           />
           <span v-else>
-            --
-            <q-tooltip>
-              <span>{{ $t('transactions.all_profit_is_realized') }}</span>
-            </q-tooltip>
+            -- 1
+            <span>{{ $t('transactions.all_profit_is_realized') }}</span>
           </span>
         </q-td>
         <q-td key="item_actions" :props="props" class="text-grey-6">
