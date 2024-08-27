@@ -53,6 +53,11 @@ export const enUsMessages = {
     no_holdings:
       'No holding are there yet, You can start by creating a Transaction',
   },
+  charts: {
+    portfolio_performance: 'Portfolio performance',
+    benchmarks: 'Benchmarks',
+    portfolio_performance_description: 'testme',
+  },
   dashboard: {
     kpis: {
       cash_flow: 'Free Cash Flow',
@@ -68,6 +73,7 @@ export const enUsMessages = {
   delete: 'Delete',
   yes: 'Yes',
   no: 'No',
+  reset: 'Reset'
 };
 
 export const enUsCurrency = {

@@ -20,3 +20,10 @@ export const COLOR_PALLET = [
   '#BDBDBD',
   '#78909C',
 ];
+
+export const SERIES_COLORS_PALLET = [
+  '#42A5F5',
+  '#26A69A',
+  '#FFA726',
+  '#8D6E63',
+]

@@ -1,6 +1,7 @@
 import { buildDateRangeFromToday, midDay } from 'src/service/stocks/dates';
 import { PortfolioHistory, StockChartResponse } from 'app/shared/types';
 import { ChartSeries, Formatter } from './base';
+import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
 
 /**
  * Ensures a given series includes data point for each day in the period time.
@@ -13,7 +14,8 @@ const normalizeSeriesTimePeriod = (
   timeRange: number[]
 ) => {
   const seriesData = series.data;
-  let matchIndex = 0;
+  let matchIndex = 0, lastKnownValue = 0;
+
   const normalizedData = timeRange.map((periodDate) => {
     const seriesDataPoint = seriesData[matchIndex];
 
@@ -27,8 +29,12 @@ const normalizeSeriesTimePeriod = (
       (dataPoint) => dataPoint.x.getTime() > periodDate
     );
 
+    matchIndex = nextDataPointIndex;
+
     const normalizedDate = midDay(new Date(periodDate));
-    const normalizedValue = seriesData[nextDataPointIndex - 1]?.y ?? 0;
+    const normalizedValue = seriesData[nextDataPointIndex - 1]?.y ?? lastKnownValue;
+
+    lastKnownValue = normalizedValue;
 
     return { x: normalizedDate, y: normalizedValue };
   });
@@ -52,13 +58,9 @@ const normalizeBenchmarkValue = (
   let lastDeposit = 0,
     currentShares = 0;
 
-  if (!portfolioHistory.length) {
-    return series;
-  }
-
   series.data = series.data.map((point, index) => {
     const currentDeposit = lastDeposit
-      ? portfolioHistory[index]?.deposited
+      ? portfolioHistory[index]?.invested
       : portfolioHistory[index].currentValue;
 
     if (currentDeposit > lastDeposit) {
@@ -69,7 +71,7 @@ const normalizeBenchmarkValue = (
 
     const value = point.y * currentShares;
 
-    return { ...point, y: value };
+    return { ...point, y: value, close: point.y };
   });
 
   return series;
@@ -84,6 +86,10 @@ const normalizePerformanceData = (
   const periodHistoryItems = portfolioHistory.filter((history) =>
     periodTimeRange.includes(midDay(new Date(history.date)).getTime())
   );
+
+  if (!periodHistoryItems.length) {
+    return []
+  }
 
   const portfolioHistorySeries = normalizeSeriesTimePeriod(
     {
@@ -140,10 +146,45 @@ export const getPortfolioPerformanceChart = (
         toolbar: {
           show: false,
         },
+        animations: {
+          speed: 100
+        },
         events: {
           beforeZoom: onZoom,
         },
       },
+      colors: SERIES_COLORS_PALLET,
+      legend: {
+        offsetY: 8,
+      },
+      markers: {
+        size: 0
+      },
+/*      annotations: {
+        points: [{
+          id: 'test-annot',
+          x: series[0]?.data[0]?.x?.getTime(),
+          y: series[0]?.data[0]?.y,
+          strokeDashArray: 0,
+          marker: {
+            size: 5,
+            strokeColor: '#775DD0',
+            strokeWidth: 2,
+          },
+          borderColor: 'transparent',
+          label: {
+            offsetY: -10,
+            orientation: 'horizontal',
+            borderColor: '#775DD0',
+            style: {
+              color: '#fff',
+              cssClass: 'apexcharts-point-annotation-label',
+              background: '#775DD0',
+            },
+            text: 'B',
+          }
+        }],
+      },*/
       dataLabels: {
         enabled: false,
       },
@@ -152,16 +193,9 @@ export const getPortfolioPerformanceChart = (
         curve: 'straight',
         width: 2,
       },
-      /*      markers: {
-        discrete: [{
-          seriesIndex: 0,
-          dataPointIndex: 5,
-          fillColor: '#ffffff',
-          strokeColor: '#3c7b41',
-          size: 7,
-          shape: 'circle'
-        }]
-      },*/
+      grid: {
+        strokeDashArray: 4,
+      },
       fill: {
         type: 'gradient',
         gradient: {
@@ -173,16 +207,34 @@ export const getPortfolioPerformanceChart = (
         },
       },
       xaxis: {
+        axisTicks: {
+          show: false
+        },
+        axisBorder: {
+          show: false
+        },
+        tooltip: {
+          enabled: false
+        },
         type: 'datetime',
+        convertedCatToNumeric: false,
       },
       yaxis: {
+        forceNiceScale: true,
         labels: {
-          formatter: (value: number) => formatter(value, 'decimal'),
+          formatter: (value: number) => value ? `${(value / 1000).toFixed(0)}K` : value,
         },
       },
       tooltip: {
         shared: true,
+        y: {
+          formatter: (value: number) => value ? formatter(value, 'decimal') : value,
+        },
+        marker: {
+          show: true,
+        },
       },
     },
   };
 };
+
