@@ -69,9 +69,9 @@ export default defineComponent({
     const $n = useI18n().n;
     const portfolioStore = usePortfolioStore();
 
-    const setBenchmarkData = async (tickers: Option[]) => {
+    const setBenchmarkData = async (tickerOptions: Option[]) => {
       benchmarkData.value = await getQuotesChartData(
-        tickers.map((ticker) => ticker.value)
+        tickerOptions.map((ticker) => ticker.value)
       );
     };
 
