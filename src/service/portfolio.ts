@@ -7,6 +7,7 @@ import {
 import { authentication } from 'src/service/firebase/authentication';
 
 const portfolioCollection = () => getCollections().portfolio;
+const portfolioHistoryCollection = () => getCollections().portfolioHistory;
 
 const api = {
   list: queries.listUserPortfolios,
@@ -43,6 +44,13 @@ const api = {
   // TODO - Deletion should clean all portfolio related entities such as Transactions / Holdings.
   delete: async (portfolioId: string) =>
     firestoreAPI.deleteDocument(portfolioId, portfolioCollection()),
+  removeHistoryRecords: async (recordsIds: string[]) => {
+    await Promise.all(
+      recordsIds.map((recordId) =>
+        firestoreAPI.deleteDocument(recordId, portfolioHistoryCollection())
+      )
+    );
+  },
 };
 
 export default api;

@@ -1,2 +1,6 @@
 firestore.indexes.json
 firestore.rules.json
+dist/
+lib/
+.quasar/
+.firebase/

@@ -27,6 +27,7 @@ const createCollection = <CollectionName extends AppCollectionsNames>(
  */
 export const getCollections = () => ({
   portfolio: createCollection('portfolios'),
+  portfolioHistory: createCollection('portfolioHistory'),
   transaction: createCollection('transactions'),
   holding: createCollection('holdings'),
 });
@@ -82,6 +83,16 @@ export const queries = {
     );
 
     return firestoreAPI.getAll(holdingsQuery);
+  },
+  getPortfolioHistory: async (portfolioId: string) => {
+    const historyCollection = getCollections().portfolioHistory;
+
+    const portfolioHistoryQuery = query(
+      historyCollection,
+      where('portfolioId', '==', portfolioId)
+    );
+
+    return firestoreAPI.getAll(portfolioHistoryQuery);
   },
 };
 

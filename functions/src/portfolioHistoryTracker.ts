@@ -19,9 +19,12 @@ import {
  * 3. For each group, calculate it's summary profit, dailyChange, fees....
  * 4. Save over portfolios_history collection
  */
-export const portfolioHistoryTracker = async () => {
+export const portfolioHistoryTracker = async (dryRun = false) => {
   const now = Date.now();
-  logger.info('Portfolio History Tracker Start', { timestamp: now });
+  logger.info('Portfolio History Tracker Start', {
+    timestamp: new Date(),
+    dryRun,
+  });
 
   const portfolios = await getCollection<Portfolio>('portfolios');
   const holdings = await getCollection<Holding>('holdings');
@@ -71,13 +74,25 @@ export const portfolioHistoryTracker = async () => {
       dailyChangePercent: kpis.dailyChange.percentage,
       deposited: portfoliosTransformer.depositsValue(portfolioWithHoldings),
       cashFlow: portfoliosTransformer.cashFlow(portfolioWithHoldings),
+      // TODO - Add sectors profits
     };
   });
 
+  logger.info(`Generated ${historyRecords.length} History records`);
+
   // Saving history records.
-  await saveDocument<PortfolioHistory>('portfolioHistory', historyRecords);
+  if (!dryRun) {
+    await saveDocument<PortfolioHistory>('portfolioHistory', historyRecords);
+  } else {
+    historyRecords.forEach((record) => {
+      logger.info('Portfolio History Tracker Dry Run', {
+        record,
+      });
+    });
+  }
 
   logger.info('Portfolio History Tracker Done', {
-    timestamp: Date.now() - now,
+    totalTime: Date.now() - now,
+    dryRun,
   });
 };

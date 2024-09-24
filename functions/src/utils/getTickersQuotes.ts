@@ -1,4 +1,4 @@
-import * as https from 'node:https';
+import * as https from 'https';
 import { stocksClient } from '../../../shared/api';
 import { GetQuotesResponse } from '../../../shared/types';
 

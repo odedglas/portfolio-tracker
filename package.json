@@ -10,6 +10,7 @@
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\"",
     "test": "node ./test.js",
     "dev": "quasar dev",
+    "firebase:dev": "cd functions && npm run serve",
     "build": "quasar build",
     "postbuild": "cp -r src/assets/* dist/spa/assets",
     "predeploy": "npm run build",
