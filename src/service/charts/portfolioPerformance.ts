@@ -152,7 +152,7 @@ const buildTransactionsAnnotations = (
   return {
     points: [...groupedTransactions.entries()].map(
       ([date, transactionGroup]) => {
-        const isSingle = transactionGroup.length == 1;
+        const isSingle = transactionGroup.length === 1;
 
         const transactionDate = midDay(new Date(date));
         const isBuyAction = (transactionGroup[0]?.action ?? '') === 'buy';
@@ -162,6 +162,13 @@ const buildTransactionsAnnotations = (
             ? 'B'
             : 'S'
           : transactionGroup.length;
+
+        // Create tooltip content summarizing the transactions
+        const tooltipContent = transactionGroup
+          .map((transaction) => {
+            return `${transaction.action.toUpperCase()} - $XXXXX`;
+          })
+          .join('<br>');
 
         return {
           x: transactionDate.getTime(),
@@ -194,6 +201,18 @@ const buildTransactionsAnnotations = (
               borderRadius: 2,
             },
             text: displayText,
+          },
+          tooltip: {
+            enabled: true,
+            offsetY: 0,
+            style: {
+              fontSize: '12px',
+            },
+            // Tooltip content, which could also be a summary of all transactions on that date
+            formatter: () => {
+              debugger;
+              return tooltipContent;
+            },
           },
         };
       }
@@ -292,6 +311,8 @@ export const getPortfolioPerformanceChart = (
       },
       tooltip: {
         shared: true,
+        followCursor: true, // Tooltip follows the cursor
+        intersect: false, // Allows tooltip to show on hover instead of click
         y: {
           formatter: (value: number) =>
             value ? formatter(value, 'decimal') : value,

@@ -5,7 +5,7 @@
         <div class="flex items-center q-mr-sm">
           <q-icon name="query_stats" class="text-grey-6 q-mr-sm" size="sm" />
           <p class="text-h6 text-grey-7 q-mb-none">
-            {{ $t('charts.portfolio_performance') }}
+            {{ $t('charts.portfolio_value') }}
           </p>
         </div>
         <div class="flex items-center q-gutter-md">
@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, Ref, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, Ref, ref, watch } from 'vue';
 import { date as DateAPI } from 'quasar';
 import VueApexCharts from 'vue3-apexcharts';
 import { getPortfolioPerformanceChart } from 'src/service/charts';
@@ -128,6 +128,7 @@ export default defineComponent({
     const selectedBenchmark: Ref<Option[]> = ref([benchmarkOptions[0]]);
     const benchmarkData = ref<StockChartResponse>({});
     const selectedTimeRangeOption = ref<Option>(timeRangeOptions[2]);
+    const showTransactionsMarkers = ref(false);
 
     const $n = useI18n().n;
     const { emitLoadingTask } = useLoadingStore();
@@ -163,7 +164,7 @@ export default defineComponent({
         portfolioStore.history,
         benchmarkData.value,
         periodTimeRange.value,
-        transactionsStore.transactions,
+        showTransactionsMarkers.value ? transactionsStore.transactions : [],
         $n,
         () => {
           if (!showResetZoom.value) {

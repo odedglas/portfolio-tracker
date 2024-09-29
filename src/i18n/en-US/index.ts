@@ -54,9 +54,8 @@ export const enUsMessages = {
       'No holding are there yet, You can start by creating a Transaction',
   },
   charts: {
-    portfolio_performance: 'Portfolio performance',
+    portfolio_value: 'Portfolio value',
     benchmarks: 'Benchmarks',
-    portfolio_performance_description: 'testme',
   },
   dashboard: {
     kpis: {
