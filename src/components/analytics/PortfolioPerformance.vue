@@ -95,6 +95,8 @@ import {
 } from 'src/service/stocks/dates';
 import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
 import NumericValue from 'components/common/NumericValue.vue';
+import { useLoadingStore } from 'stores/loading';
+import { useTransactionsStore } from 'stores/transactions';
 
 type Option = { label: string; value: string; [key: string]: unknown };
 
@@ -128,7 +130,9 @@ export default defineComponent({
     const selectedTimeRangeOption = ref<Option>(timeRangeOptions[2]);
 
     const $n = useI18n().n;
+    const { emitLoadingTask } = useLoadingStore();
     const portfolioStore = usePortfolioStore();
+    const transactionsStore = useTransactionsStore();
 
     const periodTimeRange = computed(() => {
       const portfolioHistoryStartDate = portfolioStore.history[0]?.date;
@@ -145,9 +149,11 @@ export default defineComponent({
     });
 
     const setBenchmarkData = async (tickerOptions: Option[]) => {
-      benchmarkData.value = await getQuotesChartData(
-        tickerOptions.map((ticker) => ticker.value)
-      );
+       await emitLoadingTask(async() => {
+         benchmarkData.value = await getQuotesChartData(
+          tickerOptions.map((ticker) => ticker.value)
+        );
+      });
     };
 
     watch(selectedBenchmark, setBenchmarkData, { immediate: true });
@@ -157,6 +163,7 @@ export default defineComponent({
         portfolioStore.history,
         benchmarkData.value,
         periodTimeRange.value,
+        transactionsStore.transactions,
         $n,
         () => {
           if (!showResetZoom.value) {

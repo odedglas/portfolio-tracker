@@ -6,6 +6,7 @@
     :columns="columns"
     row-key="name"
     :pagination="{ sortBy: 'date', descending: true }"
+    :rows-per-page-options="[10, 15, 25, 0]"
     binary-state-sort
   >
     <template v-slot:top>

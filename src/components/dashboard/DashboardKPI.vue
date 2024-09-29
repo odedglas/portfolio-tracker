@@ -12,7 +12,7 @@
           {{
             showValueSign
               ? `${valueSign} ${$n(Math.abs(value), 'decimal')}`
-              : $n(value, 'decimal')
+              : $n(Math.abs(value), 'decimal')
           }}
         </span>
         <profit-indicator

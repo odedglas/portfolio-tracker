@@ -1,7 +1,7 @@
 import { midDay } from 'src/service/stocks/dates';
-import { PortfolioHistory, StockChartResponse } from 'app/shared/types';
+import { PortfolioHistory, StockChartResponse, Transaction } from 'app/shared/types';
 import { ChartSeries, Formatter } from './base';
-import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
+import { COLOR_PALLET, SERIES_COLORS_PALLET } from 'src/service/charts/constants';
 
 /**
  * Ensures a given series includes data point for each day in the period time.
@@ -22,6 +22,7 @@ const normalizeSeriesTimePeriod = (
 
     if (seriesDataPoint?.x?.getTime() === periodDate) {
       matchIndex++;
+      lastKnownValue = seriesDataPoint.y;
       return seriesDataPoint;
     }
 
@@ -33,6 +34,7 @@ const normalizeSeriesTimePeriod = (
     matchIndex = nextDataPointIndex;
 
     const normalizedDate = midDay(new Date(periodDate));
+
     const normalizedValue =
       seriesData[nextDataPointIndex - 1]?.y ?? lastKnownValue;
 
@@ -125,10 +127,65 @@ const normalizePerformanceData = (
   return [portfolioHistorySeries, ...benchmarksSeries];
 };
 
+const buildTransactionsAnnotations = (portfolioSeries: ChartSeries, transactions: Transaction[]) => {
+  // Grouping transactions by their date
+  const groupedTransactions = transactions.reduce((acc, transaction) => {
+    const transactionDate = midDay(new Date(transaction.date)).getTime();
+    const existingTransactions = acc.get(transactionDate) ?? [];
+
+    return acc.set(transactionDate, [...existingTransactions, transaction]);
+  }, new Map<number, Transaction[]>());
+
+  const [portfolioMarkerColor] = SERIES_COLORS_PALLET;
+  const [sellAnnotationColor] = COLOR_PALLET;
+
+  return {
+    points: [...groupedTransactions.entries()].map(([date, transactionGroup]) => {
+      const isSingle = transactionGroup.length == 1;
+
+      const transactionDate = midDay(new Date(date));
+      const isBuyAction = (transactionGroup[0]?.action ?? '') === 'buy';
+
+      const displayText = isSingle ? isBuyAction ? 'B' : 'S' : transactionGroup.length;
+
+      return {
+        x: transactionDate.getTime(),
+        y: portfolioSeries?.data.find(
+          (dataPoint) => dataPoint.x.getTime() === transactionDate.getTime()
+        )?.y,
+        marker: {
+          size: 6,
+          fillColor: 'white',
+          strokeColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
+          strokeWidth: 1,
+        },
+        label: {
+          borderColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
+          offsetY: -2,
+          style: {
+            color: 'grey',
+            fontSize: '10px',
+            fontWeight: 'bold',
+            padding: {
+              top: 2,
+              bottom: 2,
+              left: 4,
+              right: 4,
+            },
+            borderRadius: 2,
+          },
+          text: displayText
+        }
+      };
+    }),
+  };
+};
+
 export const getPortfolioPerformanceChart = (
   portfolioHistory: PortfolioHistory[],
   benchmarks: StockChartResponse,
   periodTimeRange: number[],
+  transactions: Transaction[],
   formatter: Formatter,
   onZoom: (
     ctx: unknown,
@@ -140,6 +197,8 @@ export const getPortfolioPerformanceChart = (
     benchmarks,
     periodTimeRange
   );
+
+  const [portfolioSeries] = series;
 
   return {
     series,
@@ -169,31 +228,7 @@ export const getPortfolioPerformanceChart = (
       markers: {
         size: 0,
       },
-      /*      annotations: {
-        points: [{
-          id: 'test-annot',
-          x: series[0]?.data[0]?.x?.getTime(),
-          y: series[0]?.data[0]?.y,
-          strokeDashArray: 0,
-          marker: {
-            size: 5,
-            strokeColor: '#775DD0',
-            strokeWidth: 2,
-          },
-          borderColor: 'transparent',
-          label: {
-            offsetY: -10,
-            orientation: 'horizontal',
-            borderColor: '#775DD0',
-            style: {
-              color: '#fff',
-              cssClass: 'apexcharts-point-annotation-label',
-              background: '#775DD0',
-            },
-            text: 'B',
-          }
-        }],
-      },*/
+      annotations: buildTransactionsAnnotations(portfolioSeries, transactions),
       dataLabels: {
         enabled: false,
       },
@@ -243,7 +278,7 @@ export const getPortfolioPerformanceChart = (
         },
         marker: {
           show: true,
-        },
+        }
       },
     },
   };
