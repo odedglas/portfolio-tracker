@@ -1,7 +1,14 @@
 import { midDay } from 'src/service/stocks/dates';
-import { PortfolioHistory, StockChartResponse, Transaction } from 'app/shared/types';
+import {
+  PortfolioHistory,
+  StockChartResponse,
+  Transaction,
+} from 'app/shared/types';
 import { ChartSeries, Formatter } from './base';
-import { COLOR_PALLET, SERIES_COLORS_PALLET } from 'src/service/charts/constants';
+import {
+  COLOR_PALLET,
+  SERIES_COLORS_PALLET,
+} from 'src/service/charts/constants';
 
 /**
  * Ensures a given series includes data point for each day in the period time.
@@ -127,7 +134,10 @@ const normalizePerformanceData = (
   return [portfolioHistorySeries, ...benchmarksSeries];
 };
 
-const buildTransactionsAnnotations = (portfolioSeries: ChartSeries, transactions: Transaction[]) => {
+const buildTransactionsAnnotations = (
+  portfolioSeries: ChartSeries,
+  transactions: Transaction[]
+) => {
   // Grouping transactions by their date
   const groupedTransactions = transactions.reduce((acc, transaction) => {
     const transactionDate = midDay(new Date(transaction.date)).getTime();
@@ -140,44 +150,54 @@ const buildTransactionsAnnotations = (portfolioSeries: ChartSeries, transactions
   const [sellAnnotationColor] = COLOR_PALLET;
 
   return {
-    points: [...groupedTransactions.entries()].map(([date, transactionGroup]) => {
-      const isSingle = transactionGroup.length == 1;
+    points: [...groupedTransactions.entries()].map(
+      ([date, transactionGroup]) => {
+        const isSingle = transactionGroup.length == 1;
 
-      const transactionDate = midDay(new Date(date));
-      const isBuyAction = (transactionGroup[0]?.action ?? '') === 'buy';
+        const transactionDate = midDay(new Date(date));
+        const isBuyAction = (transactionGroup[0]?.action ?? '') === 'buy';
 
-      const displayText = isSingle ? isBuyAction ? 'B' : 'S' : transactionGroup.length;
+        const displayText = isSingle
+          ? isBuyAction
+            ? 'B'
+            : 'S'
+          : transactionGroup.length;
 
-      return {
-        x: transactionDate.getTime(),
-        y: portfolioSeries?.data.find(
-          (dataPoint) => dataPoint.x.getTime() === transactionDate.getTime()
-        )?.y,
-        marker: {
-          size: 6,
-          fillColor: 'white',
-          strokeColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
-          strokeWidth: 1,
-        },
-        label: {
-          borderColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
-          offsetY: -2,
-          style: {
-            color: 'grey',
-            fontSize: '10px',
-            fontWeight: 'bold',
-            padding: {
-              top: 2,
-              bottom: 2,
-              left: 4,
-              right: 4,
-            },
-            borderRadius: 2,
+        return {
+          x: transactionDate.getTime(),
+          y: portfolioSeries?.data.find(
+            (dataPoint) => dataPoint.x.getTime() === transactionDate.getTime()
+          )?.y,
+          marker: {
+            size: 6,
+            fillColor: 'white',
+            strokeColor: isBuyAction
+              ? portfolioMarkerColor
+              : sellAnnotationColor,
+            strokeWidth: 1,
           },
-          text: displayText
-        }
-      };
-    }),
+          label: {
+            borderColor: isBuyAction
+              ? portfolioMarkerColor
+              : sellAnnotationColor,
+            offsetY: -2,
+            style: {
+              color: 'grey',
+              fontSize: '10px',
+              fontWeight: 'bold',
+              padding: {
+                top: 2,
+                bottom: 2,
+                left: 4,
+                right: 4,
+              },
+              borderRadius: 2,
+            },
+            text: displayText,
+          },
+        };
+      }
+    ),
   };
 };
 
@@ -278,7 +298,7 @@ export const getPortfolioPerformanceChart = (
         },
         marker: {
           show: true,
-        }
+        },
       },
     },
   };

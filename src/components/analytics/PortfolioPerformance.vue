@@ -149,8 +149,8 @@ export default defineComponent({
     });
 
     const setBenchmarkData = async (tickerOptions: Option[]) => {
-       await emitLoadingTask(async() => {
-         benchmarkData.value = await getQuotesChartData(
+      await emitLoadingTask(async () => {
+        benchmarkData.value = await getQuotesChartData(
           tickerOptions.map((ticker) => ticker.value)
         );
       });
