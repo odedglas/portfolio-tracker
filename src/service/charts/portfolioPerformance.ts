@@ -66,25 +66,44 @@ const normalizeSeriesTimePeriod = (
  */
 const normalizeBenchmarkValue = (
   series: ChartSeries,
-  portfolioHistory: PortfolioHistory[]
+  portfolioHistory: PortfolioHistory[],
+  mode: Mode
 ) => {
-  let lastDeposit = 0,
-    currentShares = 0;
+  const isPercentageMode = mode === 'percentage';
+  const [historyStartingPoint] = portfolioHistory;
+  const [benchmarkStartingPoint] = series.data;
+
+  let lastInvested = historyStartingPoint.invested,
+    currentShares =
+      historyStartingPoint.currentValue / benchmarkStartingPoint.y; // Takes currentValue to ensure a "pure" comparison.
+
+  let avgPrice = benchmarkStartingPoint.y;
 
   series.data = series.data.map((point, index) => {
-    const currentDeposit = lastDeposit
-      ? portfolioHistory[index]?.invested
-      : portfolioHistory[index].currentValue;
+    const currentInvested = portfolioHistory[index].invested;
 
-    if (currentDeposit > lastDeposit) {
-      currentShares += (currentDeposit - lastDeposit) / point.y;
+    if (currentInvested > lastInvested) {
+      // Assume to purchase new benchmark stocks with given deposit delta.
+      const newDeposit = currentInvested - lastInvested;
+      const newSharesAmount = newDeposit / point.y;
+
+      avgPrice =
+        (currentShares * avgPrice + point.y * newSharesAmount) /
+        (currentShares + newSharesAmount);
+      currentShares += newSharesAmount;
     }
 
-    lastDeposit = currentDeposit;
+    lastInvested = currentInvested;
 
     const value = point.y * currentShares;
+    const profitPercentage =
+      (value - avgPrice * currentShares) / historyStartingPoint.currentValue;
 
-    return { ...point, y: value, close: point.y };
+    return {
+      ...point,
+      y: isPercentageMode ? profitPercentage : value,
+      close: point.y,
+    };
   });
 
   return series;
@@ -134,7 +153,7 @@ const normalizePerformanceData = (
     })
     .filter((series) => series.data.length > 1)
     .map((series) => normalizeSeriesTimePeriod(series, periodTimeRange))
-    .map((series) => normalizeBenchmarkValue(series, periodHistoryItems));
+    .map((series) => normalizeBenchmarkValue(series, periodHistoryItems, mode));
 
   // Ensuring each series includes data point for each day in the period time.
   return [portfolioHistorySeries, ...benchmarksSeries];
@@ -156,6 +175,15 @@ const buildTransactionsAnnotations = (
   const [sellAnnotationColor] = COLOR_PALLET;
 
   return {
+    yaxis: [
+      {
+        y: 0,
+        strokeDashArray: 1,
+        borderColor: '#c2c2c2',
+        fillColor: '#c2c2c2',
+        yAxisIndex: 0,
+      },
+    ],
     points: [...groupedTransactions.entries()].map(
       ([date, transactionGroup]) => {
         const isSingle = transactionGroup.length === 1;
@@ -168,13 +196,6 @@ const buildTransactionsAnnotations = (
             ? 'B'
             : 'S'
           : transactionGroup.length;
-
-        // Create tooltip content summarizing the transactions
-        const tooltipContent = transactionGroup
-          .map((transaction) => {
-            return `${transaction.action.toUpperCase()} - $XXXXX`;
-          })
-          .join('<br>');
 
         return {
           x: transactionDate.getTime(),
@@ -214,11 +235,6 @@ const buildTransactionsAnnotations = (
             style: {
               fontSize: '12px',
             },
-            // Tooltip content, which could also be a summary of all transactions on that date
-            formatter: () => {
-              debugger;
-              return tooltipContent;
-            },
           },
         };
       }
@@ -239,7 +255,6 @@ export const getPortfolioPerformanceChart = (
   mode: Mode = 'value'
 ) => {
   const isPercentageMode = mode === 'percentage';
-  console.log(portfolioHistory);
   const series = normalizePerformanceData(
     portfolioHistory,
     benchmarks,
@@ -314,6 +329,7 @@ export const getPortfolioPerformanceChart = (
       },
       yaxis: {
         forceNiceScale: true,
+        ...(isPercentageMode && { stepSize: 2 }),
         labels: {
           formatter: (value: number) => {
             if (!value) {

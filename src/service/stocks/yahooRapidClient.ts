@@ -33,7 +33,7 @@ export const getQuotesChartData = cachedOperation(
       'market/get-spark',
       {
         interval: interval ?? '1d',
-        range: range ?? '3mo',
+        range: range ?? '6mo',
         symbols: tickers.join(','),
       }
     );

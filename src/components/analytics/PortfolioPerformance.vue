@@ -45,7 +45,10 @@
               class="q-mx-sm flex items-center"
             >
               <span class="data-label q-mr-sm" :style="totalValue.style" />
-              <numeric-value :value="totalValue.value" />
+              <numeric-value
+                :value="totalValue.value"
+                :format="mode === 'value' ? 'currency' : 'percent'"
+              />
               <q-tooltip>
                 {{ totalValue.name }}
               </q-tooltip>
@@ -174,6 +177,7 @@ export default defineComponent({
     const seriesTotalValues = computed(() => {
       const series = chartData.value.series;
 
+      debugger;
       return series.map((serie, index) => ({
         value: serie.data[serie.data.length - 1].y - serie.data[0].y,
         name: serie.name,
