@@ -1,23 +1,12 @@
 <template>
-  <q-card flat bordered class="q-my-md portfolio-performance-card">
+  <q-card flat bordered class="portfolio-performance-card">
     <q-card-section>
       <div class="flex justify-between">
         <div class="flex items-center q-mr-sm">
           <q-icon name="query_stats" class="text-grey-6 q-mr-sm" size="sm" />
           <p class="text-h6 text-grey-7 q-mb-none">
-            {{ $t('charts.portfolio_value') }}
+            {{ title }}
           </p>
-        </div>
-        <div class="flex items-center q-gutter-md">
-          <p class="text-body2 text-grey-7 q-mb-none">
-            {{ $t('charts.benchmarks') }}:
-          </p>
-          <q-select
-            v-model="selectedBenchmark"
-            dense
-            multiple
-            :options="benchmarkOptions"
-          />
         </div>
       </div>
       <div
@@ -81,40 +70,18 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, Ref, ref, watch } from 'vue';
+import { computed, defineComponent, PropType, Ref, ref } from 'vue';
 import { date as DateAPI } from 'quasar';
 import VueApexCharts from 'vue3-apexcharts';
 import { getPortfolioPerformanceChart } from 'src/service/charts';
 import { StockChartResponse } from 'app/shared/types';
-import { getQuotesChartData } from 'src/service/stocks';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useI18n } from 'vue-i18n';
-import {
-  buildDateRangeFromToday,
-  yearToDateDays,
-} from 'src/service/stocks/dates';
+import { buildDateRangeFromToday } from 'src/service/stocks/dates';
 import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
 import NumericValue from 'components/common/NumericValue.vue';
-import { useLoadingStore } from 'stores/loading';
 import { useTransactionsStore } from 'stores/transactions';
-
-type Option = { label: string; value: string; [key: string]: unknown };
-
-const benchmarkOptions: Option[] = [
-  { label: 'S&P 500', value: 'SPY' },
-  { label: 'NASDAQ 100', value: 'QQQ' },
-  { label: 'RUSSEL 2000', value: 'IWM' },
-];
-
-const timeRangeOptions: Option[] = [
-  { label: '7d', value: '5d', days: 7 },
-  { label: '1m', value: '1m', days: 30 },
-  { label: '3m', value: '3m', days: 90 },
-  { label: '6m', value: '6m', days: 180 },
-  { label: 'YTD', value: 'ytd', days: yearToDateDays() },
-  { label: '1y', value: '1y', days: 365 },
-  { label: '5y', value: '5y', days: 365 * 5 },
-];
+import { Option, benchmarkOptions, timeRangeOptions } from './constants';
 
 export default defineComponent({
   name: 'PortfolioPerformance',
@@ -122,16 +89,30 @@ export default defineComponent({
     NumericValue,
     apexchart: VueApexCharts,
   },
-  setup() {
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    mode: {
+      type: String as PropType<'value' | 'percentage'>,
+      default: 'value',
+    },
+    showTransactionsMarkers: {
+      type: Boolean,
+      default: false,
+    },
+    benchmarkData: {
+      type: Object as PropType<StockChartResponse>,
+      default: {} as StockChartResponse,
+    },
+  },
+  setup(props) {
     const showResetZoom = ref(false);
     const chartRef: Ref = ref(undefined);
-    const selectedBenchmark: Ref<Option[]> = ref([benchmarkOptions[0]]);
-    const benchmarkData = ref<StockChartResponse>({});
     const selectedTimeRangeOption = ref<Option>(timeRangeOptions[2]);
-    const showTransactionsMarkers = ref(false);
 
     const $n = useI18n().n;
-    const { emitLoadingTask } = useLoadingStore();
     const portfolioStore = usePortfolioStore();
     const transactionsStore = useTransactionsStore();
 
@@ -149,28 +130,19 @@ export default defineComponent({
       );
     });
 
-    const setBenchmarkData = async (tickerOptions: Option[]) => {
-      await emitLoadingTask(async () => {
-        benchmarkData.value = await getQuotesChartData(
-          tickerOptions.map((ticker) => ticker.value)
-        );
-      });
-    };
-
-    watch(selectedBenchmark, setBenchmarkData, { immediate: true });
-
     const chartData = computed(() =>
       getPortfolioPerformanceChart(
         portfolioStore.history,
-        benchmarkData.value,
+        props.benchmarkData,
         periodTimeRange.value,
-        showTransactionsMarkers.value ? transactionsStore.transactions : [],
+        props.showTransactionsMarkers ? transactionsStore.transactions : [],
         $n,
         () => {
           if (!showResetZoom.value) {
             showResetZoom.value = true;
           }
-        }
+        },
+        props.mode
       )
     );
 
@@ -213,16 +185,15 @@ export default defineComponent({
     });
 
     return {
-      showResetZoom,
       benchmarkOptions,
       resetChart,
       timeRangeOptions,
-      selectedTimeRangeOption,
-      selectedBenchmark,
       chartRef,
       chartData,
       selectTimeRange,
       timeRangeText,
+      selectedTimeRangeOption,
+      showResetZoom,
       seriesTotalValues,
     };
   },
@@ -249,12 +220,6 @@ export default defineComponent({
     border-color: rgb(255, 255, 255);
     border-radius: 12px;
     display: inline-block;
-  }
-}
-
-.holdings-heat-map {
-  svg {
-    transform: translate(8px, 0) !important;
   }
 }
 </style>

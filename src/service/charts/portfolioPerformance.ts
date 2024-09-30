@@ -10,6 +10,8 @@ import {
   SERIES_COLORS_PALLET,
 } from 'src/service/charts/constants';
 
+type Mode = 'value' | 'percentage';
+
 /**
  * Ensures a given series includes data point for each day in the period time.
  * Sets the previous available value for any missing date point
@@ -91,7 +93,8 @@ const normalizeBenchmarkValue = (
 const normalizePerformanceData = (
   portfolioHistory: PortfolioHistory[],
   benchmarks: StockChartResponse,
-  periodTimeRange: number[]
+  periodTimeRange: number[],
+  mode: Mode
 ) => {
   const periodHistoryItems = portfolioHistory.filter((history) =>
     periodTimeRange.includes(midDay(new Date(history.date)).getTime())
@@ -107,7 +110,10 @@ const normalizePerformanceData = (
       data: periodHistoryItems.map((history) => {
         return {
           x: midDay(new Date(history.date)),
-          y: history.currentValue,
+          y:
+            mode === 'value'
+              ? history.currentValue
+              : history.profitPercent ?? 0,
         };
       }),
     },
@@ -229,12 +235,16 @@ export const getPortfolioPerformanceChart = (
   onZoom: (
     ctx: unknown,
     values: { xaxis: { min: number; max: number } }
-  ) => void
+  ) => void,
+  mode: Mode = 'value'
 ) => {
+  const isPercentageMode = mode === 'percentage';
+  console.log(portfolioHistory);
   const series = normalizePerformanceData(
     portfolioHistory,
     benchmarks,
-    periodTimeRange
+    periodTimeRange,
+    mode
   );
 
   const [portfolioSeries] = series;
@@ -305,8 +315,17 @@ export const getPortfolioPerformanceChart = (
       yaxis: {
         forceNiceScale: true,
         labels: {
-          formatter: (value: number) =>
-            value ? `${(value / 1000).toFixed(0)}K` : value,
+          formatter: (value: number) => {
+            if (!value) {
+              return value;
+            }
+
+            if (isPercentageMode) {
+              return formatter(value, 'fixedPercent');
+            }
+
+            return `${(value / 1000).toFixed(0)}K`;
+          },
         },
       },
       tooltip: {
@@ -314,8 +333,13 @@ export const getPortfolioPerformanceChart = (
         followCursor: true, // Tooltip follows the cursor
         intersect: false, // Allows tooltip to show on hover instead of click
         y: {
-          formatter: (value: number) =>
-            value ? formatter(value, 'decimal') : value,
+          formatter: (value: number) => {
+            if (!value) {
+              return value;
+            }
+
+            return formatter(value, isPercentageMode ? 'percent' : 'decimal');
+          },
         },
         marker: {
           show: true,
