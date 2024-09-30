@@ -63,6 +63,7 @@ const normalizeSeriesTimePeriod = (
  * as a purchase with the closing price.
  * @param series
  * @param portfolioHistory
+ * @param mode
  */
 const normalizeBenchmarkValue = (
   series: ChartSeries,
@@ -90,6 +91,7 @@ const normalizeBenchmarkValue = (
       avgPrice =
         (currentShares * avgPrice + point.y * newSharesAmount) /
         (currentShares + newSharesAmount);
+
       currentShares += newSharesAmount;
     }
 
@@ -97,7 +99,7 @@ const normalizeBenchmarkValue = (
 
     const value = point.y * currentShares;
     const profitPercentage =
-      (value - avgPrice * currentShares) / historyStartingPoint.currentValue;
+      (value - avgPrice * currentShares) / currentInvested;
 
     return {
       ...point,
@@ -127,12 +129,12 @@ const normalizePerformanceData = (
     {
       name: 'Portfolio',
       data: periodHistoryItems.map((history) => {
+        const profitInvestmentPercent =
+          (history.currentValue - history.invested) / history.invested;
+
         return {
           x: midDay(new Date(history.date)),
-          y:
-            mode === 'value'
-              ? history.currentValue
-              : history.profitPercent ?? 0,
+          y: mode === 'value' ? history.currentValue : profitInvestmentPercent,
         };
       }),
     },

@@ -3,7 +3,11 @@
     <q-card-section>
       <div class="flex justify-between">
         <div class="flex items-center q-mr-sm">
-          <q-icon name="query_stats" class="text-grey-6 q-mr-sm" size="sm" />
+          <q-icon
+            :name="ModeIconMap[mode]"
+            class="text-grey-6 q-mr-sm"
+            size="sm"
+          />
           <p class="text-h6 text-grey-7 q-mb-none">
             {{ title }}
           </p>
@@ -47,7 +51,7 @@
               <span class="data-label q-mr-sm" :style="totalValue.style" />
               <numeric-value
                 :value="totalValue.value"
-                :format="mode === 'value' ? 'currency' : 'percent'"
+                :format="totalValue.format"
               />
               <q-tooltip>
                 {{ totalValue.name }}
@@ -80,11 +84,16 @@ import { getPortfolioPerformanceChart } from 'src/service/charts';
 import { StockChartResponse } from 'app/shared/types';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useI18n } from 'vue-i18n';
-import { buildDateRangeFromToday } from 'src/service/stocks/dates';
+import { buildDateRangeFromToday, midDay } from 'src/service/stocks/dates';
 import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
 import NumericValue from 'components/common/NumericValue.vue';
 import { useTransactionsStore } from 'stores/transactions';
-import { Option, benchmarkOptions, timeRangeOptions } from './constants';
+import { Option, timeRangeOptions } from './constants';
+
+const ModeIconMap: Record<'value' | 'percentage', string> = {
+  value: 'query_stats',
+  percentage: 'percent',
+};
 
 export default defineComponent({
   name: 'PortfolioPerformance',
@@ -120,12 +129,13 @@ export default defineComponent({
     const transactionsStore = useTransactionsStore();
 
     const periodTimeRange = computed(() => {
-      const portfolioHistoryStartDate = portfolioStore.history[0]?.date;
-
-      if (!portfolioHistoryStartDate) {
+      if (!portfolioStore.history[0]?.date) {
         return [];
       }
 
+      const portfolioHistoryStartDate = midDay(
+        new Date(portfolioStore.history[0]?.date)
+      ).getTime();
       const days = selectedTimeRangeOption.value.days;
 
       return buildDateRangeFromToday(days as number).filter(
@@ -175,11 +185,13 @@ export default defineComponent({
     });
 
     const seriesTotalValues = computed(() => {
+      const isPercentage = props.mode === 'percentage';
+
       const series = chartData.value.series;
 
-      debugger;
       return series.map((serie, index) => ({
         value: serie.data[serie.data.length - 1].y - serie.data[0].y,
+        format: isPercentage ? 'percent' : 'currency',
         name: serie.name,
         style: {
           background: SERIES_COLORS_PALLET[index],
@@ -189,7 +201,6 @@ export default defineComponent({
     });
 
     return {
-      benchmarkOptions,
       resetChart,
       timeRangeOptions,
       chartRef,
@@ -199,6 +210,7 @@ export default defineComponent({
       selectedTimeRangeOption,
       showResetZoom,
       seriesTotalValues,
+      ModeIconMap,
     };
   },
 });
