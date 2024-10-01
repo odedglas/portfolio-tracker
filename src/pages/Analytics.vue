@@ -3,7 +3,11 @@
     <div class="col-10 column analytics-page-wrapper">
       <p class="text-h5 q-mb-none text-grey-7 dashboard-title">Analytics</p>
       <div class="analytics-kpis-wrapper">
-        <dashboard-kpi v-for="kpi in kpis" :key="kpi.title" v-bind="kpi" />
+        <dashboard-kpi
+          v-for="kpi in kpis"
+          :key="`analytics-${kpi.title}`"
+          v-bind="kpi"
+        />
       </div>
 
       <benchmarks-selector @update:selected-benchmark="setBenchmarkData" />

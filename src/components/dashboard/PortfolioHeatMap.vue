@@ -22,8 +22,8 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
-import { useI18n } from 'vue-i18n';
 import { getPortfolioHoldingsHeatMapChartOptions } from 'src/service/charts';
+import { useNumberFormatter } from 'components/composables/useNumberFormatter';
 
 export default defineComponent({
   name: 'PortfolioHeatMap',
@@ -31,10 +31,10 @@ export default defineComponent({
     apexchart: VueApexCharts,
   },
   setup() {
-    const $n = useI18n().n;
+    const numberFormatter = useNumberFormatter();
 
     const chartData = computed(() =>
-      getPortfolioHoldingsHeatMapChartOptions($n)
+      getPortfolioHoldingsHeatMapChartOptions(numberFormatter)
     );
 
     return {

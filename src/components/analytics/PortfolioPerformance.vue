@@ -83,12 +83,12 @@ import VueApexCharts from 'vue3-apexcharts';
 import { getPortfolioPerformanceChart } from 'src/service/charts';
 import { StockChartResponse } from 'app/shared/types';
 import { usePortfolioStore } from 'stores/portfolios';
-import { useI18n } from 'vue-i18n';
 import { buildDateRangeFromToday, midDay } from 'src/service/stocks/dates';
 import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
 import NumericValue from 'components/common/NumericValue.vue';
 import { useTransactionsStore } from 'stores/transactions';
 import { Option, timeRangeOptions } from './constants';
+import { useNumberFormatter } from 'components/composables/useNumberFormatter';
 
 const ModeIconMap: Record<'value' | 'percentage', string> = {
   value: 'query_stats',
@@ -124,7 +124,7 @@ export default defineComponent({
     const chartRef: Ref = ref(undefined);
     const selectedTimeRangeOption = ref<Option>(timeRangeOptions[2]);
 
-    const $n = useI18n().n;
+    const numberFormatter = useNumberFormatter();
     const portfolioStore = usePortfolioStore();
     const transactionsStore = useTransactionsStore();
 
@@ -149,7 +149,7 @@ export default defineComponent({
         props.benchmarkData,
         periodTimeRange.value,
         props.showTransactionsMarkers ? transactionsStore.transactions : [],
-        $n,
+        numberFormatter,
         () => {
           if (!showResetZoom.value) {
             showResetZoom.value = true;

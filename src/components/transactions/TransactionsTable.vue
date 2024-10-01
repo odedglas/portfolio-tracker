@@ -88,7 +88,8 @@
           :class="`${props.row.totalValue.textClass} text-bold`"
           :props="props"
         >
-          {{ props.row.totalValue.sign }}{{ props.row.totalValue.value }}
+          {{ props.row.totalValue.sign
+          }}{{ $n(props.row.totalValue.value, 'decimal') }}
         </q-td>
         <q-td key="total_profit" :props="props">
           <profit-indicator
@@ -171,7 +172,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, PropType, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { date } from 'quasar';
 import { storeToRefs } from 'pinia';
 import TickerLogo from 'components/common/TickerLogo.vue';
@@ -195,7 +195,6 @@ export default defineComponent({
   },
   emit: ['deleteTransaction', 'editTransaction'],
   setup() {
-    const $n = useI18n().n;
     const filter = ref('');
     const transactionsStore = useTransactionsStore();
 
@@ -213,7 +212,7 @@ export default defineComponent({
           ...transaction,
           actionTextClass: isBuyAction ? 'text-green-4' : 'text-red-4',
           totalValue: {
-            value: $n(transactionValue, 'decimal'),
+            value: transactionValue,
             textClass: isBuyAction ? 'text-red-6' : 'text-green-6',
             sign: isBuyAction ? '-' : '+',
           },

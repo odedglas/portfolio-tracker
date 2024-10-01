@@ -33,7 +33,7 @@
           {{ $n(props.row.invested, 'decimal') }}
         </q-td>
         <q-td key="total_value" :props="props">
-          {{ props.row.totalValue.value }}
+          {{ $n(props.row.totalValue.value, 'decimal') }}
         </q-td>
         <q-td key="total_profit" :props="props">
           <profit-indicator
@@ -102,7 +102,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import { useHoldingsStore } from 'src/stores/holdings';
@@ -116,7 +115,6 @@ export default defineComponent({
     TickerLogo,
   },
   setup() {
-    const $n = useI18n().n;
     const filter = ref('');
     const holdingsStore = useHoldingsStore();
 
@@ -131,7 +129,7 @@ export default defineComponent({
         return {
           ...holding,
           totalValue: {
-            value: $n(totalValue, 'decimal'),
+            value: totalValue,
             textClass: totalValue >= 0 ? 'text-green-6' : 'text-red-6',
           },
           profit: {

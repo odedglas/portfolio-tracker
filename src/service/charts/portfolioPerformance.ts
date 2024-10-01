@@ -309,10 +309,10 @@ export const getPortfolioPerformanceChart = (
       fill: {
         type: 'gradient',
         gradient: {
-          shadeIntensity: 1,
           inverseColors: false,
+          shadeIntensity: 1,
           opacityFrom: 0.5,
-          opacityTo: 0,
+          opacityTo: 0.1,
           stops: [0, 90, 100],
         },
       },
@@ -331,6 +331,7 @@ export const getPortfolioPerformanceChart = (
       },
       yaxis: {
         forceNiceScale: true,
+        min: undefined,
         ...(isPercentageMode && { stepSize: 2 }),
         labels: {
           formatter: (value: number) => {
@@ -352,6 +353,7 @@ export const getPortfolioPerformanceChart = (
         intersect: false, // Allows tooltip to show on hover instead of click
         y: {
           formatter: (value: number) => {
+            console.log('Fomratter called');
             if (!value) {
               return value;
             }
