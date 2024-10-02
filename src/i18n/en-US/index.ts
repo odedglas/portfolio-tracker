@@ -108,4 +108,11 @@ export const enUsCurrency = {
     maximumFractionDigits: 2,
     minimumFractionDigits: 0,
   },
+  noneSensitiveDecimal: {
+    style: 'currency',
+    currency: 'USD',
+    currencyDisplay: 'symbol',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  },
 };

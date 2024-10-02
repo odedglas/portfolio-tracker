@@ -1,15 +1,24 @@
 import { App } from 'vue';
 import { useFeaturesStore } from 'stores/features';
 
+export const NONE_SENSITIVE_FORMATTERS = [
+  'percent',
+  'fixed',
+  'noneSensitiveDecimal',
+];
+
 export const formatterStealthInterceptor =
   (originalNumberFormatter: unknown) =>
   (value: number, ...args: unknown[]) => {
     const featuresStore = useFeaturesStore();
 
     const [format] = args;
-    const isPercentage = ['percent', 'fixed'].includes(format as string);
 
-    if (featuresStore.stealthMode && !isPercentage) {
+    const isNoneSensitiveFormat = NONE_SENSITIVE_FORMATTERS.includes(
+      format as string
+    );
+
+    if (featuresStore.stealthMode && !isNoneSensitiveFormat) {
       return '$----'; // Return placeholder when stealth mode is enabled
     }
 

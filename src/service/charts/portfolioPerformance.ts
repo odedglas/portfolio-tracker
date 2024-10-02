@@ -353,7 +353,6 @@ export const getPortfolioPerformanceChart = (
         intersect: false, // Allows tooltip to show on hover instead of click
         y: {
           formatter: (value: number) => {
-            console.log('Fomratter called');
             if (!value) {
               return value;
             }

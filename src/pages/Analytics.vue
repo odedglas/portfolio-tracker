@@ -76,5 +76,6 @@ export default defineComponent({
   gap: 16px;
   grid-template-rows: repeat(1, auto);
   grid-template-columns: repeat(3, 1fr);
+  grid-template-areas: 'kpi kpi kpi';
 }
 </style>
