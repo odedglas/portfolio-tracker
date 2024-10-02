@@ -24,7 +24,7 @@ export const getQuotes = cachedOperation(
       symbols: tickers.join(','),
     }),
   (tickers: string[]) => `ticker-quotes-${tickers.join('-')}`,
-  1000 * 60 * 60 // One hour quotes caching
+  1000 * 60 // One minute quotes caching
 );
 
 export const getQuotesChartData = cachedOperation(

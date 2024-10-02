@@ -10,7 +10,7 @@ export const localStorageCache = {
   exists: (key: string) => {
     return !!localStorage.getItem(key);
   },
-  get: <T>(key: string): T => {
+  get: <T>(key: string): T | undefined => {
     const result = localStorage.getItem(key);
 
     if (!result) {
@@ -22,6 +22,7 @@ export const localStorageCache = {
     if (Date.now() - storedAt >= expiration) {
       console.warn(`LocalStorageCache item is expired - ${key}`);
       localStorage.removeItem(key);
+      return undefined;
     }
 
     return value as T;
@@ -59,8 +60,9 @@ export const cachedOperation = <
   return async (...args: Parameters<T>): Promise<Awaited<ReturnType<T>>> => {
     const keyValue = typeof key === 'string' ? key : key(...args);
 
-    if (localStorageCache.exists(keyValue)) {
-      return Promise.resolve(localStorageCache.get<ReturnType<T>>(keyValue));
+    const existing = localStorageCache.get<ReturnType<T>>(keyValue);
+    if (existing) {
+      return Promise.resolve(existing);
     }
 
     const result = await fn(...args);
