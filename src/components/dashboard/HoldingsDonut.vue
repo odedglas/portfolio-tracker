@@ -26,8 +26,8 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
-import { useI18n } from 'vue-i18n';
 import { getHoldingsDonutChatOptions } from 'src/service/charts';
+import { useNumberFormatter } from 'components/composables/useNumberFormatter';
 
 export default defineComponent({
   name: 'HoldingsDonut',
@@ -35,13 +35,13 @@ export default defineComponent({
     apexchart: VueApexCharts,
   },
   setup() {
-    const $n = useI18n().n;
+    const numberFormatter = useNumberFormatter();
     const showInvested = ref(false);
 
     const holdingsDonutData = computed(() => {
       return getHoldingsDonutChatOptions(
         showInvested.value ? 'invested' : 'currentValue',
-        $n
+        numberFormatter
       );
     });
 

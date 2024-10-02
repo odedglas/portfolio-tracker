@@ -26,7 +26,7 @@
               }}</span>
             </span>
             <span class="text-caption text-grey-9 q-mt-xs">
-              {{ $n(getTickerLastPrice(holding), 'decimal') }}
+              {{ $n(getTickerLastPrice(holding), 'noneSensitiveDecimal') }}
             </span>
             <profit-indicator
               class="text-caption text-bold"

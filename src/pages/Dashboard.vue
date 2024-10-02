@@ -73,9 +73,6 @@ export default defineComponent({
 .dashboard-holdings-donut {
   grid-area: donut;
 }
-.dashboard-kpi-card {
-  grid-area: kpi;
-}
 
 .dashboard-portfolio-heat-map {
   grid-area: heatmap;

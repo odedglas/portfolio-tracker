@@ -1,7 +1,16 @@
 import { midDay } from 'src/service/stocks/dates';
-import { PortfolioHistory, StockChartResponse } from 'app/shared/types';
+import {
+  PortfolioHistory,
+  StockChartResponse,
+  Transaction,
+} from 'app/shared/types';
 import { ChartSeries, Formatter } from './base';
-import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
+import {
+  COLOR_PALLET,
+  SERIES_COLORS_PALLET,
+} from 'src/service/charts/constants';
+
+type Mode = 'value' | 'percentage';
 
 /**
  * Ensures a given series includes data point for each day in the period time.
@@ -22,6 +31,7 @@ const normalizeSeriesTimePeriod = (
 
     if (seriesDataPoint?.x?.getTime() === periodDate) {
       matchIndex++;
+      lastKnownValue = seriesDataPoint.y;
       return seriesDataPoint;
     }
 
@@ -33,6 +43,7 @@ const normalizeSeriesTimePeriod = (
     matchIndex = nextDataPointIndex;
 
     const normalizedDate = midDay(new Date(periodDate));
+
     const normalizedValue =
       seriesData[nextDataPointIndex - 1]?.y ?? lastKnownValue;
 
@@ -52,28 +63,49 @@ const normalizeSeriesTimePeriod = (
  * as a purchase with the closing price.
  * @param series
  * @param portfolioHistory
+ * @param mode
  */
 const normalizeBenchmarkValue = (
   series: ChartSeries,
-  portfolioHistory: PortfolioHistory[]
+  portfolioHistory: PortfolioHistory[],
+  mode: Mode
 ) => {
-  let lastDeposit = 0,
-    currentShares = 0;
+  const isPercentageMode = mode === 'percentage';
+  const [historyStartingPoint] = portfolioHistory;
+  const [benchmarkStartingPoint] = series.data;
+
+  let lastInvested = historyStartingPoint.invested,
+    currentShares =
+      historyStartingPoint.currentValue / benchmarkStartingPoint.y; // Takes currentValue to ensure a "pure" comparison.
+
+  let avgPrice = benchmarkStartingPoint.y;
 
   series.data = series.data.map((point, index) => {
-    const currentDeposit = lastDeposit
-      ? portfolioHistory[index]?.invested
-      : portfolioHistory[index].currentValue;
+    const currentInvested = portfolioHistory[index].invested;
 
-    if (currentDeposit > lastDeposit) {
-      currentShares += (currentDeposit - lastDeposit) / point.y;
+    if (currentInvested > lastInvested) {
+      // Assume to purchase new benchmark stocks with given deposit delta.
+      const newDeposit = currentInvested - lastInvested;
+      const newSharesAmount = newDeposit / point.y;
+
+      avgPrice =
+        (currentShares * avgPrice + point.y * newSharesAmount) /
+        (currentShares + newSharesAmount);
+
+      currentShares += newSharesAmount;
     }
 
-    lastDeposit = currentDeposit;
+    lastInvested = currentInvested;
 
     const value = point.y * currentShares;
+    const profitPercentage =
+      (value - avgPrice * currentShares) / currentInvested;
 
-    return { ...point, y: value, close: point.y };
+    return {
+      ...point,
+      y: isPercentageMode ? profitPercentage : value,
+      close: point.y,
+    };
   });
 
   return series;
@@ -82,7 +114,8 @@ const normalizeBenchmarkValue = (
 const normalizePerformanceData = (
   portfolioHistory: PortfolioHistory[],
   benchmarks: StockChartResponse,
-  periodTimeRange: number[]
+  periodTimeRange: number[],
+  mode: Mode
 ) => {
   const periodHistoryItems = portfolioHistory.filter((history) =>
     periodTimeRange.includes(midDay(new Date(history.date)).getTime())
@@ -96,9 +129,12 @@ const normalizePerformanceData = (
     {
       name: 'Portfolio',
       data: periodHistoryItems.map((history) => {
+        const profitInvestmentPercent =
+          (history.currentValue - history.invested) / history.invested;
+
         return {
           x: midDay(new Date(history.date)),
-          y: history.currentValue,
+          y: mode === 'value' ? history.currentValue : profitInvestmentPercent,
         };
       }),
     },
@@ -119,27 +155,102 @@ const normalizePerformanceData = (
     })
     .filter((series) => series.data.length > 1)
     .map((series) => normalizeSeriesTimePeriod(series, periodTimeRange))
-    .map((series) => normalizeBenchmarkValue(series, periodHistoryItems));
+    .map((series) => normalizeBenchmarkValue(series, periodHistoryItems, mode));
 
   // Ensuring each series includes data point for each day in the period time.
   return [portfolioHistorySeries, ...benchmarksSeries];
+};
+
+const buildTransactionsAnnotations = (
+  portfolioSeries: ChartSeries,
+  transactionsMap: Map<number, Transaction[]>
+) => {
+  const [portfolioMarkerColor] = SERIES_COLORS_PALLET;
+  const [sellAnnotationColor] = COLOR_PALLET;
+
+  return {
+    yaxis: [
+      {
+        y: 0,
+        strokeDashArray: 1,
+        borderColor: '#c2c2c2',
+        fillColor: '#c2c2c2',
+        yAxisIndex: 0,
+      },
+    ],
+    points: [...transactionsMap.entries()].map(([date, transactionGroup]) => {
+      const isSingle = transactionGroup.length === 1;
+
+      const transactionDate = midDay(new Date(date));
+      const isBuyAction = (transactionGroup[0]?.action ?? '') === 'buy';
+
+      const displayText = isSingle
+        ? isBuyAction
+          ? 'B'
+          : 'S'
+        : transactionGroup.length;
+
+      return {
+        x: transactionDate.getTime(),
+        y: portfolioSeries?.data.find(
+          (dataPoint) => dataPoint.x.getTime() === transactionDate.getTime()
+        )?.y,
+        marker: {
+          size: 6,
+          fillColor: 'white',
+          strokeColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
+          strokeWidth: 1,
+        },
+        label: {
+          borderColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
+          offsetY: -2,
+          style: {
+            color: 'grey',
+            fontSize: '10px',
+            fontWeight: 'bold',
+            padding: {
+              top: 2,
+              bottom: 2,
+              left: 4,
+              right: 4,
+            },
+            borderRadius: 2,
+          },
+          text: displayText,
+        },
+        tooltip: {
+          enabled: true,
+          offsetY: 0,
+          style: {
+            fontSize: '12px',
+          },
+        },
+      };
+    }),
+  };
 };
 
 export const getPortfolioPerformanceChart = (
   portfolioHistory: PortfolioHistory[],
   benchmarks: StockChartResponse,
   periodTimeRange: number[],
+  transactionsMap: Map<number, Transaction[]>,
   formatter: Formatter,
   onZoom: (
     ctx: unknown,
     values: { xaxis: { min: number; max: number } }
-  ) => void
+  ) => void,
+  mode: Mode = 'value'
 ) => {
+  const isPercentageMode = mode === 'percentage';
   const series = normalizePerformanceData(
     portfolioHistory,
     benchmarks,
-    periodTimeRange
+    periodTimeRange,
+    mode
   );
+
+  const [portfolioSeries] = series;
 
   return {
     series,
@@ -169,31 +280,10 @@ export const getPortfolioPerformanceChart = (
       markers: {
         size: 0,
       },
-      /*      annotations: {
-        points: [{
-          id: 'test-annot',
-          x: series[0]?.data[0]?.x?.getTime(),
-          y: series[0]?.data[0]?.y,
-          strokeDashArray: 0,
-          marker: {
-            size: 5,
-            strokeColor: '#775DD0',
-            strokeWidth: 2,
-          },
-          borderColor: 'transparent',
-          label: {
-            offsetY: -10,
-            orientation: 'horizontal',
-            borderColor: '#775DD0',
-            style: {
-              color: '#fff',
-              cssClass: 'apexcharts-point-annotation-label',
-              background: '#775DD0',
-            },
-            text: 'B',
-          }
-        }],
-      },*/
+      annotations: buildTransactionsAnnotations(
+        portfolioSeries,
+        transactionsMap
+      ),
       dataLabels: {
         enabled: false,
       },
@@ -208,10 +298,10 @@ export const getPortfolioPerformanceChart = (
       fill: {
         type: 'gradient',
         gradient: {
-          shadeIntensity: 1,
           inverseColors: false,
+          shadeIntensity: 1,
           opacityFrom: 0.5,
-          opacityTo: 0,
+          opacityTo: 0.1,
           stops: [0, 90, 100],
         },
       },
@@ -230,16 +320,34 @@ export const getPortfolioPerformanceChart = (
       },
       yaxis: {
         forceNiceScale: true,
+        min: undefined,
+        ...(isPercentageMode && { stepSize: 2 }),
         labels: {
-          formatter: (value: number) =>
-            value ? `${(value / 1000).toFixed(0)}K` : value,
+          formatter: (value: number) => {
+            if (!value) {
+              return value;
+            }
+
+            if (isPercentageMode) {
+              return formatter(value, 'fixedPercent');
+            }
+
+            return `${(value / 1000).toFixed(0)}K`;
+          },
         },
       },
       tooltip: {
         shared: true,
+        followCursor: true, // Tooltip follows the cursor
+        intersect: false, // Allows tooltip to show on hover instead of click
         y: {
-          formatter: (value: number) =>
-            value ? formatter(value, 'decimal') : value,
+          formatter: (value: number) => {
+            if (!value) {
+              return value;
+            }
+
+            return formatter(value, isPercentageMode ? 'percent' : 'decimal');
+          },
         },
         marker: {
           show: true,

@@ -8,12 +8,9 @@
         <div class="text-subtitle2 text-grey-9">{{ title }}</div>
       </div>
       <div class="flex items-center q-my-sm text-h4">
+        <span v-if="showValueSign">{{ valueSign }}</span>
         <span>
-          {{
-            showValueSign
-              ? `${valueSign} ${$n(Math.abs(value), 'decimal')}`
-              : $n(value, 'decimal')
-          }}
+          {{ $n(Math.abs(value), 'decimal') }}
         </span>
         <profit-indicator
           v-if="valuePercentage"

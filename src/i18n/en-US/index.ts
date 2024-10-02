@@ -54,9 +54,9 @@ export const enUsMessages = {
       'No holding are there yet, You can start by creating a Transaction',
   },
   charts: {
-    portfolio_performance: 'Portfolio performance',
+    portfolio_performance: 'Portfolio investment growth',
+    portfolio_value: 'Portfolio value',
     benchmarks: 'Benchmarks',
-    portfolio_performance_description: 'testme',
   },
   dashboard: {
     kpis: {
@@ -97,8 +97,21 @@ export const enUsCurrency = {
     useGrouping: false,
     maximumFractionDigits: 2,
   },
+  fixedPercent: {
+    style: 'percent',
+    useGrouping: false,
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  },
   fixed: {
     style: 'decimal',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  },
+  noneSensitiveDecimal: {
+    style: 'currency',
+    currency: 'USD',
+    currencyDisplay: 'symbol',
     maximumFractionDigits: 2,
     minimumFractionDigits: 0,
   },

@@ -1,23 +1,16 @@
 <template>
-  <q-card flat bordered class="q-my-md portfolio-performance-card">
+  <q-card flat bordered class="portfolio-performance-card">
     <q-card-section>
       <div class="flex justify-between">
         <div class="flex items-center q-mr-sm">
-          <q-icon name="query_stats" class="text-grey-6 q-mr-sm" size="sm" />
-          <p class="text-h6 text-grey-7 q-mb-none">
-            {{ $t('charts.portfolio_performance') }}
-          </p>
-        </div>
-        <div class="flex items-center q-gutter-md">
-          <p class="text-body2 text-grey-7 q-mb-none">
-            {{ $t('charts.benchmarks') }}:
-          </p>
-          <q-select
-            v-model="selectedBenchmark"
-            dense
-            multiple
-            :options="benchmarkOptions"
+          <q-icon
+            :name="ModeIconMap[mode]"
+            class="text-grey-6 q-mr-sm"
+            size="sm"
           />
+          <p class="text-h6 text-grey-7 q-mb-none">
+            {{ title }}
+          </p>
         </div>
       </div>
       <div
@@ -56,7 +49,10 @@
               class="q-mx-sm flex items-center"
             >
               <span class="data-label q-mr-sm" :style="totalValue.style" />
-              <numeric-value :value="totalValue.value" />
+              <numeric-value
+                :value="totalValue.value"
+                :format="totalValue.format"
+              />
               <q-tooltip>
                 {{ totalValue.name }}
               </q-tooltip>
@@ -77,42 +73,63 @@
         :series="chartData.series"
       ></apexchart>
     </q-card-section>
+
+    <q-menu
+      anchor="top start"
+      self="bottom left"
+      class="marker-menu"
+      :target="markerMenuTargetEl"
+      :model-value="!!markerMenuTargetEl"
+      @update:modelValue="clearMarkerMenu"
+    >
+      <div class="q-px-md q-py-sm text-caption">
+        <b>{{ markerMenu.title }}</b
+        >, transactions: {{ markerMenu.total }}
+      </div>
+      <q-separator />
+      <div class="q-px-md q-py-sm">
+        <p
+          v-for="transaction in markerMenu.transactions"
+          :key="transaction.id"
+          class="transaction-row flex items-center"
+        >
+          <q-item-label
+            :class="`text-capitalize text-bold ${
+              transaction.action === 'buy' ? 'text-green-6' : 'text-red-6'
+            }`"
+            >{{ transaction.action }}</q-item-label
+          >
+          <q-item-label class="text-bold"
+            >{{ transaction.ticker }}:</q-item-label
+          >
+          <q-item-label caption
+            >{{ transaction.shares }} shares for
+            {{ $n(transaction.price, 'decimal') }}</q-item-label
+          >
+        </p>
+      </div>
+    </q-menu>
   </q-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, Ref, ref, watch } from 'vue';
+import { computed, defineComponent, PropType, Ref, ref, watch } from 'vue';
 import { date as DateAPI } from 'quasar';
 import VueApexCharts from 'vue3-apexcharts';
 import { getPortfolioPerformanceChart } from 'src/service/charts';
-import { StockChartResponse } from 'app/shared/types';
-import { getQuotesChartData } from 'src/service/stocks';
+import { StockChartResponse, Transaction } from 'app/shared/types';
 import { usePortfolioStore } from 'stores/portfolios';
-import { useI18n } from 'vue-i18n';
-import {
-  buildDateRangeFromToday,
-  yearToDateDays,
-} from 'src/service/stocks/dates';
+import { buildDateRangeFromToday, midDay } from 'src/service/stocks/dates';
 import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
 import NumericValue from 'components/common/NumericValue.vue';
+import { useTransactionsStore } from 'stores/transactions';
+import { Option, timeRangeOptions } from './constants';
+import { useNumberFormatter } from 'components/composables/useNumberFormatter';
 
-type Option = { label: string; value: string; [key: string]: unknown };
-
-const benchmarkOptions: Option[] = [
-  { label: 'S&P 500', value: 'SPY' },
-  { label: 'NASDAQ 100', value: 'QQQ' },
-  { label: 'RUSSEL 2000', value: 'IWM' },
-];
-
-const timeRangeOptions: Option[] = [
-  { label: '7d', value: '5d', days: 7 },
-  { label: '1m', value: '1m', days: 30 },
-  { label: '3m', value: '3m', days: 90 },
-  { label: '6m', value: '6m', days: 180 },
-  { label: 'YTD', value: 'ytd', days: yearToDateDays() },
-  { label: '1y', value: '1y', days: 365 },
-  { label: '5y', value: '5y', days: 365 * 5 },
-];
+const ModeIconMap: Record<'value' | 'percentage', string> = {
+  value: 'query_stats',
+  percentage: 'percent',
+};
 
 export default defineComponent({
   name: 'PortfolioPerformance',
@@ -120,22 +137,43 @@ export default defineComponent({
     NumericValue,
     apexchart: VueApexCharts,
   },
-  setup() {
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+    mode: {
+      type: String as PropType<'value' | 'percentage'>,
+      default: 'value',
+    },
+    showTransactionsMarkers: {
+      type: Boolean,
+      default: false,
+    },
+    benchmarkData: {
+      type: Object as PropType<StockChartResponse>,
+      default: {} as StockChartResponse,
+    },
+  },
+  setup(props) {
     const showResetZoom = ref(false);
     const chartRef: Ref = ref(undefined);
-    const selectedBenchmark: Ref<Option[]> = ref([benchmarkOptions[0]]);
-    const benchmarkData = ref<StockChartResponse>({});
     const selectedTimeRangeOption = ref<Option>(timeRangeOptions[2]);
+    const markerMenuTargetEl = ref<Element | undefined>(undefined);
+    const selectedAnnotationDate = ref<number | undefined>(undefined);
 
-    const $n = useI18n().n;
+    const numberFormatter = useNumberFormatter();
     const portfolioStore = usePortfolioStore();
+    const transactionsStore = useTransactionsStore();
 
     const periodTimeRange = computed(() => {
-      const portfolioHistoryStartDate = portfolioStore.history[0]?.date;
-
-      if (!portfolioHistoryStartDate) {
+      if (!portfolioStore.history[0]?.date) {
         return [];
       }
+
+      const portfolioHistoryStartDate = midDay(
+        new Date(portfolioStore.history[0]?.date)
+      ).getTime();
 
       const days = selectedTimeRangeOption.value.days;
 
@@ -144,25 +182,28 @@ export default defineComponent({
       );
     });
 
-    const setBenchmarkData = async (tickerOptions: Option[]) => {
-      benchmarkData.value = await getQuotesChartData(
-        tickerOptions.map((ticker) => ticker.value)
-      );
-    };
+    const groupedTransactions = computed(() =>
+      transactionsStore.transactions.reduce((acc, transaction) => {
+        const transactionDate = midDay(new Date(transaction.date)).getTime();
+        const existingTransactions = acc.get(transactionDate) ?? [];
 
-    watch(selectedBenchmark, setBenchmarkData, { immediate: true });
+        return acc.set(transactionDate, [...existingTransactions, transaction]);
+      }, new Map<number, Transaction[]>())
+    );
 
     const chartData = computed(() =>
       getPortfolioPerformanceChart(
         portfolioStore.history,
-        benchmarkData.value,
+        props.benchmarkData,
         periodTimeRange.value,
-        $n,
+        props.showTransactionsMarkers ? groupedTransactions.value : new Map(),
+        numberFormatter,
         () => {
           if (!showResetZoom.value) {
             showResetZoom.value = true;
           }
-        }
+        },
+        props.mode
       )
     );
 
@@ -192,10 +233,13 @@ export default defineComponent({
     });
 
     const seriesTotalValues = computed(() => {
+      const isPercentage = props.mode === 'percentage';
+
       const series = chartData.value.series;
 
       return series.map((serie, index) => ({
         value: serie.data[serie.data.length - 1].y - serie.data[0].y,
+        format: isPercentage ? 'percent' : 'currency',
         name: serie.name,
         style: {
           background: SERIES_COLORS_PALLET[index],
@@ -204,18 +248,72 @@ export default defineComponent({
       }));
     });
 
+    const clearMarkerMenu = () => {
+      markerMenuTargetEl.value = undefined;
+      selectedAnnotationDate.value = undefined;
+    };
+
+    watch(
+      () => showResetZoom.value,
+      () => {
+        setTimeout(() => {
+          const annotations = document.querySelectorAll(
+            '.apexcharts-point-annotation-marker'
+          );
+
+          annotations.forEach((annotation, index) => {
+            if (!!annotation.getAttribute('data-marker-menu')) {
+              return;
+            }
+
+            const annotationDateKey = [...groupedTransactions.value.keys()][
+              index
+            ];
+
+            const showMarkerMenu = (event: Event) => {
+              markerMenuTargetEl.value = event.target as Element;
+              selectedAnnotationDate.value = annotationDateKey;
+            };
+
+            annotation.addEventListener('mouseover', showMarkerMenu);
+            annotation.addEventListener('mouseout', clearMarkerMenu);
+
+            annotation.setAttribute('data-marker-menu', 'true');
+          });
+        }, 1000);
+      },
+      { immediate: true }
+    );
+
+    const markerMenu = computed(() => {
+      const transactions = groupedTransactions.value.get(
+        selectedAnnotationDate.value ?? 0
+      );
+      if (!selectedAnnotationDate.value) {
+        return {};
+      }
+
+      return {
+        title: DateAPI.formatDate(selectedAnnotationDate.value, 'MMM D, YY'),
+        total: transactions?.length,
+        transactions,
+      };
+    });
+
     return {
-      showResetZoom,
-      benchmarkOptions,
       resetChart,
       timeRangeOptions,
-      selectedTimeRangeOption,
-      selectedBenchmark,
       chartRef,
       chartData,
       selectTimeRange,
       timeRangeText,
+      selectedTimeRangeOption,
+      showResetZoom,
       seriesTotalValues,
+      ModeIconMap,
+      markerMenuTargetEl,
+      clearMarkerMenu,
+      markerMenu,
     };
   },
 });
@@ -244,9 +342,14 @@ export default defineComponent({
   }
 }
 
-.holdings-heat-map {
-  svg {
-    transform: translate(8px, 0) !important;
+.marker-menu {
+  .transaction-row {
+    gap: 4px;
+    margin-bottom: 8px;
+
+    .q-item__label + .q-item__label {
+      margin-top: 0;
+    }
   }
 }
 </style>
