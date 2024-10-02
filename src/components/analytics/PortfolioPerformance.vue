@@ -73,15 +73,51 @@
         :series="chartData.series"
       ></apexchart>
     </q-card-section>
+
+    <q-menu
+      anchor="top start"
+      self="bottom left"
+      class="marker-menu"
+      :target="markerMenuTargetEl"
+      :model-value="!!markerMenuTargetEl"
+      @update:modelValue="clearMarkerMenu"
+    >
+      <div class="q-px-md q-py-sm text-caption">
+        <b>{{ markerMenu.title }}</b
+        >, transactions: {{ markerMenu.total }}
+      </div>
+      <q-separator />
+      <div class="q-px-md q-py-sm">
+        <p
+          v-for="transaction in markerMenu.transactions"
+          :key="transaction.id"
+          class="transaction-row flex items-center"
+        >
+          <q-item-label
+            :class="`text-capitalize text-bold ${
+              transaction.action === 'buy' ? 'text-green-6' : 'text-red-6'
+            }`"
+            >{{ transaction.action }}</q-item-label
+          >
+          <q-item-label class="text-bold"
+            >{{ transaction.ticker }}:</q-item-label
+          >
+          <q-item-label caption
+            >{{ transaction.shares }} shares for
+            {{ $n(transaction.price, 'decimal') }}</q-item-label
+          >
+        </p>
+      </div>
+    </q-menu>
   </q-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, Ref, ref } from 'vue';
+import { computed, defineComponent, PropType, Ref, ref, watch } from 'vue';
 import { date as DateAPI } from 'quasar';
 import VueApexCharts from 'vue3-apexcharts';
 import { getPortfolioPerformanceChart } from 'src/service/charts';
-import { StockChartResponse } from 'app/shared/types';
+import { StockChartResponse, Transaction } from 'app/shared/types';
 import { usePortfolioStore } from 'stores/portfolios';
 import { buildDateRangeFromToday, midDay } from 'src/service/stocks/dates';
 import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
@@ -123,6 +159,8 @@ export default defineComponent({
     const showResetZoom = ref(false);
     const chartRef: Ref = ref(undefined);
     const selectedTimeRangeOption = ref<Option>(timeRangeOptions[2]);
+    const markerMenuTargetEl = ref<Element | undefined>(undefined);
+    const selectedAnnotationDate = ref<number | undefined>(undefined);
 
     const numberFormatter = useNumberFormatter();
     const portfolioStore = usePortfolioStore();
@@ -136,6 +174,7 @@ export default defineComponent({
       const portfolioHistoryStartDate = midDay(
         new Date(portfolioStore.history[0]?.date)
       ).getTime();
+
       const days = selectedTimeRangeOption.value.days;
 
       return buildDateRangeFromToday(days as number).filter(
@@ -143,12 +182,21 @@ export default defineComponent({
       );
     });
 
+    const groupedTransactions = computed(() =>
+      transactionsStore.transactions.reduce((acc, transaction) => {
+        const transactionDate = midDay(new Date(transaction.date)).getTime();
+        const existingTransactions = acc.get(transactionDate) ?? [];
+
+        return acc.set(transactionDate, [...existingTransactions, transaction]);
+      }, new Map<number, Transaction[]>())
+    );
+
     const chartData = computed(() =>
       getPortfolioPerformanceChart(
         portfolioStore.history,
         props.benchmarkData,
         periodTimeRange.value,
-        props.showTransactionsMarkers ? transactionsStore.transactions : [],
+        props.showTransactionsMarkers ? groupedTransactions.value : new Map(),
         numberFormatter,
         () => {
           if (!showResetZoom.value) {
@@ -200,6 +248,58 @@ export default defineComponent({
       }));
     });
 
+    const clearMarkerMenu = () => {
+      markerMenuTargetEl.value = undefined;
+      selectedAnnotationDate.value = undefined;
+    };
+
+    watch(
+      () => showResetZoom.value,
+      () => {
+        setTimeout(() => {
+          const annotations = document.querySelectorAll(
+            '.apexcharts-point-annotation-marker'
+          );
+
+          annotations.forEach((annotation, index) => {
+            if (!!annotation.getAttribute('data-marker-menu')) {
+              return;
+            }
+
+            const annotationDateKey = [...groupedTransactions.value.keys()][
+              index
+            ];
+
+            const showMarkerMenu = (event: Event) => {
+              markerMenuTargetEl.value = event.target as Element;
+              selectedAnnotationDate.value = annotationDateKey;
+            };
+
+            annotation.addEventListener('mouseover', showMarkerMenu);
+            annotation.addEventListener('mouseout', clearMarkerMenu);
+
+            annotation.setAttribute('data-marker-menu', 'true');
+          });
+        }, 1000);
+      },
+      { immediate: true }
+    );
+
+    const markerMenu = computed(() => {
+      const transactions = groupedTransactions.value.get(
+        selectedAnnotationDate.value ?? 0
+      );
+      if (!selectedAnnotationDate.value) {
+        return {};
+      }
+
+      return {
+        title: DateAPI.formatDate(selectedAnnotationDate.value, 'MMM D, YY'),
+        total: transactions?.length,
+        transactions,
+      };
+    });
+
     return {
       resetChart,
       timeRangeOptions,
@@ -211,6 +311,9 @@ export default defineComponent({
       showResetZoom,
       seriesTotalValues,
       ModeIconMap,
+      markerMenuTargetEl,
+      clearMarkerMenu,
+      markerMenu,
     };
   },
 });
@@ -236,6 +339,17 @@ export default defineComponent({
     border-color: rgb(255, 255, 255);
     border-radius: 12px;
     display: inline-block;
+  }
+}
+
+.marker-menu {
+  .transaction-row {
+    gap: 4px;
+    margin-bottom: 8px;
+
+    .q-item__label + .q-item__label {
+      margin-top: 0;
+    }
   }
 }
 </style>

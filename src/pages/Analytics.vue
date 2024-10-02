@@ -14,6 +14,7 @@
 
       <portfolio-performance
         :title="$t('charts.portfolio_value')"
+        :show-transactions-markers="true"
         :benchmarkData="benchmarkData"
       />
 

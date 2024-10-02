@@ -163,16 +163,8 @@ const normalizePerformanceData = (
 
 const buildTransactionsAnnotations = (
   portfolioSeries: ChartSeries,
-  transactions: Transaction[]
+  transactionsMap: Map<number, Transaction[]>
 ) => {
-  // Grouping transactions by their date
-  const groupedTransactions = transactions.reduce((acc, transaction) => {
-    const transactionDate = midDay(new Date(transaction.date)).getTime();
-    const existingTransactions = acc.get(transactionDate) ?? [];
-
-    return acc.set(transactionDate, [...existingTransactions, transaction]);
-  }, new Map<number, Transaction[]>());
-
   const [portfolioMarkerColor] = SERIES_COLORS_PALLET;
   const [sellAnnotationColor] = COLOR_PALLET;
 
@@ -186,61 +178,55 @@ const buildTransactionsAnnotations = (
         yAxisIndex: 0,
       },
     ],
-    points: [...groupedTransactions.entries()].map(
-      ([date, transactionGroup]) => {
-        const isSingle = transactionGroup.length === 1;
+    points: [...transactionsMap.entries()].map(([date, transactionGroup]) => {
+      const isSingle = transactionGroup.length === 1;
 
-        const transactionDate = midDay(new Date(date));
-        const isBuyAction = (transactionGroup[0]?.action ?? '') === 'buy';
+      const transactionDate = midDay(new Date(date));
+      const isBuyAction = (transactionGroup[0]?.action ?? '') === 'buy';
 
-        const displayText = isSingle
-          ? isBuyAction
-            ? 'B'
-            : 'S'
-          : transactionGroup.length;
+      const displayText = isSingle
+        ? isBuyAction
+          ? 'B'
+          : 'S'
+        : transactionGroup.length;
 
-        return {
-          x: transactionDate.getTime(),
-          y: portfolioSeries?.data.find(
-            (dataPoint) => dataPoint.x.getTime() === transactionDate.getTime()
-          )?.y,
-          marker: {
-            size: 6,
-            fillColor: 'white',
-            strokeColor: isBuyAction
-              ? portfolioMarkerColor
-              : sellAnnotationColor,
-            strokeWidth: 1,
-          },
-          label: {
-            borderColor: isBuyAction
-              ? portfolioMarkerColor
-              : sellAnnotationColor,
-            offsetY: -2,
-            style: {
-              color: 'grey',
-              fontSize: '10px',
-              fontWeight: 'bold',
-              padding: {
-                top: 2,
-                bottom: 2,
-                left: 4,
-                right: 4,
-              },
-              borderRadius: 2,
+      return {
+        x: transactionDate.getTime(),
+        y: portfolioSeries?.data.find(
+          (dataPoint) => dataPoint.x.getTime() === transactionDate.getTime()
+        )?.y,
+        marker: {
+          size: 6,
+          fillColor: 'white',
+          strokeColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
+          strokeWidth: 1,
+        },
+        label: {
+          borderColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
+          offsetY: -2,
+          style: {
+            color: 'grey',
+            fontSize: '10px',
+            fontWeight: 'bold',
+            padding: {
+              top: 2,
+              bottom: 2,
+              left: 4,
+              right: 4,
             },
-            text: displayText,
+            borderRadius: 2,
           },
-          tooltip: {
-            enabled: true,
-            offsetY: 0,
-            style: {
-              fontSize: '12px',
-            },
+          text: displayText,
+        },
+        tooltip: {
+          enabled: true,
+          offsetY: 0,
+          style: {
+            fontSize: '12px',
           },
-        };
-      }
-    ),
+        },
+      };
+    }),
   };
 };
 
@@ -248,7 +234,7 @@ export const getPortfolioPerformanceChart = (
   portfolioHistory: PortfolioHistory[],
   benchmarks: StockChartResponse,
   periodTimeRange: number[],
-  transactions: Transaction[],
+  transactionsMap: Map<number, Transaction[]>,
   formatter: Formatter,
   onZoom: (
     ctx: unknown,
@@ -294,7 +280,10 @@ export const getPortfolioPerformanceChart = (
       markers: {
         size: 0,
       },
-      annotations: buildTransactionsAnnotations(portfolioSeries, transactions),
+      annotations: buildTransactionsAnnotations(
+        portfolioSeries,
+        transactionsMap
+      ),
       dataLabels: {
         enabled: false,
       },
