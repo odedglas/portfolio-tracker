@@ -39,6 +39,28 @@ export type DepositEntity = Deposit &
     index: number;
   };
 
+export type StockPlanType = 'espp' | 'rsu';
+
+export type StocksPlan = Entity & {
+  grantDate: number;
+  vestingEndDate: number;
+  grantPrice: number;
+  ticker: string;
+  name: string;
+  logoImage?: string;
+  type: StockPlanType;
+  amount: number;
+  vested: number;
+  cliff?: boolean;
+  activePlan?: boolean;
+  // Computed properties
+  nextVesting?: number;
+  lastVested?: number;
+  vestingPeriods?: number[];
+  potentialValue?: number;
+  sellableValue?: number;
+};
+
 export type Portfolio = Entity &
   Timestamped &
   Profitable & {
@@ -46,6 +68,7 @@ export type Portfolio = Entity &
     title: string;
     target: number;
     deposits: Deposit[];
+    stocksPlans?: StocksPlan[];
   };
 
 export type PortfolioHistory = Profitable & {
