@@ -1,0 +1,77 @@
+<template>
+  <swiper :slides-per-view="9" :vertical="true" :space-between="16">
+    <swiper-slide
+      v-for="mover in movers"
+      :key="mover.id"
+      class="daily-item-wrapper"
+    >
+      <div
+        class="daily-mover-item q-pb-none flex column items-center text-center"
+      >
+        <span class="flex items-center">
+          <ticker-logo
+            :ticker="mover.ticker"
+            :logo-image="mover.logoImage"
+            class="q-mr-xs"
+            :size="24"
+          />
+          <span class="text-caption text-bold text-grey-9">{{
+            mover.ticker
+          }}</span>
+        </span>
+        <span class="text-caption text-grey-9 q-mt-xs">
+          {{ $n(mover.lastPrice, 'noneSensitiveDecimal') }}
+        </span>
+        <profit-indicator
+          class="text-caption text-bold"
+          :percentage="mover.dailyChangePercent"
+          :display-as-row="false"
+        />
+      </div>
+    </swiper-slide>
+  </swiper>
+</template>
+
+<script lang="ts">
+import { defineComponent, PropType } from 'vue';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import TickerLogo from 'components/common/TickerLogo.vue';
+import 'swiper/css';
+import ProfitIndicator from 'components/common/ProfitIndicator.vue';
+
+export default defineComponent({
+  name: 'DailyMoversSwiper',
+  components: { ProfitIndicator, TickerLogo, Swiper, SwiperSlide },
+  props: {
+    movers: {
+      required: true,
+      type: Array as PropType<
+        {
+          id: string;
+          ticker: string;
+          logoImage?: string;
+          lastPrice: number;
+          dailyChangePercent: number;
+        }[]
+      >,
+    },
+  },
+});
+</script>
+
+<style lang="scss">
+.daily-movers {
+  .daily-item-wrapper {
+    .daily-mover-item {
+      border: 1px solid $grey-9;
+      border-radius: 8px;
+      padding: 8px 8px 4px;
+      gap: 4px;
+
+      .q-icon {
+        font-size: 20px !important;
+      }
+    }
+  }
+}
+</style>
