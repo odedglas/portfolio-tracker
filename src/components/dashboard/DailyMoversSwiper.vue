@@ -1,8 +1,8 @@
 <template>
   <swiper :slides-per-view="9" :vertical="true" :space-between="16">
     <swiper-slide
-      v-for="mover in movers"
-      :key="mover.id"
+      v-for="(mover, index) in movers"
+      :key="index"
       class="daily-item-wrapper"
     >
       <div
@@ -10,13 +10,14 @@
       >
         <span class="flex items-center">
           <ticker-logo
+            v-if="showLogo"
             :ticker="mover.ticker"
             :logo-image="mover.logoImage"
             class="q-mr-xs"
             :size="24"
           />
           <span class="text-caption text-bold text-grey-9">{{
-            mover.ticker
+            showLogo ? mover.ticker : mover.label
           }}</span>
         </span>
         <span class="text-caption text-grey-9 q-mt-xs">
@@ -47,13 +48,18 @@ export default defineComponent({
       required: true,
       type: Array as PropType<
         {
-          id: string;
+          id?: string;
           ticker: string;
+          label?: string;
           logoImage?: string;
           lastPrice: number;
           dailyChangePercent: number;
         }[]
       >,
+    },
+    showLogo: {
+      default: true,
+      type: Boolean,
     },
   },
 });

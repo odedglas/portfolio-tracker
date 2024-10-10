@@ -42,6 +42,7 @@ export type DepositEntity = Deposit &
 export type StockPlanType = 'espp' | 'rsu';
 
 export type StocksPlan = Entity & {
+  identifier: string;
   grantDate: number;
   vestingEndDate: number;
   grantPrice: number;
@@ -50,10 +51,10 @@ export type StocksPlan = Entity & {
   logoImage?: string;
   type: StockPlanType;
   amount: number;
-  vested: number;
   cliff?: boolean;
   activePlan?: boolean;
   // Computed properties
+  vested?: number;
   nextVesting?: number;
   lastVested?: number;
   vestingPeriods?: number[];

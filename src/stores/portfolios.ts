@@ -76,6 +76,35 @@ export const usePortfolioStore = defineStore('portfolios', {
         (a, b) => a.date - b.date
       );
       await transactionsStore.list(portfolioId);
+
+      if (this.selectedPortfolio) {
+        this.selectedPortfolio.stocksPlans = [
+          {
+            id: '1',
+            identifier: 's32',
+            grantDate: 1556841600000,
+            vestingEndDate: 1620000000000,
+            grantPrice: 45,
+            ticker: 'FVR',
+            name: 'Fiverr.',
+            type: 'rsu',
+            amount: 1400,
+            activePlan: false,
+          },
+          {
+            id: '1',
+            identifier: 's32',
+            grantDate: 1714694400000,
+            vestingEndDate: 1844016929516,
+            grantPrice: 233,
+            ticker: 'MNDY',
+            name: 'Monday.com',
+            type: 'rsu',
+            amount: 1250,
+            activePlan: true,
+          },
+        ];
+      }
     },
     async list() {
       const persisted = localStorage.getItem(selectedPortfolioStorageKey);

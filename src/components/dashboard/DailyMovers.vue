@@ -10,7 +10,7 @@
     </q-card-section>
     <q-card-section class="q-py-sm">
       <p class="text-caption text-grey-8 q-mb-sm">Market:</p>
-      <daily-movers-swiper :movers="benchmarks" />
+      <daily-movers-swiper :movers="benchmarks" :show-logo="false" />
     </q-card-section>
   </q-card>
 </template>
@@ -22,12 +22,11 @@ import DailyMoversSwiper from 'components/dashboard/DailyMoversSwiper.vue';
 import { useQuotesStore } from 'stores/quotes';
 
 import 'swiper/css';
-import { benchmarkOptions } from 'components/analytics/constants';
+import { dailyMoversBenchmarks } from './constants';
 import { getQuotes } from 'src/service/stocks';
 
-const benchmarkDefaults = benchmarkOptions.map((opt) => ({
-  ticker: opt.value,
-  id: opt.label,
+const benchmarkDefaults = dailyMoversBenchmarks.map((opt) => ({
+  ...opt,
   lastPrice: 0,
   dailyChangePercent: 0,
 }));
