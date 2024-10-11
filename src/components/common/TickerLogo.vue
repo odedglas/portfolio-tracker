@@ -31,6 +31,7 @@ export default defineComponent({
   },
   setup(props) {
     const computedStyle = computed(() => ({
+      borderRadius: '50%',
       width: `${props.size}px`,
       height: `${props.size}px`,
     }));
@@ -44,7 +45,7 @@ export default defineComponent({
 
 <style lang="scss">
 .empty-logo-alt {
-  border-radius: 5px;
+  border-radius: 50%;
   background-color: #f3f6f9;
   background-size: cover;
 

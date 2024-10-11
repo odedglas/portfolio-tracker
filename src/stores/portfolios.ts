@@ -5,6 +5,7 @@ import { Deposit, Portfolio, PortfolioHistory } from 'app/shared/types';
 import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
 import { queries } from 'src/service/firebase/collections';
+import { useStocksPlansStore } from 'stores/stocksPlans';
 
 const selectedPortfolioStorageKey = 'selected_portfolio_id';
 
@@ -67,6 +68,7 @@ export const usePortfolioStore = defineStore('portfolios', {
   actions: {
     async selectPortfolio(portfolioId: string) {
       const transactionsStore = useTransactionsStore();
+      const stocksPlansStore = useStocksPlansStore();
       localStorage.setItem(selectedPortfolioStorageKey, portfolioId);
 
       this.selectedPortfolioId = portfolioId;
@@ -75,6 +77,7 @@ export const usePortfolioStore = defineStore('portfolios', {
       this.history = (await queries.getPortfolioHistory(portfolioId)).sort(
         (a, b) => a.date - b.date
       );
+
       await transactionsStore.list(portfolioId);
 
       if (this.selectedPortfolio) {
@@ -85,11 +88,12 @@ export const usePortfolioStore = defineStore('portfolios', {
             grantDate: 1556841600000,
             vestingEndDate: 1620000000000,
             grantPrice: 45,
+            vestingMonthsInterval: 3,
             ticker: 'FVR',
             name: 'Fiverr.',
             type: 'rsu',
             amount: 1400,
-            activePlan: false,
+            terminationDate: 1620000000000,
           },
           {
             id: '1',
@@ -97,14 +101,17 @@ export const usePortfolioStore = defineStore('portfolios', {
             grantDate: 1714694400000,
             vestingEndDate: 1844016929516,
             grantPrice: 233,
+            vestingMonthsInterval: 3,
             ticker: 'MNDY',
             name: 'Monday.com',
             type: 'rsu',
             amount: 1250,
-            activePlan: true,
+            cliff: true,
           },
         ];
       }
+
+      await stocksPlansStore.setStocksPlans(this.selectedPortfolio?.stocksPlans ?? []);
     },
     async list() {
       const persisted = localStorage.getItem(selectedPortfolioStorageKey);

@@ -45,6 +45,7 @@ export type StocksPlan = Entity & {
   identifier: string;
   grantDate: number;
   vestingEndDate: number;
+  vestingMonthsInterval: number;
   grantPrice: number;
   ticker: string;
   name: string;
@@ -52,12 +53,14 @@ export type StocksPlan = Entity & {
   type: StockPlanType;
   amount: number;
   cliff?: boolean;
-  activePlan?: boolean;
+  terminationDate?: number;
+
   // Computed properties
-  vested?: number;
+  vestingPeriods?: number[];
+  vestedPeriods?: number;
   nextVesting?: number;
   lastVested?: number;
-  vestingPeriods?: number[];
+  vested?: number;
   potentialValue?: number;
   sellableValue?: number;
 };

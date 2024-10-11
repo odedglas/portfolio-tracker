@@ -14,7 +14,7 @@
             :ticker="mover.ticker"
             :logo-image="mover.logoImage"
             class="q-mr-xs"
-            :size="24"
+            :size="20"
           />
           <span class="text-caption text-bold text-grey-9">{{
             showLogo ? mover.ticker : mover.label
