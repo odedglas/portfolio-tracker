@@ -1,6 +1,6 @@
 import * as logger from 'firebase-functions/logger';
 import { getTickersQuotes } from './utils/getTickersQuotes';
-import { getCollection, saveDocument } from './utils/getCollection';
+import { getCollection, saveDocuments } from './utils/getCollection';
 import {
   Holding,
   HoldingWithProfits,
@@ -18,6 +18,8 @@ import {
  * 2. Get all Holdings and group by Portfolio
  * 3. For each group, calculate it's summary profit, dailyChange, fees....
  * 4. Save over portfolios_history collection
+ *
+ * @param {boolean} dryRun - Rather to use "dryRun" mode or not.
  */
 export const portfolioHistoryTracker = async (dryRun = false) => {
   const now = Date.now();
@@ -82,7 +84,7 @@ export const portfolioHistoryTracker = async (dryRun = false) => {
 
   // Saving history records.
   if (!dryRun) {
-    await saveDocument<PortfolioHistory>('portfolioHistory', historyRecords);
+    await saveDocuments<PortfolioHistory>('portfolioHistory', historyRecords);
   } else {
     historyRecords.forEach((record) => {
       logger.info('Portfolio History Tracker Dry Run', {

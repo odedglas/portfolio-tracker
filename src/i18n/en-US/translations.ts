@@ -65,6 +65,12 @@ export const enUsMessages = {
       value: 'Current Value',
     },
   },
+  analytics: {
+    title: 'Analytics',
+  },
+  stocks_plans: {
+    title: 'Stocks Plans',
+  },
   no_results: 'No results',
   cancel: 'Cancel',
   save: 'Save',

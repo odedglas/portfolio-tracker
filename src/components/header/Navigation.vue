@@ -34,6 +34,7 @@
 import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { QBtn, QBtnDropdown, QMenu } from 'quasar';
+import { ROUTE_PATHS } from 'src/router/routes';
 
 export default defineComponent({
   name: 'AppNavigation',
@@ -48,7 +49,7 @@ export default defineComponent({
     const navigationButtons = [
       {
         id: 'dashboard',
-        route: '/dashboard',
+        route: ROUTE_PATHS.DASHBOARD,
         component: 'q-btn',
         props: { label: 'Dashboard' },
       },
@@ -57,37 +58,41 @@ export default defineComponent({
         props: { label: 'Portfolio' },
         component: 'q-btn',
         preventNavigation: true,
-        route: ['/transactions', '/holdings', '/cash'],
+        route: [
+          ROUTE_PATHS.TRANSACTIONS,
+          ROUTE_PATHS.HOLDINGS,
+          ROUTE_PATHS.CASH,
+        ],
         menuOptions: [
           {
             id: 'transactions',
             text: 'Transactions',
             icon: 'transform',
-            route: '/transactions',
+            route: ROUTE_PATHS.TRANSACTIONS,
           },
           {
             id: 'holdings',
             text: 'Holdings',
             icon: 'cases',
-            route: '/holdings',
+            route: ROUTE_PATHS.HOLDINGS,
           },
           {
             id: 'cash',
             text: 'Cash Flow',
             icon: 'attach_money',
-            route: '/cash',
+            route: ROUTE_PATHS.CASH,
           },
         ],
       },
       {
         id: 'analytics',
-        route: '/analytics',
+        route: ROUTE_PATHS.ANALYTICS,
         component: 'q-btn',
         props: { label: 'Analytics' },
       },
       {
         id: 'stock-plans',
-        route: '/stocks-plans',
+        route: ROUTE_PATHS.STOCK_PLANS,
         component: 'q-btn',
         props: { label: 'Stocks Plans' },
       },
