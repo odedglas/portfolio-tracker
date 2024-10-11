@@ -111,7 +111,9 @@ export const usePortfolioStore = defineStore('portfolios', {
         ];
       }
 
-      await stocksPlansStore.setStocksPlans(this.selectedPortfolio?.stocksPlans ?? []);
+      await stocksPlansStore.setStocksPlans(
+        this.selectedPortfolio?.stocksPlans ?? []
+      );
     },
     async list() {
       const persisted = localStorage.getItem(selectedPortfolioStorageKey);

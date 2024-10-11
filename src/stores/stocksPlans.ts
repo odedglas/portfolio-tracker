@@ -11,7 +11,9 @@ const calculateStocksPlanVestingPeriods = (plan: StocksPlan) => {
 
   let current = grantDate;
   while (current < vestingEndDate) {
-    const nextVesting = DateAPI.addToDate(new Date(current), { months: vestingMonthsInterval }).getTime();
+    const nextVesting = DateAPI.addToDate(new Date(current), {
+      months: vestingMonthsInterval,
+    }).getTime();
 
     // Adds the next vesting period if it's in valid range of vesting end date.
     if (nextVesting <= vestingEndDate) {
@@ -21,12 +23,16 @@ const calculateStocksPlanVestingPeriods = (plan: StocksPlan) => {
   }
 
   return vestingPeriods;
-}
+};
 
-const isVestedPeriod = (cliffDate: number, terminationDate: number | undefined, periodDate: number) => {
+const isVestedPeriod = (
+  cliffDate: number,
+  terminationDate: number | undefined,
+  periodDate: number
+) => {
   // Period is under a cliff constraint
   if (periodDate <= cliffDate) {
-    return false
+    return false;
   }
 
   // Period is after termination date
@@ -36,45 +42,76 @@ const isVestedPeriod = (cliffDate: number, terminationDate: number | undefined, 
 
   // Rather period is vested
   return Date.now() >= periodDate;
-}
-
-const calculateStocksPlanVestedPeriods = (plan: StocksPlan, vestingPeriods: number[]) => {
-  const { grantDate, cliff, terminationDate } = plan;
-
-  const cliffDate = DateAPI.addToDate(new Date(grantDate), { years: cliff ? 1 : 0 });
-
-  return vestingPeriods.filter((periodDate) => isVestedPeriod(cliffDate.getTime(), terminationDate, periodDate)).length;
 };
 
-const findNextVestingPeriod = (plan: StocksPlan, vestingPeriods: number[], vestedPeriods: number) => {
+const calculateStocksPlanVestedPeriods = (
+  plan: StocksPlan,
+  vestingPeriods: number[]
+) => {
+  const { grantDate, cliff, terminationDate } = plan;
+
+  const cliffDate = DateAPI.addToDate(new Date(grantDate), {
+    years: cliff ? 1 : 0,
+  });
+
+  return vestingPeriods.filter((periodDate) =>
+    isVestedPeriod(cliffDate.getTime(), terminationDate, periodDate)
+  ).length;
+};
+
+const findNextVestingPeriod = (
+  plan: StocksPlan,
+  vestingPeriods: number[],
+  vestedPeriods: number
+) => {
   const { cliff, vestingMonthsInterval } = plan;
 
-  const computedVestingPeriods = vestedPeriods + (cliff ? 12 / vestingMonthsInterval : 0);
+  const computedVestingPeriods =
+    vestedPeriods + (cliff ? 12 / vestingMonthsInterval : 0);
 
-  return computedVestingPeriods < vestingPeriods.length - 1 ? vestingPeriods[computedVestingPeriods] : undefined;
-}
+  return computedVestingPeriods < vestingPeriods.length - 1
+    ? vestingPeriods[computedVestingPeriods]
+    : undefined;
+};
 
 export const useStocksPlansStore = defineStore('stocksPlans', {
   state: (): { stocksPlans: StocksPlan[] } => ({
-    stocksPlans: []
+    stocksPlans: [],
   }),
   actions: {
     async setStocksPlans(plans: StocksPlan[]) {
-      const { quoteResponse } = await getQuotes(plans.map((plan) => plan.ticker));
+      const { quoteResponse } = await getQuotes(
+        plans.map((plan) => plan.ticker)
+      );
 
       this.stocksPlans = plans.map((plan) => {
-        const planQuote = quoteResponse.result.find((quote) => quote.symbol === plan.ticker);
+        const planQuote = quoteResponse.result.find(
+          (quote) => quote.symbol === plan.ticker
+        );
 
         const vestingPeriods = calculateStocksPlanVestingPeriods(plan);
-        const vestedPeriods = calculateStocksPlanVestedPeriods(plan, vestingPeriods);
+        const vestedPeriods = calculateStocksPlanVestedPeriods(
+          plan,
+          vestingPeriods
+        );
 
-        const lastVested = vestedPeriods > 0 ? vestingPeriods[vestedPeriods - 1] : undefined;
-        const nextVesting = findNextVestingPeriod(plan, vestingPeriods, vestedPeriods);
+        const lastVested =
+          vestedPeriods > 0 ? vestingPeriods[vestedPeriods - 1] : undefined;
+        const nextVesting = findNextVestingPeriod(
+          plan,
+          vestingPeriods,
+          vestedPeriods
+        );
 
-        const vestedShares = vestedPeriods > 0 ? ((plan.amount / vestedPeriods) * vestedPeriods): 0;
+        const vestedShares =
+          vestedPeriods > 0 ? (plan.amount / vestedPeriods) * vestedPeriods : 0;
 
-        const potentialValue = planQuote ? planQuote.regularMarketPrice * plan.amount : 0;
-        const sellableValue = planQuote ? planQuote.regularMarketPrice * vestedShares : 0;
+        const potentialValue = planQuote
+          ? planQuote.regularMarketPrice * plan.amount
+          : 0;
+        const sellableValue = planQuote
+          ? planQuote.regularMarketPrice * vestedShares
+          : 0;
 
         return {
           ...plan,
@@ -84,7 +121,7 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           lastVested,
           vested: vestedShares,
           potentialValue,
-          sellableValue
+          sellableValue,
         };
       });
     },
