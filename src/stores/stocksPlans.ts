@@ -74,6 +74,23 @@ const findNextVestingPeriod = (
     : undefined;
 };
 
+const calculateVestedShares = (
+  plan: StocksPlan,
+  vestingPeriods: number[],
+  vestedPeriods: number
+) => {
+  const { grantDate, vestingEndDate, amount } = plan;
+
+  if (grantDate === vestingEndDate) {
+    // Means its granted as fully vested.
+    return amount;
+  }
+
+  return vestedPeriods > 0
+    ? Math.round(amount * (vestedPeriods / vestingPeriods.length))
+    : 0;
+};
+
 export const useStocksPlansStore = defineStore('stocksPlans', {
   state: (): { stocksPlans: StocksPlan[] } => ({
     stocksPlans: [],
@@ -84,6 +101,7 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
         plans.map((plan) => plan.ticker)
       );
 
+      debugger;
       this.stocksPlans = plans.map((plan) => {
         const planQuote = quoteResponse.result.find(
           (quote) => quote.symbol === plan.ticker
@@ -103,8 +121,11 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           vestedPeriods
         );
 
-        const vestedShares =
-          vestedPeriods > 0 ? (plan.amount / vestedPeriods) * vestedPeriods : 0;
+        const vestedShares = calculateVestedShares(
+          plan,
+          vestingPeriods,
+          vestedPeriods
+        );
 
         const potentialValue = planQuote
           ? planQuote.regularMarketPrice * plan.amount

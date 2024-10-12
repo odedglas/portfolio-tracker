@@ -7,6 +7,7 @@
       hide-pagination
       flat
       row-key="identifier"
+      :rows-per-page-options="[100]"
     >
       <template v-slot:body="props">
         <q-tr
@@ -124,13 +125,21 @@ export default defineComponent({
       }
 
       if (terminationDate) {
-        return 'Terminated Plan.';
+        return 'Terminated Plan';
       }
 
       return nextVesting ? formatDate(nextVesting) : '---';
     };
 
-    const getLastVestedText = ({ lastVested }: StocksPlan) => {
+    const getLastVestedText = ({
+      grantDate,
+      vestingEndDate,
+      lastVested,
+    }: StocksPlan) => {
+      if (grantDate === vestingEndDate) {
+        return formatDate(grantDate);
+      }
+
       if (lastVested) {
         return formatDate(lastVested);
       }

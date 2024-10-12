@@ -35,7 +35,7 @@
 
           <div class="row" style="gap: 12px">
             <q-input
-              v-model.number="localPlan.identifier"
+              v-model="localPlan.identifier"
               class="col"
               type="text"
               lazy-rules
@@ -119,12 +119,14 @@
             @update:model-value="(v) => onVestingYearsChange(Number(v))"
             class="col"
             type="number"
+            :disable="isESPP"
             lazy-rules
             label="Grant Vesting years"
           />
 
           <q-toggle
             v-model="localPlan.cliff"
+            :disable="isESPP"
             label="Plan has cliff constraint?"
           />
         </q-form>
@@ -151,7 +153,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
+import {
+  defineComponent,
+  PropType,
+  computed,
+  ref,
+  toRef,
+  Ref,
+  watch,
+} from 'vue';
 import { date as dateUtils, useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useLoadingStore } from 'stores/loading';
@@ -219,6 +229,12 @@ export default defineComponent({
       set: (date: string) => {
         localPlan.value.grantDate = new Date(date).getTime();
       },
+    });
+
+    const isESPP = computed(() => localPlan.value?.type === 'espp');
+
+    watch(isESPP, () => {
+      vestingYears.value = isESPP.value ? 0 : 4;
     });
 
     const setLocalPlan = () => {
@@ -298,6 +314,7 @@ export default defineComponent({
       vestingYears,
       onVestingYearsChange,
       terminatePlan,
+      isESPP,
     };
   },
 });

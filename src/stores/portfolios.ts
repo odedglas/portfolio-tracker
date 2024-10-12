@@ -1,3 +1,4 @@
+import omit from 'lodash/omit';
 import { defineStore } from 'pinia';
 import { holdingsTransformer } from 'app/shared/transformers';
 import portfolioAPI from 'src/service/portfolio';
@@ -85,55 +86,6 @@ export const usePortfolioStore = defineStore('portfolios', {
 
       await transactionsStore.list(portfolioId);
 
-      if (this.selectedPortfolio) {
-        this.selectedPortfolio.stocksPlans = [
-          {
-            id: '1',
-            identifier: 'S433',
-            grantDate: 1556841600000,
-            vestingEndDate: 1620000000000,
-            grantPrice: 45,
-            vestingMonthsInterval: 3,
-            ticker: 'FVR',
-            name: 'Fiverr.',
-            logoImage: 'https://s3-symbol-logo.tradingview.com/fiverr.svg',
-            type: 'rsu',
-            amount: 400,
-            terminationDate: 1620000000000,
-            cliff: false,
-          },
-          {
-            id: '2',
-            identifier: 'S3402',
-            grantDate: 1556841600000,
-            vestingEndDate: 1620000000000,
-            grantPrice: 22,
-            vestingMonthsInterval: 3,
-            ticker: 'FVR',
-            name: 'Fiverr.',
-            logoImage: 'https://s3-symbol-logo.tradingview.com/fiverr.svg',
-            type: 'rsu',
-            amount: 1000,
-            terminationDate: 1620000000000,
-            cliff: false,
-          },
-          {
-            id: '3',
-            identifier: 'R55',
-            grantDate: 1714694400000,
-            vestingEndDate: 1844016929516,
-            grantPrice: 233,
-            vestingMonthsInterval: 3,
-            ticker: 'MNDY',
-            name: 'Monday.com',
-            logoImage: 'https://s3-symbol-logo.tradingview.com/monday-com.svg',
-            type: 'rsu',
-            amount: 1250,
-            cliff: true,
-          },
-        ];
-      }
-
       await stocksPlansStore.setStocksPlans(
         this.selectedPortfolio?.stocksPlans ?? []
       );
@@ -219,6 +171,15 @@ export const usePortfolioStore = defineStore('portfolios', {
       return portfolioAPI.update(portfolio, portfolio.id);
     },
     async updateStocksPlan(plan: StocksPlan, remove = false) {
+      const rawPlan = omit(plan, [
+        'lastVested',
+        'nextVesting',
+        'sellableValue',
+        'potentialValue',
+        'vestedPeriods',
+        'vestingPeriods',
+      ]);
+
       const stocksPlansStore = useStocksPlansStore();
 
       const portfolio = this.selectedPortfolio;
@@ -233,7 +194,7 @@ export const usePortfolioStore = defineStore('portfolios', {
       portfolio.stocksPlans = [...(filteredPlans ?? [])];
 
       if (!remove) {
-        portfolio.stocksPlans.push(plan);
+        portfolio.stocksPlans.push(rawPlan as StocksPlan);
       }
 
       await stocksPlansStore.setStocksPlans(portfolio.stocksPlans);
