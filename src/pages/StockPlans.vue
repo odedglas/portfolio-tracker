@@ -1,31 +1,46 @@
 <template>
   <q-page class="row justify-center q-pa-md">
     <div class="col-10 column stocks-plan-wrapper">
-      <p class="text-h5 q-mb-none text-grey-7 dashboard-title">
+      <p class="text-h5 q-mt-md q-mb-lg text-grey-7 dashboard-title">
         {{ $t('stocks_plans.title') }}
       </p>
 
-      Body....
+      <div class="plans-wrapper flex column">
+        <stocks-plans-group-details
+          v-for="(plans, index) in stocksPlansGroups"
+          :key="index"
+          :plans="plans"
+        />
+      </div>
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
-import { stocksClient } from 'app/shared/api';
+import { computed, defineComponent } from 'vue';
+import groupBy from 'lodash/groupBy';
+import { useStocksPlansStore } from 'stores/stocksPlans';
+import StocksPlansGroupDetails from 'components/stocksPlan/StocksPlansGroupDetails.vue';
 
 export default defineComponent({
   name: 'StocksPlans',
-  components: {},
+  components: { StocksPlansGroupDetails },
   setup() {
-    onMounted(async () => {
-      const res = await stocksClient.getFearAndGreedIndex();
+    const stocksPlansStore = useStocksPlansStore();
 
-      console.log(res.data);
-    });
-    return {};
+    const stocksPlansGroups = computed(() =>
+      groupBy(stocksPlansStore.stocksPlans, 'ticker')
+    );
+
+    return {
+      stocksPlansGroups,
+    };
   },
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.plans-wrapper {
+  gap: 24px;
+}
+</style>

@@ -2,10 +2,10 @@ import type { QTableProps } from 'quasar';
 
 export const columns: QTableProps['columns'] = [
   {
-    name: 'name',
+    name: 'grant_name',
     align: 'center',
-    label: 'Name',
-    field: 'name',
+    label: 'Grant Name',
+    field: 'identifier',
     sortable: true,
   },
   {
@@ -21,7 +21,7 @@ export const columns: QTableProps['columns'] = [
     label: 'Grant Price',
     field: 'grantPrice',
     sortable: true,
-    align: 'left',
+    align: 'center',
   },
   {
     name: 'type',
@@ -45,16 +45,16 @@ export const columns: QTableProps['columns'] = [
     field: 'lastVested',
   },
   {
-    name: 'current_value',
+    name: 'sellable_value',
     align: 'center',
-    label: 'Current Value',
-    field: 'currentValue',
+    label: 'Sellable Value',
+    field: 'sellableValue',
   },
   {
     name: 'total_value',
     align: 'center',
     label: 'Total Value',
-    field: 'totalValue',
+    field: 'potentialValue',
   },
   { name: 'item_actions', align: 'center', label: '', field: 'none' },
 ];
