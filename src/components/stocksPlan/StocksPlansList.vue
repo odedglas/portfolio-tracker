@@ -6,10 +6,24 @@
       :columns="columns"
       hide-pagination
       flat
-      row-key="grant_name"
+      row-key="identifier"
     >
       <template v-slot:body="props">
-        <q-tr :props="props">
+        <q-tr
+          :props="props"
+          @click="props.expand = !props.expand"
+          class="clickable"
+        >
+          <q-td key="row_expand" auto-width>
+            <q-btn
+              size="md"
+              round
+              dense
+              flat
+              :class="`expand-icon ${props.expand ? 'expanded' : ''}`"
+              icon="expand_more"
+            />
+          </q-td>
           <q-td key="grant_name" :props="props">
             <div class="row items-center">
               <div class="column q-ml-sm">
@@ -33,18 +47,10 @@
             {{ $n(props.row.vested ?? 0, 'fixed') }}
           </q-td>
           <q-td key="next_vesting" :props="props">
-            {{
-              !props.row.terminationDate && props.row.nextVesting
-                ? formatDate(props.row.nextVesting)
-                : '---'
-            }}
+            {{ getNextVestingText(props.row) }}
           </q-td>
           <q-td key="last_vested" :props="props">
-            {{
-              props.row.terminationDate && props.row.lastVested
-                ? formatDate(props.row.lastVested)
-                : '---'
-            }}
+            {{ getLastVestedText(props.row) }}
           </q-td>
           <q-td key="sellable_value" :props="props">
             {{ $n(props.row.sellableValue, 'decimal') }}
@@ -52,7 +58,19 @@
           <q-td key="total_value" :props="props">
             {{ $n(props.row.potentialValue, 'decimal') }}
           </q-td>
-          <q-td key="item_actions" :props="props"> ACTIONS </q-td>
+          <q-td key="item_actions" :props="props">
+            <div class="text-grey-8 q-gutter-xs">
+              <q-btn class="gt-xs" size="12px" flat dense round icon="edit" />
+              <q-btn size="12px" flat dense round icon="delete"> </q-btn>
+            </div>
+          </q-td>
+        </q-tr>
+        <q-tr v-show="props.expand" :props="props">
+          <q-td colspan="100%">
+            <div class="text-left">
+              This is expand slot for row above: {{ props.row.name }}.
+            </div>
+          </q-td>
         </q-tr>
       </template>
     </q-table>
@@ -78,9 +96,36 @@ export default defineComponent({
       return DateAPI.formatDate(date, 'DD MMM YYYY');
     };
 
+    const getNextVestingText = ({
+      vested,
+      amount,
+      terminationDate,
+      nextVesting,
+    }: StocksPlan) => {
+      if (amount === vested) {
+        return 'Fully vested';
+      }
+
+      if (terminationDate) {
+        return 'Terminated Plan.';
+      }
+
+      return nextVesting ? formatDate(nextVesting) : '---';
+    };
+
+    const getLastVestedText = ({ lastVested }: StocksPlan) => {
+      if (lastVested) {
+        return formatDate(lastVested);
+      }
+
+      return '---';
+    };
+
     return {
       columns,
       formatDate,
+      getNextVestingText,
+      getLastVestedText,
     };
   },
 });
@@ -95,6 +140,15 @@ export default defineComponent({
 
   .q-table td {
     font-size: 14px;
+  }
+
+  .expand-icon {
+    transition: all 0.2s ease;
+    transform: rotate(0);
+
+    &.expanded {
+      transform: rotate(180deg);
+    }
   }
 }
 </style>

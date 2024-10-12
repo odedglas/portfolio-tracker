@@ -84,7 +84,7 @@ export const usePortfolioStore = defineStore('portfolios', {
         this.selectedPortfolio.stocksPlans = [
           {
             id: '1',
-            identifier: 's32',
+            identifier: 'S433',
             grantDate: 1556841600000,
             vestingEndDate: 1620000000000,
             grantPrice: 45,
@@ -98,7 +98,7 @@ export const usePortfolioStore = defineStore('portfolios', {
           },
           {
             id: '2',
-            identifier: 's32',
+            identifier: 'S3402',
             grantDate: 1556841600000,
             vestingEndDate: 1620000000000,
             grantPrice: 22,
@@ -112,7 +112,7 @@ export const usePortfolioStore = defineStore('portfolios', {
           },
           {
             id: '3',
-            identifier: 's32',
+            identifier: 'R55',
             grantDate: 1714694400000,
             vestingEndDate: 1844016929516,
             grantPrice: 233,

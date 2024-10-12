@@ -6,8 +6,13 @@
           <ticker-logo v-bind="plansGroupMeta" />
         </q-item-section>
         <q-item-section>
-          <q-item-label class="text-subtitle1">
+          <q-item-label class="text-h5">
             {{ plansGroupMeta.name }}
+          </q-item-label>
+        </q-item-section>
+        <q-item-section side class="flex row">
+          <q-item-label class="text-subtitle1 text-black">
+            Value: {{ $n(plansTotal.total, 'currency') }}
           </q-item-label>
         </q-item-section>
       </q-item>
@@ -48,9 +53,22 @@ export default defineComponent({
       };
     });
 
+    const plansTotal = computed(() =>
+      props.plans.reduce(
+        (acc, plan) => {
+          return {
+            total: acc.total + (plan.potentialValue ?? 0),
+            sellable: acc.sellable + (plan.sellableValue ?? 0),
+          };
+        },
+        { total: 0, sellable: 0 }
+      )
+    );
+
     return {
       plansGroupMeta,
       isVisible,
+      plansTotal,
     };
   },
 });

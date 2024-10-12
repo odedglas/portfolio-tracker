@@ -5,12 +5,16 @@
         {{ $t('stocks_plans.title') }}
       </p>
 
-      <div class="plans-wrapper flex column">
+      <div class="plans-wrapper flex column" v-if="stocksPlansGroups">
         <stocks-plans-group-details
           v-for="(plans, index) in stocksPlansGroups"
           :key="index"
           :plans="plans"
         />
+      </div>
+
+      <div v-else class="q-pa-lg">
+        <p class="text-body1">No stocks plans were found...</p>
       </div>
     </div>
   </q-page>

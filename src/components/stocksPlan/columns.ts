@@ -1,6 +1,7 @@
 import type { QTableProps } from 'quasar';
 
 export const columns: QTableProps['columns'] = [
+  { name: 'row_expand', align: 'center', label: '', field: 'none' },
   {
     name: 'grant_name',
     align: 'center',
