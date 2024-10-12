@@ -70,6 +70,13 @@ export const enUsMessages = {
   },
   stocks_plans: {
     title: 'Stocks Plans',
+    new: 'New Stocks Plan',
+    edit: 'Edit Plan',
+    search_plan: "Add a new grants stock plan by searching it's ticker",
+    rsu: 'RSU',
+    espp: 'ESPP',
+    esop: 'ESOP',
+    terminate_plan: 'Terminate Plan',
   },
   no_results: 'No results',
   cancel: 'Cancel',
@@ -110,6 +117,11 @@ export const enUsCurrency = {
     minimumFractionDigits: 0,
   },
   fixed: {
+    style: 'decimal',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  },
+  fixedSensitive: {
     style: 'decimal',
     maximumFractionDigits: 2,
     minimumFractionDigits: 0,

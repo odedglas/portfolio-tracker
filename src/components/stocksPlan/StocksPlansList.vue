@@ -41,10 +41,10 @@
             {{ props.row.type }}
           </q-td>
           <q-td key="amount" :props="props">
-            {{ $n(props.row.amount, 'fixed') }}
+            {{ $n(props.row.amount, 'fixedSensitive') }}
           </q-td>
           <q-td key="vested" :props="props">
-            {{ $n(props.row.vested ?? 0, 'fixed') }}
+            {{ $n(props.row.vested ?? 0, 'fixedSensitive') }}
           </q-td>
           <q-td key="next_vesting" :props="props">
             {{ getNextVestingText(props.row) }}
@@ -60,8 +60,24 @@
           </q-td>
           <q-td key="item_actions" :props="props">
             <div class="text-grey-8 q-gutter-xs">
-              <q-btn class="gt-xs" size="12px" flat dense round icon="edit" />
-              <q-btn size="12px" flat dense round icon="delete"> </q-btn>
+              <q-btn
+                class="gt-xs"
+                size="12px"
+                flat
+                dense
+                round
+                icon="edit"
+                @click.stop="() => $emit('edit-plan', props.row)"
+              />
+              <q-btn
+                size="12px"
+                flat
+                dense
+                round
+                icon="delete"
+                @click.stop="() => $emit('delete-plan', props.row)"
+              >
+              </q-btn>
             </div>
           </q-td>
         </q-tr>
@@ -85,6 +101,7 @@ import { columns } from './columns';
 
 export default defineComponent({
   name: 'StocksPlansList',
+  emits: ['delete-plan', 'edit-plan'],
   props: {
     plans: {
       type: Object as PropType<StocksPlan[]>,
@@ -93,7 +110,7 @@ export default defineComponent({
   },
   setup() {
     const formatDate = (date: number) => {
-      return DateAPI.formatDate(date, 'DD MMM YYYY');
+      return DateAPI.formatDate(date, 'DD MMM YY');
     };
 
     const getNextVestingText = ({

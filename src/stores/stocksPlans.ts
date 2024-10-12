@@ -67,7 +67,7 @@ const findNextVestingPeriod = (
   const { cliff, vestingMonthsInterval } = plan;
 
   const computedVestingPeriods =
-    vestedPeriods + (cliff ? 12 / vestingMonthsInterval : 0);
+    vestedPeriods + (cliff ? 12 / vestingMonthsInterval - 1 : 0);
 
   return computedVestingPeriods < vestingPeriods.length - 1
     ? vestingPeriods[computedVestingPeriods]

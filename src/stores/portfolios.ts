@@ -1,7 +1,12 @@
 import { defineStore } from 'pinia';
 import { holdingsTransformer } from 'app/shared/transformers';
 import portfolioAPI from 'src/service/portfolio';
-import { Deposit, Portfolio, PortfolioHistory } from 'app/shared/types';
+import {
+  Deposit,
+  Portfolio,
+  PortfolioHistory,
+  StocksPlan,
+} from 'app/shared/types';
 import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
 import { queries } from 'src/service/firebase/collections';
@@ -95,6 +100,7 @@ export const usePortfolioStore = defineStore('portfolios', {
             type: 'rsu',
             amount: 400,
             terminationDate: 1620000000000,
+            cliff: false,
           },
           {
             id: '2',
@@ -109,6 +115,7 @@ export const usePortfolioStore = defineStore('portfolios', {
             type: 'rsu',
             amount: 1000,
             terminationDate: 1620000000000,
+            cliff: false,
           },
           {
             id: '3',
@@ -208,6 +215,28 @@ export const usePortfolioStore = defineStore('portfolios', {
       }
 
       portfolio.deposits.splice(index, 1);
+
+      return portfolioAPI.update(portfolio, portfolio.id);
+    },
+    async updateStocksPlan(plan: StocksPlan, remove = false) {
+      const stocksPlansStore = useStocksPlansStore();
+
+      const portfolio = this.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      const filteredPlans = portfolio.stocksPlans?.filter(
+        (stocksPlan) => stocksPlan.identifier !== plan.identifier
+      );
+
+      portfolio.stocksPlans = [...(filteredPlans ?? [])];
+
+      if (!remove) {
+        portfolio.stocksPlans.push(plan);
+      }
+
+      await stocksPlansStore.setStocksPlans(portfolio.stocksPlans);
 
       return portfolioAPI.update(portfolio, portfolio.id);
     },

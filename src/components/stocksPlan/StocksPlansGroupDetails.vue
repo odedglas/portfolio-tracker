@@ -19,7 +19,11 @@
     </q-card-section>
 
     <q-card-section class="q-pt-none">
-      <stocks-plans-list :plans="plans" />
+      <stocks-plans-list
+        :plans="plans"
+        @delete-plan="(plan) => $emit('delete-plan', plan)"
+        @edit-plan="(plan) => $emit('edit-plan', plan)"
+      />
     </q-card-section>
   </q-card>
 </template>
@@ -33,6 +37,7 @@ import StocksPlansList from 'components/stocksPlan/StocksPlansList.vue';
 export default defineComponent({
   name: 'StocksPlansGroupDetails',
   components: { StocksPlansList, TickerLogo },
+  emits: ['delete-plan', 'edit-plan'],
   props: {
     plans: {
       type: Object as PropType<StocksPlan[]>,

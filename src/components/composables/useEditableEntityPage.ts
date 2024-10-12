@@ -22,7 +22,6 @@ export function useEditableEntityPage<T extends Entity>({
 
   const openEntityModal = async (entity?: T | undefined) => {
     const isEdit = !!entity?.id;
-
     if (isEdit) {
       editEntity.value = { ...(entity as UnwrapRef<T>) };
     }

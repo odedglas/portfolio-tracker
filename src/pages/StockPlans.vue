@@ -1,22 +1,44 @@
 <template>
   <q-page class="row justify-center q-pa-md">
     <div class="col-10 column stocks-plan-wrapper">
-      <p class="text-h5 q-mt-md q-mb-lg text-grey-7 dashboard-title">
-        {{ $t('stocks_plans.title') }}
-      </p>
+      <div class="q-mt-md q-mb-lg text-grey-7 plans-title">
+        <p class="text-h5">
+          {{ $t('stocks_plans.title') }}
+        </p>
 
-      <div class="plans-wrapper flex column" v-if="stocksPlansGroups">
+        <q-btn
+          flat
+          icon="add"
+          color="primary"
+          @click="() => openEntityModal(undefined)"
+          label="Add new Plan"
+        />
+      </div>
+
+      <div
+        class="plans-wrapper flex column"
+        v-if="Object.keys(stocksPlansGroups).length"
+      >
         <stocks-plans-group-details
           v-for="(plans, index) in stocksPlansGroups"
+          @delete-plan="deleteEntity"
+          @edit-plan="openEntityModal"
           :key="index"
           :plans="plans"
         />
       </div>
-
-      <div v-else class="q-pa-lg">
-        <p class="text-body1">No stocks plans were found...</p>
+      <div v-else>
+        <p class="text-body1">
+          No stocks plans were found... You can start by adding new one
+        </p>
       </div>
     </div>
+
+    <stocks-plan-dialog
+      :show="showModal"
+      @close="hideEntityModal"
+      :plan="editEntity"
+    />
   </q-page>
 </template>
 
@@ -25,18 +47,43 @@ import { computed, defineComponent } from 'vue';
 import groupBy from 'lodash/groupBy';
 import { useStocksPlansStore } from 'stores/stocksPlans';
 import StocksPlansGroupDetails from 'components/stocksPlan/StocksPlansGroupDetails.vue';
+import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
+import { StocksPlan } from 'app/shared/types';
+import StocksPlanDialog from 'components/stocksPlan/StocksPlanDialog.vue';
+import { usePortfolioStore } from 'stores/portfolios';
 
 export default defineComponent({
   name: 'StocksPlans',
-  components: { StocksPlansGroupDetails },
+  components: { StocksPlanDialog, StocksPlansGroupDetails },
   setup() {
+    const portfolioStore = usePortfolioStore();
     const stocksPlansStore = useStocksPlansStore();
+
+    const {
+      editEntity,
+      showModal,
+      openEntityModal,
+      hideEntityModal,
+      deleteEntity,
+    } = useEditableEntityPage<StocksPlan>({
+      deleteModal: {
+        title: 'Delete Stocks Plan',
+        message: (plan) =>
+          `Are you sure you want to delete the following stocks plan: ${plan.identifier} of "${plan.name}"?`,
+        callback: async (plan) => portfolioStore.updateStocksPlan(plan, true),
+      },
+    });
 
     const stocksPlansGroups = computed(() =>
       groupBy(stocksPlansStore.stocksPlans, 'ticker')
     );
 
     return {
+      editEntity,
+      showModal,
+      openEntityModal,
+      deleteEntity,
+      hideEntityModal,
       stocksPlansGroups,
     };
   },
@@ -44,7 +91,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.plans-wrapper {
-  gap: 24px;
+.stocks-plan-wrapper {
+  .plans-title {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .plans-wrapper {
+    gap: 24px;
+  }
 }
 </style>

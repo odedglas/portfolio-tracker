@@ -17,8 +17,6 @@ export const search = cachedOperation(
   (query: string) => `ticker-search-${query}`
 );
 
-console.log('******************', process.env.STOCKS_QUOTE_CACHE_TTL)
-
 export const getQuotes = cachedOperation(
   (tickers: string[]) =>
     stocksClient.getRequest<GetQuotesResponse>('market/v2/get-quotes', {
