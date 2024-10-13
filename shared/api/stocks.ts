@@ -8,6 +8,14 @@ const axiosInstance = axios.create({
   },
 });
 
+const featAndGreedInstance = axios.create({
+  baseURL: 'https://fear-and-greed-index.p.rapidapi.com',
+  headers: {
+    'X-RapidAPI-Key': process.env.RAPID_YAHOO_API_KEY,
+    'X-RapidAPI-Host': 'fear-and-greed-index.p.rapidapi.com',
+  },
+});
+
 const getRequest = async <Resolved>(
   url: string,
   params: object,
@@ -25,4 +33,5 @@ const getRequest = async <Resolved>(
 
 export const stocksClient = {
   getRequest,
+  getFearAndGreedIndex: () => featAndGreedInstance.get('/v1/fgi'),
 };

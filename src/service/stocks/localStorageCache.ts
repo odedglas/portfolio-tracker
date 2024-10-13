@@ -14,7 +14,7 @@ export const localStorageCache = {
     const result = localStorage.getItem(key);
 
     if (!result) {
-      throw new Error(`Cannot access localStorage item - ${key}`);
+      return undefined;
     }
 
     const { value, expiration, storedAt } = JSON.parse(result) as CacheItem;

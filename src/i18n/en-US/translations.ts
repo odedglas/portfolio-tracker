@@ -65,6 +65,22 @@ export const enUsMessages = {
       value: 'Current Value',
     },
   },
+  analytics: {
+    title: 'Analytics',
+  },
+  stocks_plans: {
+    title: 'Stocks Plans',
+    new: 'New Stocks Plan',
+    edit: 'Edit Plan',
+    search_plan: "Add a new grants stock plan by searching it's ticker",
+    rsu: 'RSU',
+    espp: 'ESPP',
+    esop: 'ESOP',
+    terminate_plan: 'Terminate Plan',
+    empty_plans:
+      'No stocks plans were found... You can start by adding new one',
+    add: 'Add new Plan',
+  },
   no_results: 'No results',
   cancel: 'Cancel',
   save: 'Save',
@@ -104,6 +120,11 @@ export const enUsCurrency = {
     minimumFractionDigits: 0,
   },
   fixed: {
+    style: 'decimal',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  },
+  fixedSensitive: {
     style: 'decimal',
     maximumFractionDigits: 2,
     minimumFractionDigits: 0,

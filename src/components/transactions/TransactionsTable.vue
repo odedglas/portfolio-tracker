@@ -236,7 +236,9 @@ export default defineComponent({
       }, 0)
     );
 
-    const isEmpty = computed(() => transactions.value.length === 0);
+    const isEmpty = computed(() => {
+      return transactions.value.length === 0;
+    });
 
     const summaryToClassMap = {
       buy: 'text-green-6',

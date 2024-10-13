@@ -1,10 +1,17 @@
+import omit from 'lodash/omit';
 import { defineStore } from 'pinia';
 import { holdingsTransformer } from 'app/shared/transformers';
 import portfolioAPI from 'src/service/portfolio';
-import { Deposit, Portfolio, PortfolioHistory } from 'app/shared/types';
+import {
+  Deposit,
+  Portfolio,
+  PortfolioHistory,
+  StocksPlan,
+} from 'app/shared/types';
 import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
 import { queries } from 'src/service/firebase/collections';
+import { useStocksPlansStore } from 'stores/stocksPlans';
 
 const selectedPortfolioStorageKey = 'selected_portfolio_id';
 
@@ -67,6 +74,7 @@ export const usePortfolioStore = defineStore('portfolios', {
   actions: {
     async selectPortfolio(portfolioId: string) {
       const transactionsStore = useTransactionsStore();
+      const stocksPlansStore = useStocksPlansStore();
       localStorage.setItem(selectedPortfolioStorageKey, portfolioId);
 
       this.selectedPortfolioId = portfolioId;
@@ -75,7 +83,12 @@ export const usePortfolioStore = defineStore('portfolios', {
       this.history = (await queries.getPortfolioHistory(portfolioId)).sort(
         (a, b) => a.date - b.date
       );
+
       await transactionsStore.list(portfolioId);
+
+      await stocksPlansStore.setStocksPlans(
+        this.selectedPortfolio?.stocksPlans ?? []
+      );
     },
     async list() {
       const persisted = localStorage.getItem(selectedPortfolioStorageKey);
@@ -154,6 +167,37 @@ export const usePortfolioStore = defineStore('portfolios', {
       }
 
       portfolio.deposits.splice(index, 1);
+
+      return portfolioAPI.update(portfolio, portfolio.id);
+    },
+    async updateStocksPlan(plan: StocksPlan, remove = false) {
+      const rawPlan = omit(plan, [
+        'lastVested',
+        'nextVesting',
+        'sellableValue',
+        'potentialValue',
+        'vestedPeriods',
+        'vestingPeriods',
+      ]);
+
+      const stocksPlansStore = useStocksPlansStore();
+
+      const portfolio = this.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      const filteredPlans = portfolio.stocksPlans?.filter(
+        (stocksPlan) => stocksPlan.identifier !== plan.identifier
+      );
+
+      portfolio.stocksPlans = [...(filteredPlans ?? [])];
+
+      if (!remove) {
+        portfolio.stocksPlans.push(rawPlan as StocksPlan);
+      }
+
+      await stocksPlansStore.setStocksPlans(portfolio.stocksPlans);
 
       return portfolioAPI.update(portfolio, portfolio.id);
     },

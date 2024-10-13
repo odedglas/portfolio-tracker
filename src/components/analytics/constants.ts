@@ -9,8 +9,9 @@ export type Option = {
 
 export const benchmarkOptions: Option[] = [
   { label: 'S&P 500', value: 'SPY', order: 1 },
-  { label: 'NASDAQ 100', value: 'QQQ', order: 2 },
-  { label: 'RUSSEL 2000', value: 'IWM', order: 3 },
+  { label: 'Nasdaq 100', value: 'QQQ', order: 2 },
+  { label: 'Russel 2000', value: 'IWM', order: 3 },
+  { label: 'Dow Jones', value: 'DIA', order: 4 },
 ];
 
 export const timeRangeOptions: Option[] = [

@@ -7,10 +7,16 @@ export const getCollection = async <Entity>(
   const collectionRef = getFirestore().collection(collection);
   const querySnapshot = await collectionRef.get();
 
-  return querySnapshot.docs.map((doc) => doc.data() as Entity);
+  return querySnapshot.docs.map(
+    (doc) =>
+      ({
+        ...doc.data(),
+        id: doc.id,
+      } as Entity)
+  );
 };
 
-export const saveDocument = async <Entity extends object>(
+export const saveDocuments = async <Entity extends object>(
   collection: AppCollectionsNames,
   entities: Entity[]
 ) => {
@@ -18,5 +24,16 @@ export const saveDocument = async <Entity extends object>(
 
   entities.forEach(async (entity) => {
     await collectionRef.add(entity);
+  });
+};
+
+export const updateDocuments = async <Entity extends { id: string }>(
+  collection: AppCollectionsNames,
+  entities: Entity[]
+) => {
+  const collectionRef = getFirestore().collection(collection);
+
+  entities.forEach(async (entity) => {
+    await collectionRef.doc(entity.id).update(entity);
   });
 };

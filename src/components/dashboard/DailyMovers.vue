@@ -4,71 +4,75 @@
       <q-icon name="timeline" class="text-grey-6 q-mr-sm" size="sm" />
       <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
     </q-card-section>
-    <q-card-section>
-      <swiper :slides-per-view="9" :vertical="true" :space-between="16">
-        <swiper-slide
-          v-for="holding in sortedHoldings"
-          :key="holding.id"
-          class="daily-item-wrapper"
-        >
-          <div
-            class="daily-mover-item q-pb-none flex column items-center text-center"
-          >
-            <span class="flex items-center">
-              <ticker-logo
-                :ticker="holding.ticker"
-                :logo-image="holding.logoImage"
-                class="q-mr-xs"
-                :size="20"
-              />
-              <span class="text-caption text-bold text-grey-9">{{
-                holding.ticker
-              }}</span>
-            </span>
-            <span class="text-caption text-grey-9 q-mt-xs">
-              {{ $n(getTickerLastPrice(holding), 'noneSensitiveDecimal') }}
-            </span>
-            <profit-indicator
-              class="text-caption text-bold"
-              :percentage="holding.dailyChange.percent"
-              :display-as-row="false"
-            />
-          </div>
-        </swiper-slide>
-      </swiper>
+    <q-card-section class="q-py-sm">
+      <p class="text-caption text-grey-8 q-mb-sm">Portfolio:</p>
+      <daily-movers-swiper :movers="viewHoldings" />
+    </q-card-section>
+    <q-card-section class="q-py-sm">
+      <p class="text-caption text-grey-8 q-mb-sm">Market:</p>
+      <daily-movers-swiper :movers="benchmarks" :show-logo="false" />
     </q-card-section>
   </q-card>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import { Swiper, SwiperSlide } from 'swiper/vue';
+import { defineComponent, computed, ref, onMounted } from 'vue';
 import { useHoldingsStore } from 'stores/holdings';
-import TickerLogo from 'components/common/TickerLogo.vue';
-import 'swiper/css';
-import ProfitIndicator from 'components/common/ProfitIndicator.vue';
+import DailyMoversSwiper from 'components/dashboard/DailyMoversSwiper.vue';
 import { useQuotesStore } from 'stores/quotes';
-import { Holding } from 'app/shared/types';
+
+import 'swiper/css';
+import { dailyMoversBenchmarks } from './constants';
+import { getQuotes } from 'src/service/stocks';
+
+const benchmarkDefaults = dailyMoversBenchmarks.map((opt) => ({
+  ...opt,
+  lastPrice: 0,
+  dailyChangePercent: 0,
+}));
+
 export default defineComponent({
   name: 'DailyMovers',
-  components: { ProfitIndicator, TickerLogo, Swiper, SwiperSlide },
+  components: { DailyMoversSwiper },
   setup() {
+    const benchmarks = ref(benchmarkDefaults);
     const holdingsStore = useHoldingsStore();
     const quotes = useQuotesStore();
 
-    const sortedHoldings = computed(() =>
-      [...holdingsStore.portfolioHoldings].sort(
-        (a, b) => b.dailyChange.percent - a.dailyChange.percent
-      )
+    const viewHoldings = computed(() =>
+      [...holdingsStore.portfolioHoldings]
+        .map((holding) => ({
+          ...holding,
+          dailyChangePercent: holding.dailyChange.percent,
+          lastPrice:
+            quotes.tickerQuotes[holding.ticker]?.regularMarketPrice ?? 0,
+        }))
+        .sort((a, b) => b.dailyChange.percent - a.dailyChange.percent)
     );
 
-    const getTickerLastPrice = (holding: Holding) =>
-      quotes.tickerQuotes[holding.ticker]?.regularMarketPrice ?? 0;
+    onMounted(async () => {
+      const { quoteResponse } = await getQuotes(
+        benchmarks.value.map((b) => b.ticker)
+      );
+
+      benchmarks.value = benchmarks.value.map((b) => {
+        const matchingQuote = quoteResponse.result.find(
+          (quote) => quote.symbol === b.ticker
+        );
+
+        return {
+          ...b,
+          lastPrice: matchingQuote?.regularMarketPrice ?? 0,
+          dailyChangePercent:
+            (matchingQuote?.regularMarketChangePercent ?? 0) / 100,
+        };
+      });
+    });
 
     return {
       holdingsStore,
-      sortedHoldings,
-      getTickerLastPrice,
+      viewHoldings,
+      benchmarks,
     };
   },
 });

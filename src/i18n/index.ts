@@ -1,4 +1,4 @@
-import { enUsMessages, enUsCurrency } from './en-US';
+import { enUsMessages, enUsCurrency } from './en-US/translations';
 
 export const messages = {
   'en-US': enUsMessages,

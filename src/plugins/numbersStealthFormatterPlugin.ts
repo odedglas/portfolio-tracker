@@ -19,7 +19,10 @@ export const formatterStealthInterceptor =
     );
 
     if (featuresStore.stealthMode && !isNoneSensitiveFormat) {
-      return '$----'; // Return placeholder when stealth mode is enabled
+      const prefix =
+        typeof format === 'string' && format.includes('fixed') ? '' : '$';
+
+      return `${prefix}----`; // Return placeholder when stealth mode is enabled
     }
 
     // Otherwise, call the original formatter

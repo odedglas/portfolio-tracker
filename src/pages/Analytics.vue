@@ -1,7 +1,9 @@
 <template>
   <q-page class="row justify-center q-pa-md">
     <div class="col-10 column analytics-page-wrapper">
-      <p class="text-h5 q-mb-none text-grey-7 dashboard-title">Analytics</p>
+      <p class="text-h5 q-mb-none text-grey-7 dashboard-title">
+        {{ $t('analytics.title') }}
+      </p>
       <div class="analytics-kpis-wrapper">
         <dashboard-kpi
           v-for="kpi in kpis"

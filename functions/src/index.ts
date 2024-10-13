@@ -3,6 +3,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { portfolioHistoryTracker } from './portfolioHistoryTracker';
+import { migrations } from './migrations';
 
 admin.initializeApp();
 
@@ -11,9 +12,19 @@ export const manualPortfolioTracker = onRequest(
   async (_request, response) => {
     await portfolioHistoryTracker(true);
 
-    response.send('Hello from Firebase!');
+    response.send({ success: true });
   }
 );
+
+export const migrationsRunner = onRequest(async (request, response) => {
+  const { name, dryRun = 'true' } = request.query;
+
+  logger.info('Running migration', { name, dryRun });
+
+  await migrations(name as string, dryRun === 'true');
+
+  response.send({ success: true });
+});
 
 export const portfolioScheduler = onSchedule(
   {

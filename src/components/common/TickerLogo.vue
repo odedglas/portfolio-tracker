@@ -2,19 +2,22 @@
   <div class="row items-center">
     <img
       v-if="logoImage"
-      :width="size"
-      :height="size"
       :src="logoImage"
+      :style="computedStyle"
       :alt="ticker"
     />
-    <div class="empty-logo-alt flex items-center justify-center" v-else>
+    <div
+      class="empty-logo-alt flex items-center justify-center"
+      :style="computedStyle"
+      v-else
+    >
       <span class="ticker">{{ ticker }}</span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'TickerLogo',
@@ -26,14 +29,23 @@ export default defineComponent({
     },
     size: { type: Number, default: 35 },
   },
+  setup(props) {
+    const computedStyle = computed(() => ({
+      borderRadius: '50%',
+      width: `${props.size}px`,
+      height: `${props.size}px`,
+    }));
+
+    return {
+      computedStyle,
+    };
+  },
 });
 </script>
 
 <style lang="scss">
 .empty-logo-alt {
-  height: 35px;
-  width: 35px;
-  border-radius: 5px;
+  border-radius: 50%;
   background-color: #f3f6f9;
   background-size: cover;
 
