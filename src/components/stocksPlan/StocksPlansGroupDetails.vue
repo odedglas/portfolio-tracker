@@ -12,7 +12,7 @@
         </q-item-section>
         <q-item-section side class="flex row">
           <q-item-label class="text-subtitle1 text-black">
-            Value: {{ $n(plansTotal.total, 'currency') }}
+            Potential value: {{ $n(plansTotal.total, 'currency') }}
           </q-item-label>
         </q-item-section>
       </q-item>

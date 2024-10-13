@@ -1,7 +1,7 @@
 <template>
   <q-page class="row justify-center q-pa-md">
-    <div class="col-10 column stocks-plan-wrapper">
-      <div class="q-mt-md q-mb-lg text-grey-7 plans-title">
+    <div class="col-10 column stocks-plan-wrapper q-py-md">
+      <div class="q-mb-lg text-grey-7 plans-title">
         <p class="text-h5">
           {{ $t('stocks_plans.title') }}
         </p>
@@ -11,7 +11,7 @@
           icon="add"
           color="primary"
           @click="() => openEntityModal(undefined)"
-          label="Add new Plan"
+          :label="$t('stocks_plans.add')"
         />
       </div>
 
@@ -29,7 +29,7 @@
       </div>
       <div v-else>
         <p class="text-body1">
-          No stocks plans were found... You can start by adding new one
+          {{ $t('stocks_plans.empty_plans') }}
         </p>
       </div>
     </div>

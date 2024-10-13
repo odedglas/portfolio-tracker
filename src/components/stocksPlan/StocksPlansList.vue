@@ -12,11 +12,18 @@
       <template v-slot:body="props">
         <q-tr
           :props="props"
-          @click="props.expand = !props.expand"
-          class="clickable"
+          @click="
+            () => {
+              if (hasVestingPeriodsPlan(props.row)) {
+                props.expand = !props.expand;
+              }
+            }
+          "
+          :class="`${hasVestingPeriodsPlan(props.row) ? 'clickable' : ''}`"
         >
           <q-td key="row_expand" auto-width>
             <q-btn
+              v-if="hasVestingPeriodsPlan(props.row)"
               size="md"
               round
               dense
@@ -57,7 +64,7 @@
             {{ $n(props.row.sellableValue, 'decimal') }}
           </q-td>
           <q-td key="total_value" :props="props">
-            {{ $n(props.row.potentialValue, 'decimal') }}
+            {{ $n(props.row.sellableValue ?? 0, 'currency') }}
           </q-td>
           <q-td key="item_actions" :props="props">
             <div class="text-grey-8 q-gutter-xs">
@@ -82,11 +89,9 @@
             </div>
           </q-td>
         </q-tr>
-        <q-tr v-show="props.expand" :props="props">
+        <q-tr v-if="props.expand" :props="props">
           <q-td colspan="100%">
-            <div class="text-left">
-              This is expand slot for row above: {{ props.row.name }}.
-            </div>
+            <stocks-plan-extended-details :plan="props.row" />
           </q-td>
         </q-tr>
       </template>
@@ -99,9 +104,11 @@ import { date as DateAPI } from 'quasar';
 import { defineComponent, PropType } from 'vue';
 import { StocksPlan } from 'app/shared/types';
 import { columns } from './columns';
+import StocksPlanExtendedDetails from 'components/stocksPlan/StocksPlanExtendedDetails.vue';
 
 export default defineComponent({
   name: 'StocksPlansList',
+  components: { StocksPlanExtendedDetails },
   emits: ['delete-plan', 'edit-plan'],
   props: {
     plans: {
@@ -119,7 +126,12 @@ export default defineComponent({
       amount,
       terminationDate,
       nextVesting,
+      type,
     }: StocksPlan) => {
+      if (type === 'espp') {
+        return '----';
+      }
+
       if (amount === vested) {
         return 'Fully vested';
       }
@@ -147,11 +159,16 @@ export default defineComponent({
       return '---';
     };
 
+    const hasVestingPeriodsPlan = (plan: StocksPlan) => {
+      return plan.type !== 'espp';
+    };
+
     return {
       columns,
       formatDate,
       getNextVestingText,
       getLastVestedText,
+      hasVestingPeriodsPlan,
     };
   },
 });

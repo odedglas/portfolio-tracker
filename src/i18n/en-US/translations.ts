@@ -77,6 +77,9 @@ export const enUsMessages = {
     espp: 'ESPP',
     esop: 'ESOP',
     terminate_plan: 'Terminate Plan',
+    empty_plans:
+      'No stocks plans were found... You can start by adding new one',
+    add: 'Add new Plan',
   },
   no_results: 'No results',
   cancel: 'Cancel',

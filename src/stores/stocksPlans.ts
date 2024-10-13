@@ -3,6 +3,11 @@ import { defineStore } from 'pinia';
 import { StocksPlan } from 'app/shared/types';
 import { getQuotes } from 'src/service/stocks';
 
+const getCliffDate = ({ cliff, grantDate }: StocksPlan) =>
+  DateAPI.addToDate(new Date(grantDate), {
+    years: cliff ? 1 : 0,
+  }).getTime();
+
 const calculateStocksPlanVestingPeriods = (plan: StocksPlan) => {
   const { grantDate, vestingEndDate, vestingMonthsInterval } = plan;
 
@@ -44,18 +49,29 @@ const isVestedPeriod = (
   return Date.now() >= periodDate;
 };
 
+const canPeriodBeVested = (
+  periodDate: number,
+  cliffDate: number,
+  terminationDate: number | undefined
+) => {
+  if (terminationDate && periodDate > terminationDate) {
+    return false;
+  }
+
+  // If not terminated, determined by rather period date is before cliff date.
+  return periodDate >= cliffDate;
+};
+
 const calculateStocksPlanVestedPeriods = (
   plan: StocksPlan,
   vestingPeriods: number[]
 ) => {
-  const { grantDate, cliff, terminationDate } = plan;
+  const { terminationDate } = plan;
 
-  const cliffDate = DateAPI.addToDate(new Date(grantDate), {
-    years: cliff ? 1 : 0,
-  });
+  const cliffDate = getCliffDate(plan);
 
   return vestingPeriods.filter((periodDate) =>
-    isVestedPeriod(cliffDate.getTime(), terminationDate, periodDate)
+    isVestedPeriod(cliffDate, terminationDate, periodDate)
   ).length;
 };
 
@@ -91,6 +107,38 @@ const calculateVestedShares = (
     : 0;
 };
 
+export const buildVestingPeriodsDetails = (plan: StocksPlan) => {
+  const { vestingPeriods = [], amount, terminationDate } = plan;
+  const vestingPeriodsAmount = vestingPeriods.length;
+  const cliffDate = getCliffDate(plan);
+
+  let carriedAmount = 0;
+  let totalVested = 0;
+  return vestingPeriods.map((period) => {
+    const canBeVested = canPeriodBeVested(period, cliffDate, terminationDate);
+    let periodAmount =
+      vestingPeriodsAmount > 0
+        ? Math.floor(amount / vestingPeriodsAmount)
+        : amount;
+
+    if (!canBeVested) {
+      carriedAmount += periodAmount;
+    } else {
+      periodAmount += carriedAmount;
+      totalVested += periodAmount;
+
+      carriedAmount = 0;
+    }
+
+    return {
+      period,
+      disabled: !canBeVested,
+      amount: canBeVested ? periodAmount : 0,
+      totalVested,
+    };
+  });
+};
+
 export const useStocksPlansStore = defineStore('stocksPlans', {
   state: (): { stocksPlans: StocksPlan[] } => ({
     stocksPlans: [],
@@ -101,7 +149,6 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
         plans.map((plan) => plan.ticker)
       );
 
-      debugger;
       this.stocksPlans = plans.map((plan) => {
         const planQuote = quoteResponse.result.find(
           (quote) => quote.symbol === plan.ticker
@@ -127,8 +174,11 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           vestedPeriods
         );
 
+        const potentialAmount = plan.terminationDate
+          ? vestedShares
+          : plan.amount;
         const potentialValue = planQuote
-          ? planQuote.regularMarketPrice * plan.amount
+          ? planQuote.regularMarketPrice * potentialAmount
           : 0;
         const sellableValue = planQuote
           ? planQuote.regularMarketPrice * vestedShares
