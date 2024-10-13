@@ -40,7 +40,7 @@
             </div>
           </q-td>
           <q-td key="grant_date" :props="props">
-            {{ formatDate(props.row.grantDate) }}
+            {{ formatPlanDate(props.row.grantDate) }}
           </q-td>
           <q-td key="grant_price" :props="props">
             {{ $n(props.row.grantPrice, 'decimal') }}
@@ -90,7 +90,7 @@
           </q-td>
         </q-tr>
         <q-tr v-if="props.expand" :props="props">
-          <q-td colspan="100%">
+          <q-td colspan="100%" class="expanded-cell">
             <stocks-plan-extended-details :plan="props.row" />
           </q-td>
         </q-tr>
@@ -100,9 +100,9 @@
 </template>
 
 <script lang="ts">
-import { date as DateAPI } from 'quasar';
 import { defineComponent, PropType } from 'vue';
 import { StocksPlan } from 'app/shared/types';
+import { formatPlanDate } from 'src/service/date';
 import { columns } from './columns';
 import StocksPlanExtendedDetails from 'components/stocksPlan/StocksPlanExtendedDetails.vue';
 
@@ -117,10 +117,6 @@ export default defineComponent({
     },
   },
   setup() {
-    const formatDate = (date: number) => {
-      return DateAPI.formatDate(date, 'DD MMM YY');
-    };
-
     const getNextVestingText = ({
       vested,
       amount,
@@ -140,7 +136,7 @@ export default defineComponent({
         return 'Terminated Plan';
       }
 
-      return nextVesting ? formatDate(nextVesting) : '---';
+      return nextVesting ? formatPlanDate(nextVesting) : '---';
     };
 
     const getLastVestedText = ({
@@ -149,11 +145,11 @@ export default defineComponent({
       lastVested,
     }: StocksPlan) => {
       if (grantDate === vestingEndDate) {
-        return formatDate(grantDate);
+        return formatPlanDate(grantDate);
       }
 
       if (lastVested) {
-        return formatDate(lastVested);
+        return formatPlanDate(lastVested);
       }
 
       return '---';
@@ -165,7 +161,7 @@ export default defineComponent({
 
     return {
       columns,
-      formatDate,
+      formatPlanDate,
       getNextVestingText,
       getLastVestedText,
       hasVestingPeriodsPlan,
@@ -191,6 +187,12 @@ export default defineComponent({
 
     &.expanded {
       transform: rotate(180deg);
+    }
+  }
+
+  .expanded-cell {
+    &:before {
+      background: transparent;
     }
   }
 }

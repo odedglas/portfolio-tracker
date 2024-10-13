@@ -1,13 +1,18 @@
 <template>
-  <p class="text-subtitle1">{{ plan.name }} - {{ plan.identifier }}</p>
-
+  <div class="row items-center justify-between">
+    <p class="text-subtitle1 text-bold">
+      {{ plan.name }} - {{ plan.identifier }}
+    </p>
+    <p class="text-caption" v-if="plan.entitlement102Date">
+      102 Entitlement Date: {{ formatPlanDate(plan.entitlement102Date) }}
+    </p>
+  </div>
   <div class="row">
     <vesting-periods-list :plan="plan" />
-    <div>
-      Vesting Graph
+    <div class="col-3 q-pa-md">
       <apexchart
         chart="radialProgress"
-        height="350"
+        height="300"
         :options="planVestingPercentChartOptions"
         :series="planVestingPercentChartOptions.series"
       ></apexchart>
@@ -19,6 +24,7 @@
 import { computed, defineComponent, PropType } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { StocksPlan } from 'app/shared/types';
+import { formatPlanDate } from 'src/service/date';
 import VestingPeriodsList from 'components/stocksPlan/VestingPeriodsList.vue';
 
 export default defineComponent({
@@ -42,7 +48,7 @@ export default defineComponent({
 
       return {
         chart: {
-          height: 350,
+          height: 300,
           type: 'radialBar',
         },
         series: [vestingPercent],
@@ -51,15 +57,11 @@ export default defineComponent({
     });
 
     return {
+      formatPlanDate,
       planVestingPercentChartOptions,
     };
   },
 });
 </script>
 
-<style lang="scss">
-.plan-extended-details {
-  max-height: 250px;
-  overflow: scroll;
-}
-</style>
+<style lang="scss"></style>

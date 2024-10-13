@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <p class="text-caption">Vesting periods:</p>
+  <div class="col">
+    <p class="text-caption">Vesting details:</p>
 
     <div class="row q-px-md items-center">
       <span class="col text-caption" v-for="header in headers" :key="header">
@@ -15,11 +15,11 @@
       >
         <span class="col flex items-center">#{{ index + 1 }}</span>
         <span class="col flex items-center">{{ details.date }}</span>
-        <span class="col flex items-center justify-center">{{
-          details.amount
+        <span class="col flex items-center">{{
+          $n(details.amount, 'fixedSensitive')
         }}</span>
-        <span class="col flex items-center justify-center text-bold">{{
-          details.totalVested
+        <span class="col flex items-centertext-bold">{{
+          $n(details.totalVested, 'fixedSensitive')
         }}</span>
       </q-item>
     </q-list>
@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
-import { date as DateAPI } from 'quasar';
+import { formatPlanDate } from 'src/service/date';
 import { StocksPlan } from 'app/shared/types';
 import { buildVestingPeriodsDetails } from 'stores/stocksPlans';
 
@@ -42,9 +42,6 @@ export default defineComponent({
   },
   setup(props) {
     const headers = ['#', 'Date', 'Amount', 'Total Vested'];
-    const formatDate = (date: number) => {
-      return DateAPI.formatDate(date, 'DD MMM YY');
-    };
 
     const vestingPeriodsDetails = computed(() => {
       const vestingPeriods = buildVestingPeriodsDetails(props.plan);
@@ -52,7 +49,7 @@ export default defineComponent({
       if (props.plan.grantDate === props.plan.vestingEndDate) {
         return [
           {
-            date: formatDate(props.plan.grantDate),
+            date: formatPlanDate(props.plan.grantDate),
             amount: props.plan.amount,
             totalVested: props.plan.amount,
           },
@@ -63,13 +60,12 @@ export default defineComponent({
         .filter((details) => !details.disabled)
         .map((details) => ({
           ...details,
-          date: formatDate(details.period),
+          date: formatPlanDate(details.period),
         }));
     });
 
     return {
       headers,
-      formatDate,
       vestingPeriodsDetails,
     };
   },
@@ -78,7 +74,7 @@ export default defineComponent({
 
 <style lang="scss">
 .vesting-periods-list {
-  max-height: 250px;
+  max-height: 210px;
   min-width: 350px;
   overflow: scroll;
 

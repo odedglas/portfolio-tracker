@@ -63,6 +63,7 @@ export type StocksPlan = Entity & {
   vested?: number;
   potentialValue?: number;
   sellableValue?: number;
+  entitlement102Date?: number;
 };
 
 export type Portfolio = Entity &

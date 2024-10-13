@@ -184,6 +184,10 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           ? planQuote.regularMarketPrice * vestedShares
           : 0;
 
+        const entitlement102Date = DateAPI.addToDate(plan.grantDate, {
+          years: 2,
+        }).getTime();
+
         return {
           ...plan,
           vestingPeriods,
@@ -193,6 +197,7 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           vested: vestedShares,
           potentialValue,
           sellableValue,
+          entitlement102Date,
         };
       });
     },

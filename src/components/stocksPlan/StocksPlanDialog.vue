@@ -90,7 +90,7 @@
                     transition-show="scale"
                     transition-hide="scale"
                   >
-                    <q-date v-model="formattedGrantDate" mask="DD MMM YY">
+                    <q-date v-model="formattedGrantDate" mask="MMM D, YYYY">
                       <div class="row items-center justify-end">
                         <q-btn
                           v-close-popup
@@ -162,10 +162,11 @@ import {
   Ref,
   watch,
 } from 'vue';
-import { date as dateUtils, useQuasar } from 'quasar';
+import { useQuasar, date as dateUtils } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { useLoadingStore } from 'stores/loading';
 import { StocksPlan } from 'app/shared/types';
+import { formatPlanDate } from 'src/service/date';
 import TickerSearch, { TickerOption } from 'components/common/TickerSearch.vue';
 import { usePortfolioStore } from 'stores/portfolios';
 
@@ -224,7 +225,7 @@ export default defineComponent({
 
         if (!grantDate) return undefined;
 
-        return dateUtils.formatDate(localPlan.value.grantDate, 'DD MMM YY');
+        return formatPlanDate(localPlan.value.grantDate);
       },
       set: (date: string) => {
         localPlan.value.grantDate = new Date(date).getTime();
