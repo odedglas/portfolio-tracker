@@ -170,7 +170,6 @@ export const computePlanOrderGains = (
   const { type, terminationDate } = plan;
   const { date: orderDate, price: orderPrice, shares } = order;
 
-  debugger;
   const isTerminated = terminationDate ? orderDate > terminationDate : false;
   const isAbove102Entitlement = orderDate > entitlement102Date;
 
