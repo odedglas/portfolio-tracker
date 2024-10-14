@@ -1,7 +1,5 @@
 <template>
   <div class="col">
-    <p class="text-caption">Vesting details:</p>
-
     <div class="row q-px-md items-center">
       <span class="col text-caption" v-for="header in headers" :key="header">
         {{ header }}</span
@@ -30,7 +28,7 @@
 import { computed, defineComponent, PropType } from 'vue';
 import { formatPlanDate } from 'src/service/date';
 import { StocksPlan } from 'app/shared/types';
-import { buildVestingPeriodsDetails } from 'stores/stocksPlans';
+import { buildVestingPeriodsDetails } from 'src/service/stocksPlans';
 
 export default defineComponent({
   name: 'VestingPeriodsList',
