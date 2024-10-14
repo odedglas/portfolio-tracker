@@ -1,7 +1,7 @@
 export const FONT_FAMILY = 'inherit';
 
 export const COLOR_PALLET = [
-  '#EC407A',
+  '#855866',
   '#AB47BC',
   '#7E57C2',
   '#5C6BC0',

@@ -2,152 +2,13 @@ import { date as DateAPI } from 'quasar';
 import { defineStore } from 'pinia';
 import { StocksPlan } from 'app/shared/types';
 import { getQuotes } from 'src/service/stocks';
-
-const getCliffDate = ({ cliff, grantDate }: StocksPlan) =>
-  DateAPI.addToDate(new Date(grantDate), {
-    years: cliff ? 1 : 0,
-  }).getTime();
-
-const calculateStocksPlanVestingPeriods = (plan: StocksPlan) => {
-  const { grantDate, vestingEndDate, vestingMonthsInterval } = plan;
-
-  // Creates an array of vesting dates according to grantDate / endDate and vesting interval
-  const vestingPeriods = [];
-
-  let current = grantDate;
-  while (current < vestingEndDate) {
-    const nextVesting = DateAPI.addToDate(new Date(current), {
-      months: vestingMonthsInterval,
-    }).getTime();
-
-    // Adds the next vesting period if it's in valid range of vesting end date.
-    if (nextVesting <= vestingEndDate) {
-      vestingPeriods.push(nextVesting);
-    }
-    current = nextVesting;
-  }
-
-  return vestingPeriods;
-};
-
-const isVestedPeriod = (
-  cliffDate: number,
-  terminationDate: number | undefined,
-  periodDate: number
-) => {
-  const isCliffActive = Date.now() < cliffDate;
-
-  // Period is under a cliff constraint
-  if (isCliffActive && periodDate <= cliffDate) {
-    return false;
-  }
-
-  // Period is after termination date
-  if (terminationDate && periodDate > terminationDate) {
-    return false;
-  }
-
-  // Rather period is vested
-  return Date.now() >= periodDate;
-};
-
-const canPeriodBeVested = (
-  periodDate: number,
-  cliffDate: number,
-  terminationDate: number | undefined
-) => {
-  if (terminationDate && periodDate > terminationDate) {
-    return false;
-  }
-
-  // If not terminated, determined by rather period date is before cliff date.
-  return periodDate >= cliffDate;
-};
-
-const calculateStocksPlanVestedPeriods = (
-  plan: StocksPlan,
-  vestingPeriods: number[]
-) => {
-  const { terminationDate } = plan;
-
-  const cliffDate = getCliffDate(plan);
-
-  return vestingPeriods.filter((periodDate) =>
-    isVestedPeriod(cliffDate, terminationDate, periodDate)
-  ).length;
-};
-
-const findNextVestingPeriod = (
-  plan: StocksPlan,
-  vestingPeriods: number[],
-  vestedPeriods: number
-) => {
-  const { vestingMonthsInterval } = plan;
-  const cliffDate = getCliffDate(plan);
-  const isCliffActive = Date.now() < cliffDate;
-
-  const computedVestingPeriods =
-    vestedPeriods + (isCliffActive ? 12 / vestingMonthsInterval - 1 : 0);
-
-  return computedVestingPeriods < vestingPeriods.length - 1
-    ? vestingPeriods[computedVestingPeriods]
-    : undefined;
-};
-
-const calculateVestedShares = (
-  plan: StocksPlan,
-  vestingPeriods: number[],
-  vestedPeriods: number
-) => {
-  const { grantDate, vestingEndDate, amount } = plan;
-
-  if (grantDate === vestingEndDate) {
-    // Means its granted as fully vested.
-    return amount;
-  }
-
-  return vestedPeriods > 0
-    ? Math.floor(amount * (vestedPeriods / vestingPeriods.length))
-    : 0;
-};
-
-export const buildVestingPeriodsDetails = (plan: StocksPlan) => {
-  const { vestingPeriods = [], amount, terminationDate } = plan;
-  const vestingPeriodsAmount = vestingPeriods.length;
-  const cliffDate = getCliffDate(plan);
-
-  let carriedAmount = 0;
-  let totalVested = 0;
-  return vestingPeriods.map((period, index) => {
-    const isLast = index === vestingPeriodsAmount - 1;
-    const canBeVested = canPeriodBeVested(period, cliffDate, terminationDate);
-
-    let periodAmount =
-      vestingPeriodsAmount > 0 ? amount / vestingPeriodsAmount : amount;
-
-    if (!canBeVested) {
-      carriedAmount += periodAmount;
-    } else {
-      periodAmount += carriedAmount;
-      totalVested += periodAmount;
-
-      carriedAmount = 0;
-    }
-
-    if (isLast && totalVested <= amount) {
-      const delta = amount - totalVested;
-      totalVested += delta;
-      periodAmount += delta;
-    }
-
-    return {
-      period,
-      disabled: !canBeVested,
-      amount: canBeVested ? Math.floor(periodAmount) : 0,
-      totalVested: Math.round(totalVested),
-    };
-  });
-};
+import {
+  calculateStocksPlanVestedPeriods,
+  calculateStocksPlanVestingPeriods,
+  calculateVestedShares,
+  findNextVestingPeriod,
+  computePlanOrders,
+} from 'src/service/stocksPlans';
 
 export const useStocksPlansStore = defineStore('stocksPlans', {
   state: (): { stocksPlans: StocksPlan[] } => ({
@@ -184,20 +45,28 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           vestedPeriods
         );
 
-        const potentialAmount = plan.terminationDate
-          ? vestedShares
-          : plan.amount;
-        const potentialValue = planQuote
-          ? planQuote.regularMarketPrice * potentialAmount
-          : 0;
-        const sellableValue = planQuote
-          ? planQuote.regularMarketPrice * vestedShares
-          : 0;
-
         const entitlement102Date = DateAPI.addToDate(plan.grantDate, {
           years: 2,
           days: 1,
         }).getTime();
+        const planOrders = computePlanOrders(plan, entitlement102Date);
+
+        const soldShares = planOrders.reduce(
+          (acc, order) => acc + order.shares,
+          0
+        );
+        const planShares = plan.amount - soldShares;
+        const availableShares = vestedShares - soldShares;
+
+        const potentialAmount = plan.terminationDate
+          ? availableShares
+          : planShares;
+        const potentialValue = planQuote
+          ? planQuote.regularMarketPrice * potentialAmount
+          : 0;
+        const sellableValue = planQuote
+          ? planQuote.regularMarketPrice * availableShares
+          : 0;
 
         return {
           ...plan,
@@ -208,7 +77,9 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           vested: vestedShares,
           potentialValue,
           sellableValue,
+          soldShares,
           entitlement102Date,
+          orders: planOrders,
         };
       });
     },

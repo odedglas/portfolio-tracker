@@ -75,7 +75,6 @@
             <q-input
               class="col"
               v-model="formattedGrantDate"
-              dense
               label="Granting Date"
               lazy-rules
               :rules="[

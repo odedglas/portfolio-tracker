@@ -31,7 +31,13 @@ export const columns: QTableProps['columns'] = [
     field: 'type',
     sortable: true,
   },
-  { name: 'amount', align: 'center', label: 'Amount', field: 'amount' },
+  { name: 'amount', align: 'center', label: 'Grant Amount', field: 'amount' },
+  {
+    name: 'sold_shares',
+    align: 'center',
+    label: 'Sold Shares',
+    field: 'soldShares',
+  },
   { name: 'vested', align: 'center', label: 'Vested', field: 'vested' },
   {
     name: 'last_vested',

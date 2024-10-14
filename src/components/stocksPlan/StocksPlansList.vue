@@ -44,6 +44,9 @@
           <q-td key="amount" :props="props">
             {{ $n(props.row.amount, 'fixedSensitive') }}
           </q-td>
+          <q-td key="sold_shares" :props="props">
+            {{ $n(props.row.soldShares, 'fixedSensitive') }}
+          </q-td>
           <q-td key="vested" :props="props">
             {{ $n(props.row.vested ?? 0, 'fixedSensitive') }}
           </q-td>

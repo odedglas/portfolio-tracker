@@ -7,17 +7,45 @@
       102 Entitlement Date: {{ formatPlanDate(plan.entitlement102Date) }}
     </p>
   </div>
-  <div class="row" v-if="hasVestingPeriodsPlan">
-    <vesting-periods-list :plan="plan" />
-    <div class="col-3 q-px-md q-pt-sm">
-      <apexchart
-        chart="radialProgress"
-        height="300"
-        :options="planVestingPercentChartOptions"
-        :series="planVestingPercentChartOptions.series"
-      ></apexchart>
-    </div>
-  </div>
+  <q-tabs
+    v-model="activeTab"
+    dense
+    class="text-grey"
+    active-color="primary"
+    indicator-color="primary"
+    align="justify"
+    narrow-indicator
+  >
+    <q-tab name="vestingDetails" label="Vesting Details" no-caps />
+    <q-tab
+      name="planOrders"
+      label="Plan Orders"
+      no-caps
+      :disable="plan.orders.length === 0"
+    />
+  </q-tabs>
+  <q-separator />
+  <q-tab-panels v-model="activeTab" animated>
+    <q-tab-panel name="vestingDetails">
+      <div class="row">
+        <vesting-periods-list :plan="plan" />
+        <div class="col-3 q-px-md q-pt-sm">
+          <apexchart
+            chart="radialProgress"
+            height="300"
+            :options="planVestingPercentChartOptions"
+            :series="planVestingPercentChartOptions.series"
+          ></apexchart>
+        </div>
+      </div>
+    </q-tab-panel>
+    <q-tab-panel name="planOrders">
+      <stocks-plan-orders-list
+        :orders="plan.orders"
+        @delete-order="openDeleteOrderModal"
+      />
+    </q-tab-panel>
+  </q-tab-panels>
   <div class="flex justify-end q-pa-md q-gutter-md">
     <q-btn
       color="negative"
@@ -42,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import VueApexCharts from 'vue3-apexcharts';
@@ -51,12 +79,15 @@ import { formatPlanDate } from 'src/service/date';
 import VestingPeriodsList from 'components/stocksPlan/VestingPeriodsList.vue';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useLoadingStore } from 'stores/loading';
+import { vestingPie } from 'src/service/charts';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
 import StocksPlanOrderDialog from 'components/stocksPlan/StocksPlanOrderDialog.vue';
+import StocksPlanOrdersList from 'components/stocksPlan/StocksPlanOrdersList.vue';
 
 export default defineComponent({
   name: 'StocksPlanExtendedDetails',
   components: {
+    StocksPlanOrdersList,
     StocksPlanOrderDialog,
     VestingPeriodsList,
     apexchart: VueApexCharts,
@@ -68,6 +99,8 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const activeTab = ref('vestingDetails');
+
     const $q = useQuasar();
     const $t = useI18n().t;
 
@@ -83,11 +116,10 @@ export default defineComponent({
     } = useEditableEntityPage<StockPlanOrder>({
       deleteModal: {
         title: 'Delete Stocks Order',
-        message: () =>
-          `Are you sure you want to delete the following order: ${'identifier'} from plan: "${
-            props.plan.identifier
-          }"?`,
-        callback: async (order) => console.log('Delete order', order),
+        message: (order) =>
+          `Are you sure you want to delete the following order: ${order.id} from plan: "${props.plan.identifier}"?`,
+        callback: (order) =>
+          portfolioStore.removeStocksPlanOrder(props.plan, order.id),
       },
     });
 
@@ -97,14 +129,7 @@ export default defineComponent({
         ((props.plan?.vested ?? 0) / props.plan.amount)
       ).toFixed(2);
 
-      return {
-        chart: {
-          height: 300,
-          type: 'radialBar',
-        },
-        series: [vestingPercent],
-        labels: ['Vested'],
-      };
+      return vestingPie(vestingPercent);
     });
 
     const terminatePlan = async () => {
@@ -130,7 +155,10 @@ export default defineComponent({
 
     const hasVestingPeriodsPlan = computed(() => !isESPP.value);
 
+    console.log('*************', props.plan.orders);
+
     return {
+      activeTab,
       formatPlanDate,
       planVestingPercentChartOptions,
       hasVestingPeriodsPlan,
@@ -139,6 +167,7 @@ export default defineComponent({
       showOrderModal: showModal,
       hideOrderModal: hideEntityModal,
       openOrderModal: openEntityModal,
+      openDeleteOrderModal: deleteEntity,
       planOrder: editEntity,
     };
   },

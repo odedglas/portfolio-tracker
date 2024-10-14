@@ -209,11 +209,16 @@ export const usePortfolioStore = defineStore('portfolios', {
     updateStocksPlanOrder(plan: StocksPlan, order: StockPlanOrder) {
       const currentIndex = plan.orders?.findIndex((o) => o.id === order.id);
 
-      if (currentIndex) {
+      if (currentIndex !== -1) {
         plan.orders[currentIndex] = order;
       } else {
         plan.orders = [...(plan.orders ?? []), order];
       }
+
+      return this.updateStocksPlan(plan);
+    },
+    removeStocksPlanOrder(plan: StocksPlan, orderId: string) {
+      plan.orders = plan.orders?.filter((order) => order.id !== orderId);
 
       return this.updateStocksPlan(plan);
     },

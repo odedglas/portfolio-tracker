@@ -28,8 +28,10 @@
             label="Shares amount"
             :rules="[
               (val) =>
-                (val && val > 0 && val < plan.amount) ||
-                `Please enter a shares amount and less than ${plan.amount}`,
+                (val && val > 0 && val < (plan.vested ?? 0)) ||
+                `Please enter a shares amount and less than ${
+                  plan.vested ?? 0
+                }`,
             ]"
           />
 
@@ -108,7 +110,6 @@ export default defineComponent({
       required: true,
     },
     planOrder: {
-      required: true,
       type: Object as PropType<StockPlanOrder | undefined>,
     },
     plan: {
