@@ -35,8 +35,10 @@ const isVestedPeriod = (
   terminationDate: number | undefined,
   periodDate: number
 ) => {
+  const isCliffActive = Date.now() < cliffDate;
+
   // Period is under a cliff constraint
-  if (periodDate <= cliffDate) {
+  if (isCliffActive && periodDate <= cliffDate) {
     return false;
   }
 
@@ -80,10 +82,12 @@ const findNextVestingPeriod = (
   vestingPeriods: number[],
   vestedPeriods: number
 ) => {
-  const { cliff, vestingMonthsInterval } = plan;
+  const { vestingMonthsInterval } = plan;
+  const cliffDate = getCliffDate(plan);
+  const isCliffActive = Date.now() < cliffDate;
 
   const computedVestingPeriods =
-    vestedPeriods + (cliff ? 12 / vestingMonthsInterval - 1 : 0);
+    vestedPeriods + (isCliffActive ? 12 / vestingMonthsInterval - 1 : 0);
 
   return computedVestingPeriods < vestingPeriods.length - 1
     ? vestingPeriods[computedVestingPeriods]
@@ -103,7 +107,7 @@ const calculateVestedShares = (
   }
 
   return vestedPeriods > 0
-    ? Math.round(amount * (vestedPeriods / vestingPeriods.length))
+    ? Math.floor(amount * (vestedPeriods / vestingPeriods.length))
     : 0;
 };
 
@@ -114,12 +118,12 @@ export const buildVestingPeriodsDetails = (plan: StocksPlan) => {
 
   let carriedAmount = 0;
   let totalVested = 0;
-  return vestingPeriods.map((period) => {
+  return vestingPeriods.map((period, index) => {
+    const isLast = index === vestingPeriodsAmount - 1;
     const canBeVested = canPeriodBeVested(period, cliffDate, terminationDate);
+
     let periodAmount =
-      vestingPeriodsAmount > 0
-        ? Math.floor(amount / vestingPeriodsAmount)
-        : amount;
+      vestingPeriodsAmount > 0 ? amount / vestingPeriodsAmount : amount;
 
     if (!canBeVested) {
       carriedAmount += periodAmount;
@@ -130,11 +134,17 @@ export const buildVestingPeriodsDetails = (plan: StocksPlan) => {
       carriedAmount = 0;
     }
 
+    if (isLast && totalVested <= amount) {
+      const delta = amount - totalVested;
+      totalVested += delta;
+      periodAmount += delta;
+    }
+
     return {
       period,
       disabled: !canBeVested,
-      amount: canBeVested ? periodAmount : 0,
-      totalVested,
+      amount: canBeVested ? Math.floor(periodAmount) : 0,
+      totalVested: Math.round(totalVested),
     };
   });
 };
@@ -186,6 +196,7 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
 
         const entitlement102Date = DateAPI.addToDate(plan.grantDate, {
           years: 2,
+          days: 1,
         }).getTime();
 
         return {

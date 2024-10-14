@@ -136,13 +136,6 @@
         <q-btn flat :label="$t('cancel')" @click="$emit('close')" />
         <q-btn
           color="primary"
-          v-if="!isNew"
-          :label="$t('stocks_plans.terminate_plan')"
-          :disable="(localPlan.terminationDate ?? 0) > 0"
-          @click="terminatePlan"
-        />
-        <q-btn
-          color="primary"
           type="submit"
           :label="$t('save')"
           @click="submitForm"
@@ -162,8 +155,7 @@ import {
   Ref,
   watch,
 } from 'vue';
-import { useQuasar, date as dateUtils } from 'quasar';
-import { useI18n } from 'vue-i18n';
+import { date as dateUtils } from 'quasar';
 import { useLoadingStore } from 'stores/loading';
 import { StocksPlan } from 'app/shared/types';
 import { formatPlanDate } from 'src/service/date';
@@ -198,8 +190,6 @@ export default defineComponent({
   },
   emits: ['close'],
   setup(props, { emit }) {
-    const $q = useQuasar();
-    const $t = useI18n().t;
     const vestingYears = ref(4);
     const { emitLoadingTask } = useLoadingStore();
     const portfolioStore = usePortfolioStore();
@@ -236,6 +226,7 @@ export default defineComponent({
 
     watch(isESPP, () => {
       vestingYears.value = isESPP.value ? 0 : 4;
+      localPlan.value.cliff = !isESPP.value;
     });
 
     const setLocalPlan = () => {
@@ -280,29 +271,6 @@ export default defineComponent({
       setVestingEndDate(years);
     };
 
-    const terminatePlan = async () => {
-      $q.dialog({
-        title: 'Terminate Plan',
-        message: `Are you sure you wish to terminate the following grant: ${localPlan.value.identifier}?`,
-        ok: {
-          label: $t('yes'),
-          color: 'primary',
-        },
-        cancel: {
-          label: $t('no'),
-          color: 'negative',
-        },
-      }).onOk(async () => {
-        localPlan.value.terminationDate = Date.now();
-
-        await emitLoadingTask(async () => {
-          await portfolioStore.updateStocksPlan(localPlan.value);
-        });
-
-        emit('close');
-      });
-    };
-
     return {
       formRef,
       syntheticShow,
@@ -314,7 +282,6 @@ export default defineComponent({
       formattedGrantDate,
       vestingYears,
       onVestingYearsChange,
-      terminatePlan,
       isESPP,
     };
   },

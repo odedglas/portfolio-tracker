@@ -12,18 +12,11 @@
       <template v-slot:body="props">
         <q-tr
           :props="props"
-          @click="
-            () => {
-              if (hasVestingPeriodsPlan(props.row)) {
-                props.expand = !props.expand;
-              }
-            }
-          "
-          :class="`${hasVestingPeriodsPlan(props.row) ? 'clickable' : ''}`"
+          class="clickable"
+          @click="props.expand = !props.expand"
         >
           <q-td key="row_expand" auto-width>
             <q-btn
-              v-if="hasVestingPeriodsPlan(props.row)"
               size="md"
               round
               dense
@@ -54,17 +47,17 @@
           <q-td key="vested" :props="props">
             {{ $n(props.row.vested ?? 0, 'fixedSensitive') }}
           </q-td>
-          <q-td key="next_vesting" :props="props">
-            {{ getNextVestingText(props.row) }}
-          </q-td>
           <q-td key="last_vested" :props="props">
             {{ getLastVestedText(props.row) }}
+          </q-td>
+          <q-td key="next_vesting" :props="props">
+            {{ getNextVestingText(props.row) }}
           </q-td>
           <q-td key="sellable_value" :props="props">
             {{ $n(props.row.sellableValue, 'decimal') }}
           </q-td>
           <q-td key="total_value" :props="props">
-            {{ $n(props.row.sellableValue ?? 0, 'currency') }}
+            {{ $n(props.row.potentialValue ?? 0, 'currency') }}
           </q-td>
           <q-td key="item_actions" :props="props">
             <div class="text-grey-8 q-gutter-xs">
@@ -155,16 +148,11 @@ export default defineComponent({
       return '---';
     };
 
-    const hasVestingPeriodsPlan = (plan: StocksPlan) => {
-      return plan.type !== 'espp';
-    };
-
     return {
       columns,
       formatPlanDate,
       getNextVestingText,
       getLastVestedText,
-      hasVestingPeriodsPlan,
     };
   },
 });

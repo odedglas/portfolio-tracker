@@ -55,6 +55,13 @@ export type StocksPlan = Entity & {
   cliff?: boolean;
   terminationDate?: number;
 
+  // Plan orders
+  orders?: {
+    date: number;
+    shares: number;
+    price: number;
+  }[];
+
   // Computed properties
   vestingPeriods?: number[];
   vestedPeriods?: number;

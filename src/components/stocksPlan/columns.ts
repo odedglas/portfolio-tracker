@@ -34,16 +34,16 @@ export const columns: QTableProps['columns'] = [
   { name: 'amount', align: 'center', label: 'Amount', field: 'amount' },
   { name: 'vested', align: 'center', label: 'Vested', field: 'vested' },
   {
-    name: 'next_vesting',
-    align: 'center',
-    label: 'Next Vesting',
-    field: 'nextVesting',
-  },
-  {
     name: 'last_vested',
     align: 'center',
     label: 'Last Vested',
     field: 'lastVested',
+  },
+  {
+    name: 'next_vesting',
+    align: 'center',
+    label: 'Next Vesting',
+    field: 'nextVesting',
   },
   {
     name: 'sellable_value',
