@@ -29,9 +29,16 @@
       v-if="plan.sellableValue"
       color="primary"
       type="submit"
-      label="Execute stocks"
+      @click="() => openOrderModal(undefined)"
+      label="Exercise stocks"
     />
   </div>
+  <stocks-plan-order-dialog
+    :plan="plan"
+    :show="showOrderModal"
+    :plan-order="planOrder"
+    @close="hideOrderModal"
+  />
 </template>
 
 <script lang="ts">
@@ -39,15 +46,18 @@ import { computed, defineComponent, PropType } from 'vue';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import VueApexCharts from 'vue3-apexcharts';
-import { StocksPlan } from 'app/shared/types';
+import { StockPlanOrder, StocksPlan } from 'app/shared/types';
 import { formatPlanDate } from 'src/service/date';
 import VestingPeriodsList from 'components/stocksPlan/VestingPeriodsList.vue';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useLoadingStore } from 'stores/loading';
+import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
+import StocksPlanOrderDialog from 'components/stocksPlan/StocksPlanOrderDialog.vue';
 
 export default defineComponent({
   name: 'StocksPlanExtendedDetails',
   components: {
+    StocksPlanOrderDialog,
     VestingPeriodsList,
     apexchart: VueApexCharts,
   },
@@ -63,6 +73,23 @@ export default defineComponent({
 
     const { emitLoadingTask } = useLoadingStore();
     const portfolioStore = usePortfolioStore();
+
+    const {
+      editEntity,
+      showModal,
+      openEntityModal,
+      hideEntityModal,
+      deleteEntity,
+    } = useEditableEntityPage<StockPlanOrder>({
+      deleteModal: {
+        title: 'Delete Stocks Order',
+        message: () =>
+          `Are you sure you want to delete the following order: ${'identifier'} from plan: "${
+            props.plan.identifier
+          }"?`,
+        callback: async (order) => console.log('Delete order', order),
+      },
+    });
 
     const planVestingPercentChartOptions = computed(() => {
       const vestingPercent = (
@@ -80,8 +107,6 @@ export default defineComponent({
       };
     });
 
-    const hasVestingPeriodsPlan = computed(() => props.plan.type !== 'espp');
-
     const terminatePlan = async () => {
       $q.dialog({
         title: 'Terminate Plan',
@@ -94,16 +119,16 @@ export default defineComponent({
           label: $t('no'),
           color: 'negative',
         },
-      }).onOk(async () => {
-        const updatedPlan = { ...props.plan, terminationDate: Date.now() };
-
-        await emitLoadingTask(async () => {
-          await portfolioStore.updateStocksPlan(updatedPlan);
-        });
-      });
+      }).onOk(async () =>
+        emitLoadingTask(async () => {
+          await portfolioStore.terminateStocksPlan(props.plan);
+        })
+      );
     };
 
     const isESPP = computed(() => props.plan?.type === 'espp');
+
+    const hasVestingPeriodsPlan = computed(() => !isESPP.value);
 
     return {
       formatPlanDate,
@@ -111,6 +136,10 @@ export default defineComponent({
       hasVestingPeriodsPlan,
       terminatePlan,
       isESPP,
+      showOrderModal: showModal,
+      hideOrderModal: hideEntityModal,
+      openOrderModal: openEntityModal,
+      planOrder: editEntity,
     };
   },
 });

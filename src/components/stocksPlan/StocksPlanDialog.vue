@@ -75,6 +75,7 @@
             <q-input
               class="col"
               v-model="formattedGrantDate"
+              dense
               label="Granting Date"
               lazy-rules
               :rules="[
@@ -174,6 +175,7 @@ const emptyPlan = (): StocksPlan => ({
   vestingEndDate: 0,
   vestingMonthsInterval: 3,
   cliff: true,
+  orders: [],
 });
 
 export default defineComponent({

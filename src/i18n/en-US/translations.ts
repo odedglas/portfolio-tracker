@@ -80,6 +80,10 @@ export const enUsMessages = {
     empty_plans:
       'No stocks plans were found... You can start by adding new one',
     add: 'Add new Plan',
+    order: {
+      new: 'New Stocks order',
+      edit: 'Edit Stocks order',
+    },
   },
   no_results: 'No results',
   cancel: 'Cancel',

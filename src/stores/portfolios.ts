@@ -6,6 +6,7 @@ import {
   Deposit,
   Portfolio,
   PortfolioHistory,
+  StockPlanOrder,
   StocksPlan,
 } from 'app/shared/types';
 import { useTransactionsStore } from 'stores/transactions';
@@ -200,6 +201,21 @@ export const usePortfolioStore = defineStore('portfolios', {
       await stocksPlansStore.setStocksPlans(portfolio.stocksPlans);
 
       return portfolioAPI.update(portfolio, portfolio.id);
+    },
+    terminateStocksPlan(plan: StocksPlan) {
+      plan.terminationDate = Date.now();
+      return this.updateStocksPlan(plan);
+    },
+    updateStocksPlanOrder(plan: StocksPlan, order: StockPlanOrder) {
+      const currentIndex = plan.orders?.findIndex((o) => o.id === order.id);
+
+      if (currentIndex) {
+        plan.orders[currentIndex] = order;
+      } else {
+        plan.orders = [...(plan.orders ?? []), order];
+      }
+
+      return this.updateStocksPlan(plan);
     },
   },
 });

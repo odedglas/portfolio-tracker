@@ -41,6 +41,12 @@ export type DepositEntity = Deposit &
 
 export type StockPlanType = 'espp' | 'rsu';
 
+export type StockPlanOrder = Entity & {
+  date: number;
+  shares: number;
+  price: number;
+};
+
 export type StocksPlan = Entity & {
   identifier: string;
   grantDate: number;
@@ -56,11 +62,9 @@ export type StocksPlan = Entity & {
   terminationDate?: number;
 
   // Plan orders
-  orders?: {
-    date: number;
-    shares: number;
-    price: number;
-  }[];
+  orders: StockPlanOrder[];
+  soldShares?: number;
+  sellableAmount?: number;
 
   // Computed properties
   vestingPeriods?: number[];
