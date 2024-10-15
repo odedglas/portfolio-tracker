@@ -1,5 +1,5 @@
 import { date as DateAPI } from 'quasar';
-import { StockPlanOrder, StocksPlan } from 'app/shared/types';
+import { StockPlanOrder, StockPlanType, StocksPlan } from 'app/shared/types';
 
 export const getCliffDate = ({ cliff, grantDate }: StocksPlan) =>
   DateAPI.addToDate(new Date(grantDate), {
@@ -162,6 +162,55 @@ const planTaxMapping = {
   },
 } as const;
 
+type CalculateOrderGainsOptions = {
+  grantPrice: number;
+  shares: number;
+  sellPrice: number;
+  type: StockPlanType;
+  isTerminated: boolean;
+  isAbove102Entitlement: boolean;
+};
+
+export const calculateOrderGains = (options: CalculateOrderGainsOptions) => {
+  const {
+    grantPrice,
+    shares,
+    sellPrice,
+    type,
+    isTerminated,
+    isAbove102Entitlement,
+  } = options;
+
+  const baseValue = grantPrice * shares;
+  const capitalGain = (sellPrice - grantPrice) * shares;
+  const totalValue = sellPrice * shares;
+
+  const isCapitalGainPositive = capitalGain > 0;
+  const capitalLoss = capitalGain < 0 ? Math.abs(capitalGain) : 0;
+
+  const baseValueTax = planTaxMapping[type].base(isTerminated);
+  const capitalGainTax = isCapitalGainPositive
+    ? planTaxMapping[type].capital(isTerminated, isAbove102Entitlement)
+    : 0;
+
+  const baseValueForTax = isCapitalGainPositive
+    ? baseValue
+    : baseValue - capitalLoss;
+  const taxComponent =
+    baseValueForTax * baseValueTax + capitalGain * capitalGainTax;
+  const netGain = totalValue - taxComponent;
+  const profitPercent = (capitalGain / baseValue) * 100;
+
+  return {
+    baseValue,
+    capitalGain,
+    netGain,
+    taxComponent,
+    profitPercent,
+    totalValue,
+  };
+};
+
 export const computePlanOrderGains = (
   plan: StocksPlan,
   order: StockPlanOrder,
@@ -173,26 +222,15 @@ export const computePlanOrderGains = (
   const isTerminated = terminationDate ? orderDate > terminationDate : false;
   const isAbove102Entitlement = orderDate > entitlement102Date;
 
-  const baseValue = plan.grantPrice * shares;
-  const capitalGain = (orderPrice - plan.grantPrice) * shares;
-  const totalValue = orderPrice * shares;
-
-  const baseValueTax = planTaxMapping[type].base(isTerminated);
-  const capitalGainTax = planTaxMapping[type].capital(
-    isTerminated,
-    isAbove102Entitlement
-  );
-  const taxComponent = baseValue * baseValueTax + capitalGain * capitalGainTax;
-  const netGain = totalValue - taxComponent;
-  const profitPercent = (capitalGain / baseValue) * 100;
-
   return {
-    baseValue,
-    capitalGain,
-    netGain,
-    taxComponent,
-    profitPercent,
-    totalValue,
+    ...calculateOrderGains({
+      isAbove102Entitlement,
+      isTerminated,
+      sellPrice: orderPrice,
+      grantPrice: plan.grantPrice,
+      type,
+      shares,
+    }),
     isAbove102Entitlement,
   };
 };

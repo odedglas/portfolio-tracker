@@ -155,8 +155,6 @@ export default defineComponent({
 
     const hasVestingPeriodsPlan = computed(() => !isESPP.value);
 
-    console.log('*************', props.plan.orders);
-
     return {
       activeTab,
       formatPlanDate,

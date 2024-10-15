@@ -73,6 +73,7 @@ export type StocksPlan = Entity & {
   // Plan orders
   orders: StockPlanOrder[];
   soldShares?: number;
+  availableShares?: number;
 
   // Computed properties
   vestingPeriods?: number[];
@@ -83,6 +84,8 @@ export type StocksPlan = Entity & {
   potentialValue?: number;
   sellableValue?: number;
   entitlement102Date?: number;
+  is102Entitled?: boolean;
+  marketPrice?: number;
 };
 
 export type Portfolio = Entity &
