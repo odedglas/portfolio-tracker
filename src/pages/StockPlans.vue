@@ -39,6 +39,8 @@
       @close="hideEntityModal"
       :plan="editEntity"
     />
+
+    <stocks-plan-simulator :plans="stocksPlansStore.stocksPlans" />
   </q-page>
 </template>
 
@@ -51,10 +53,15 @@ import { useEditableEntityPage } from 'components/composables/useEditableEntityP
 import { StocksPlan } from 'app/shared/types';
 import StocksPlanDialog from 'components/stocksPlan/StocksPlanDialog.vue';
 import { usePortfolioStore } from 'stores/portfolios';
+import StocksPlanSimulator from 'components/stocksPlan/StocksPlanSimulator.vue';
 
 export default defineComponent({
   name: 'StocksPlans',
-  components: { StocksPlanDialog, StocksPlansGroupDetails },
+  components: {
+    StocksPlanSimulator,
+    StocksPlanDialog,
+    StocksPlansGroupDetails,
+  },
   setup() {
     const portfolioStore = usePortfolioStore();
     const stocksPlansStore = useStocksPlansStore();
@@ -79,6 +86,7 @@ export default defineComponent({
     );
 
     return {
+      stocksPlansStore,
       editEntity,
       showModal,
       openEntityModal,

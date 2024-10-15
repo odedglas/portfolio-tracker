@@ -55,18 +55,18 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           (acc, order) => acc + order.shares,
           0
         );
-        const planShares = plan.amount - soldShares;
-        const availableShares = vestedShares - soldShares;
 
-        const potentialAmount = plan.terminationDate
-          ? availableShares
-          : planShares;
-        const potentialValue = planQuote
-          ? planQuote.regularMarketPrice * potentialAmount
-          : 0;
-        const sellableValue = planQuote
-          ? planQuote.regularMarketPrice * availableShares
-          : 0;
+        const maxPlanShares = plan.amount - soldShares;
+        const sellableShares = vestedShares - soldShares;
+
+        const availableShares = plan.terminationDate
+          ? sellableShares
+          : maxPlanShares;
+
+        const holdingMarketPrice = planQuote?.regularMarketPrice ?? 0;
+
+        const potentialValue = holdingMarketPrice * availableShares;
+        const sellableValue = holdingMarketPrice * sellableShares;
 
         return {
           ...plan,
@@ -78,8 +78,11 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           potentialValue,
           sellableValue,
           soldShares,
+          availableShares,
           entitlement102Date,
+          is102Entitled: Date.now() >= entitlement102Date,
           orders: planOrders,
+          marketPrice: holdingMarketPrice,
         };
       });
     },
