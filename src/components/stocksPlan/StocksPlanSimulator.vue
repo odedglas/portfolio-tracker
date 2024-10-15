@@ -234,6 +234,7 @@ import { defineComponent, PropType, Ref, ref, watch } from 'vue';
 import { formatPlanDate } from 'src/service/date';
 import { StocksPlan } from 'app/shared/types';
 import { calculateOrderGains } from 'src/service/stocksPlans';
+import TickerLogo from 'components/common/TickerLogo.vue';
 
 type SimulatorPriceCase = 'bearish' | 'inline' | 'bullish';
 
@@ -247,6 +248,7 @@ type SimulatorResults = Record<
 
 export default defineComponent({
   name: 'StocksPlanSimulator',
+  components: { TickerLogo },
   props: {
     plans: {
       type: Array as PropType<StocksPlan[]>,
