@@ -9,7 +9,7 @@
       <daily-movers-swiper :movers="viewHoldings" />
     </q-card-section>
     <q-card-section class="q-py-sm">
-      <p class="text-caption text-grey-8 q-mb-sm">Market:</p>
+      <p class="text-caption text-grey-8 q-mb-sm">Benchmarks:</p>
       <daily-movers-swiper :movers="benchmarks" :show-logo="false" />
     </q-card-section>
   </q-card>

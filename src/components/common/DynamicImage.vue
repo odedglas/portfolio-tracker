@@ -3,7 +3,7 @@
     v-if="icon"
     :style="iconStyle"
     :class="classes"
-    :src="`src/assets/dynamic/${icon}.svg`"
+    :src="`src/assets/dynamic/${icon}.${extension}`"
     @click="imageClick"
     :alt="icon"
   />
@@ -28,6 +28,10 @@ export default defineComponent({
     size: {
       type: Number,
       default: 24,
+    },
+    extension: {
+      type: String,
+      default: 'svg',
     },
   },
 
