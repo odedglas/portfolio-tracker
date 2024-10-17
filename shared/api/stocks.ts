@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { FearAndGreedResponse } from 'app/shared/types';
 
 const axiosInstance = axios.create({
   baseURL: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com',
@@ -33,5 +34,6 @@ const getRequest = async <Resolved>(
 
 export const stocksClient = {
   getRequest,
-  getFearAndGreedIndex: () => featAndGreedInstance.get('/v1/fgi'),
+  getFearAndGreedIndex: () =>
+    featAndGreedInstance.get<FearAndGreedResponse>('/v1/fgi'),
 };

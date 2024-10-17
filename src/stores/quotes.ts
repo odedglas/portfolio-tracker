@@ -1,16 +1,18 @@
 import { defineStore } from 'pinia';
-import type { Quote } from 'app/shared/types';
+import type { FearAndGreedValues, Quote } from 'app/shared/types';
 import * as stocksAPI from 'src/service/stocks';
 
 interface QuotesState {
   tickerQuotes: Record<string, Quote>;
   tickers: string[];
+  fearAndGreed: Partial<FearAndGreedValues>;
 }
 
 export const useQuotesStore = defineStore('quotes', {
   state: (): QuotesState => ({
     tickerQuotes: {},
     tickers: [],
+    fearAndGreed: {},
   }),
   actions: {
     async getTickersQuotes(tickers: string[]) {
@@ -36,6 +38,11 @@ export const useQuotesStore = defineStore('quotes', {
       if (!this.tickers.includes(ticker)) {
         await this.getTickersQuotes([...this.tickers, ticker]);
       }
+    },
+    async setFearAndGreed() {
+      const { data } = await stocksAPI.getFearAndGreedIndex();
+
+      this.fearAndGreed = data.fgi;
     },
   },
 });

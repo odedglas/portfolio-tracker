@@ -1,8 +1,14 @@
 <template>
   <q-card flat bordered class="daily-movers q-mt-lg">
-    <q-card-section class="flex items-center">
-      <q-icon name="timeline" class="text-grey-6 q-mr-sm" size="sm" />
-      <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
+    <q-card-section class="flex justify-between">
+      <div class="flex items-center">
+        <q-icon name="timeline" class="text-grey-6 q-mr-sm" size="sm" />
+        <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
+      </div>
+      <q-chip outline size="md" color="primary"
+        >Fear and Greed Index: {{ quotesStore.fearAndGreed?.now?.valueText }} |
+        {{ quotesStore.fearAndGreed.now?.value }}</q-chip
+      >
     </q-card-section>
     <q-card-section class="q-py-sm">
       <p class="text-caption text-grey-8 q-mb-sm">Portfolio:</p>
@@ -37,7 +43,7 @@ export default defineComponent({
   setup() {
     const benchmarks = ref(benchmarkDefaults);
     const holdingsStore = useHoldingsStore();
-    const quotes = useQuotesStore();
+    const quotesStore = useQuotesStore();
 
     const viewHoldings = computed(() =>
       [...holdingsStore.portfolioHoldings]
@@ -45,7 +51,7 @@ export default defineComponent({
           ...holding,
           dailyChangePercent: holding.dailyChange.percent,
           lastPrice:
-            quotes.tickerQuotes[holding.ticker]?.regularMarketPrice ?? 0,
+            quotesStore.tickerQuotes[holding.ticker]?.regularMarketPrice ?? 0,
         }))
         .sort((a, b) => b.dailyChange.percent - a.dailyChange.percent)
     );
@@ -71,6 +77,7 @@ export default defineComponent({
 
     return {
       holdingsStore,
+      quotesStore,
       viewHoldings,
       benchmarks,
     };
