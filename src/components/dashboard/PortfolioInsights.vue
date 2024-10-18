@@ -1,7 +1,7 @@
 <template>
   <q-card flat bordered class="portfolio-insights q-mt-lg">
     <q-card-section class="flex items-center">
-      <q-icon name="auto_awesome" class="text-grey-6 q-mr-sm" size="sm" />
+      <q-icon name="auto_awesome" class="dashboard-icon q-mr-sm" size="sm" />
       <p class="text-h6 text-grey-7 q-mb-none">{{ $t('insights.title') }}</p>
     </q-card-section>
     <q-card-section class="q-py-sm row">
@@ -19,10 +19,12 @@
               class="q-mr-xs"
             />
             <span class="flex column">
-              <span class="text-caption text-grey-8">{{ insight.holding.name }} <b>is</b></span>
+              <span class="text-caption text-grey-8"
+                >{{ insight.holding.name }} <b>is</b></span
+              >
               <span class="text-h6 text-capitalize">{{
-                  $t(`insights.types.${insight.type}`)
-                }}</span>
+                $t(`insights.types.${insight.type}`)
+              }}</span>
             </span>
           </div>
           {{ insight.title }}

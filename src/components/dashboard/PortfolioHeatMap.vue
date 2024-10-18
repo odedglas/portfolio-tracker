@@ -3,7 +3,7 @@
     <q-card-section class="flex items-center">
       <q-icon
         name="local_fire_department"
-        class="text-grey-6 q-mr-sm"
+        class="dashboard-icon q-mr-sm"
         size="sm"
       />
       <p class="text-h6 text-grey-7 q-mb-none">Portfolio heat map</p>

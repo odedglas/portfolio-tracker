@@ -2,7 +2,7 @@
   <q-card flat bordered class="daily-movers q-mt-lg">
     <q-card-section class="flex justify-between">
       <div class="flex items-center">
-        <q-icon name="timeline" class="text-grey-6 q-mr-sm" size="sm" />
+        <q-icon name="timeline" class="dashboard-icon q-mr-sm" size="sm" />
         <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
       </div>
       <q-chip outline size="md" color="primary"
