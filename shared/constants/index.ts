@@ -25,3 +25,10 @@ export const TRANSACTIONS_TYPES = {
   BUY: 'buy',
   SELL: 'sell',
 } as const;
+
+export const INSIGHT_TYPE = {
+  BELOW_52_WEEK_HIGH: 'below52WeekHigh',
+  NEAR_52_WEEK_LOW: 'near52WeekLow',
+  HIGH_SHORT_INTEREST: 'highShortInterest',
+  NEAR_MOVING_AVERAGES: 'nearMovingAverages',
+} as const;

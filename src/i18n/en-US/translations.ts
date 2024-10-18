@@ -85,6 +85,15 @@ export const enUsMessages = {
       edit: 'Edit Stocks order',
     },
   },
+  insights: {
+    title: 'Insights',
+    types: {
+      nearMovingAverages: 'Near its moving averages',
+      highShortInterest: 'High short interest',
+      near52WeekLow: 'Near its 52 week low',
+      below52WeekHigh: 'Below its 52 week high',
+    },
+  },
   no_results: 'No results',
   cancel: 'Cancel',
   save: 'Save',
