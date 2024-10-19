@@ -51,3 +51,9 @@ export const getQuotesChartData = cachedOperation(
       .join('-'),
   1000 * 60 * 60 // One hour chart data caching
 );
+
+export const getFearAndGreedIndex = cachedOperation(
+  () => stocksClient.getFearAndGreedIndex(),
+  'fear-and-greed',
+  1000 * 60 * 60 // One hour chart data caching
+);

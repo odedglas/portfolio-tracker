@@ -213,3 +213,24 @@ export interface StockCharData {
 export interface StockChartResponse {
   [symbol: string]: StockCharData;
 }
+
+type FearAndGreedValue = {
+  value: number;
+  valueText: string;
+};
+
+export type FearAndGreedValues = {
+  now: FearAndGreedValue;
+  previousClose: FearAndGreedValue;
+  oneWeekAgo: FearAndGreedValue;
+  oneMonthAgo: FearAndGreedValue;
+  oneYearAgo: FearAndGreedValue;
+};
+
+export type FearAndGreedResponse = {
+  lastUpdated: {
+    epochUnixSeconds: number;
+    humanDate: string;
+  };
+  fgi: FearAndGreedValues;
+};

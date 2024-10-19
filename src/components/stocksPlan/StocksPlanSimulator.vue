@@ -189,15 +189,16 @@
               <q-item
                 v-for="(result, usecase) in simulatorResults"
                 :key="usecase"
-                class="row text-caption"
+                :class="`row text-caption simulator-results-row ${usecase}`"
               >
                 <span
                   class="col flex items-center text-capitalize text-caption"
                 >
-                  <img
-                    :src="`src/assets/${result.logo}.png`"
+                  <dynamic-image
+                    :icon="result.logo"
+                    extension="png"
                     class="q-mr-sm"
-                    height="24"
+                    :size="24"
                   />
                   {{ usecase }}
                 </span>
@@ -235,6 +236,7 @@ import { formatPlanDate } from 'src/service/date';
 import { StocksPlan } from 'app/shared/types';
 import { calculateOrderGains } from 'src/service/stocksPlans';
 import TickerLogo from 'components/common/TickerLogo.vue';
+import DynamicImage from 'components/common/DynamicImage.vue';
 
 type SimulatorPriceCase = 'bearish' | 'inline' | 'bullish';
 
@@ -248,7 +250,7 @@ type SimulatorResults = Record<
 
 export default defineComponent({
   name: 'StocksPlanSimulator',
-  components: { TickerLogo },
+  components: { DynamicImage, TickerLogo },
   props: {
     plans: {
       type: Array as PropType<StocksPlan[]>,
@@ -295,7 +297,7 @@ export default defineComponent({
           logo: 'bear-market',
         },
         {
-          case: 'inline',
+          case: 'target',
           price: inlinePrice,
           logo: 'target',
         },
@@ -351,7 +353,22 @@ export default defineComponent({
 });
 </script>
 
-<style lang="sass" scoped>
-.mode-toggle
-  border: 1px solid $primary
+<style lang="scss" scoped>
+.simulator-results-row {
+  &:not(:last-child) {
+    border-bottom: 1px solid $grey-4;
+  }
+
+  &.bearish {
+    background: linear-gradient(90deg, rgb(227 214 214) 0%, transparent 75%);
+  }
+
+  &.bullish {
+    background: linear-gradient(90deg, rgb(198, 214, 194) 0%, transparent 75%);
+  }
+
+  &.target {
+    background: linear-gradient(90deg, rgb(194, 202, 214) 0%, transparent 75%);
+  }
+}
 </style>

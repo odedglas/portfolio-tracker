@@ -1,4 +1,9 @@
-import { search, getQuotes, getQuotesChartData } from './yahooRapidClient';
+import {
+  search,
+  getQuotes,
+  getQuotesChartData,
+  getFearAndGreedIndex,
+} from './yahooRapidClient';
 import { findTickerImage } from './logos';
 
 export const getTickerData = async (ticker: string) => {
@@ -27,4 +32,4 @@ export const getTickerData = async (ticker: string) => {
   }));
 };
 
-export { getQuotes, getQuotesChartData };
+export { getQuotes, getQuotesChartData, getFearAndGreedIndex };

@@ -3,7 +3,7 @@
     <q-card-section class="q-px-lg">
       <div class="flex col justify-between">
         <div class="flex items-center q-mr-sm">
-          <q-icon name="scale" class="text-grey-6 q-mr-sm" size="sm" />
+          <q-icon name="scale" class="dashboard-icon q-mr-sm" size="sm" />
           <p class="text-h6 text-grey-7 q-mb-none">Holdings allocation</p>
         </div>
         <q-toggle v-model="showInvested" label="By Invested" />

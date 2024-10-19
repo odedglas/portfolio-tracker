@@ -1,4 +1,4 @@
-import { LOGIN_META, TRANSACTIONS_TYPES } from '../constants';
+import { INSIGHT_TYPE, LOGIN_META, TRANSACTIONS_TYPES } from '../constants';
 
 // Shared types
 export type Entity = {
@@ -150,4 +150,17 @@ export type HoldingWithProfits = Holding & {
     value: number;
     percent: number;
   };
+};
+
+type InsightType = (typeof INSIGHT_TYPE)[keyof typeof INSIGHT_TYPE];
+
+export type PortfolioInsight = {
+  type: InsightType;
+  inputs: Record<string, string | number | boolean>;
+  tags?: {
+    name: string;
+    value: number;
+    format?: string;
+  }[];
+  holding: Holding;
 };

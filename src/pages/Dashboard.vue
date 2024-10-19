@@ -10,6 +10,7 @@
       <holdings-donut class="col-8 dashboard-holdings-donut q-mt-lg" />
       <portfolio-heat-map class="dashboard-portfolio-heat-map" />
       <daily-movers class="dashboard-daily-movers" />
+      <portfolio-insights class="dashboard-portfolio-insights" />
     </div>
     <quick-add />
   </q-page>
@@ -22,6 +23,7 @@ import { usePortfolioKpis } from 'src/components/composables/usePortfolioKpis';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
 import HoldingsDonut from 'components/dashboard/HoldingsDonut.vue';
 import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
+import PortfolioInsights from 'components/dashboard/PortfolioInsights.vue';
 import QuickAdd from 'components/dashboard/QuickAdd.vue';
 import DailyMovers from 'components/dashboard/DailyMovers.vue';
 
@@ -33,6 +35,7 @@ export default defineComponent({
     PortfolioHeatMap,
     HoldingsDonut,
     DashboardKpi,
+    PortfolioInsights,
   },
   setup() {
     const portfolioStore = usePortfolioStore();
@@ -60,7 +63,8 @@ export default defineComponent({
     'title title title'
     'kpi kpi kpi'
     'donut donut heatmap'
-    'daily_movers daily_movers daily_movers';
+    'daily_movers daily_movers daily_movers'
+    'insights insights insights';
 }
 
 .dashboard-quick-add {
@@ -79,5 +83,8 @@ export default defineComponent({
 }
 .dashboard-daily-movers {
   grid-area: daily_movers;
+}
+.dashboard-portfolio-insights {
+  grid-area: insights;
 }
 </style>

@@ -163,10 +163,15 @@ const normalizePerformanceData = (
 
 const buildTransactionsAnnotations = (
   portfolioSeries: ChartSeries,
-  transactionsMap: Map<number, Transaction[]>
+  transactionsMap: Map<number, Transaction[]>,
+  periodTimeRange: number[]
 ) => {
   const [portfolioMarkerColor] = SERIES_COLORS_PALLET;
   const [sellAnnotationColor] = COLOR_PALLET;
+
+  const isWithinRange = (date: number) =>
+    date > periodTimeRange[0] &&
+    date < periodTimeRange[periodTimeRange.length - 1];
 
   return {
     yaxis: [
@@ -178,55 +183,61 @@ const buildTransactionsAnnotations = (
         yAxisIndex: 0,
       },
     ],
-    points: [...transactionsMap.entries()].map(([date, transactionGroup]) => {
-      const isSingle = transactionGroup.length === 1;
+    points: [...transactionsMap.entries()]
+      .filter(([d]) => isWithinRange(d))
+      .map(([date, transactionGroup]) => {
+        const isSingle = transactionGroup.length === 1;
 
-      const transactionDate = midDay(new Date(date));
-      const isBuyAction = (transactionGroup[0]?.action ?? '') === 'buy';
+        const transactionDate = midDay(new Date(date));
+        const isBuyAction = (transactionGroup[0]?.action ?? '') === 'buy';
 
-      const displayText = isSingle
-        ? isBuyAction
-          ? 'B'
-          : 'S'
-        : transactionGroup.length;
+        const displayText = isSingle
+          ? isBuyAction
+            ? 'B'
+            : 'S'
+          : transactionGroup.length;
 
-      return {
-        x: transactionDate.getTime(),
-        y: portfolioSeries?.data.find(
-          (dataPoint) => dataPoint.x.getTime() === transactionDate.getTime()
-        )?.y,
-        marker: {
-          size: 6,
-          fillColor: 'white',
-          strokeColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
-          strokeWidth: 1,
-        },
-        label: {
-          borderColor: isBuyAction ? portfolioMarkerColor : sellAnnotationColor,
-          offsetY: -2,
-          style: {
-            color: 'grey',
-            fontSize: '10px',
-            fontWeight: 'bold',
-            padding: {
-              top: 2,
-              bottom: 2,
-              left: 4,
-              right: 4,
+        return {
+          x: transactionDate.getTime(),
+          y: portfolioSeries?.data.find(
+            (dataPoint) => dataPoint.x.getTime() === transactionDate.getTime()
+          )?.y,
+          marker: {
+            size: 6,
+            fillColor: 'white',
+            strokeColor: isBuyAction
+              ? portfolioMarkerColor
+              : sellAnnotationColor,
+            strokeWidth: 1,
+          },
+          label: {
+            borderColor: isBuyAction
+              ? portfolioMarkerColor
+              : sellAnnotationColor,
+            offsetY: -2,
+            style: {
+              color: 'grey',
+              fontSize: '10px',
+              fontWeight: 'bold',
+              padding: {
+                top: 2,
+                bottom: 2,
+                left: 4,
+                right: 4,
+              },
+              borderRadius: 2,
             },
-            borderRadius: 2,
+            text: displayText,
           },
-          text: displayText,
-        },
-        tooltip: {
-          enabled: true,
-          offsetY: 0,
-          style: {
-            fontSize: '12px',
+          tooltip: {
+            enabled: true,
+            offsetY: 0,
+            style: {
+              fontSize: '12px',
+            },
           },
-        },
-      };
-    }),
+        };
+      }),
   };
 };
 
@@ -282,7 +293,8 @@ export const getPortfolioPerformanceChart = (
       },
       annotations: buildTransactionsAnnotations(
         portfolioSeries,
-        transactionsMap
+        transactionsMap,
+        periodTimeRange
       ),
       dataLabels: {
         enabled: false,

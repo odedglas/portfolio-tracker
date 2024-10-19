@@ -1,4 +1,4 @@
-import { Portfolio } from 'app/shared/types';
+import { Portfolio, PortfolioHistory } from 'app/shared/types';
 import {
   getCollections,
   firestoreAPI,
@@ -44,10 +44,10 @@ const api = {
   // TODO - Deletion should clean all portfolio related entities such as Transactions / Holdings.
   delete: async (portfolioId: string) =>
     firestoreAPI.deleteDocument(portfolioId, portfolioCollection()),
-  removeHistoryRecords: async (recordsIds: string[]) => {
+  addHistoryRecords: async (records: PortfolioHistory[]) => {
     await Promise.all(
-      recordsIds.map((recordId) =>
-        firestoreAPI.deleteDocument(recordId, portfolioHistoryCollection())
+      records.map((record) =>
+        firestoreAPI.addDocument(portfolioHistoryCollection(), record)
       )
     );
   },

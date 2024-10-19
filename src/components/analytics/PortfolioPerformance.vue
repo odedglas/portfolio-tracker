@@ -254,7 +254,7 @@ export default defineComponent({
     };
 
     watch(
-      () => showResetZoom.value,
+      [showResetZoom.value, periodTimeRange],
       () => {
         setTimeout(() => {
           const annotations = document.querySelectorAll(

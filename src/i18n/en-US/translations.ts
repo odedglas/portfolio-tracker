@@ -85,6 +85,33 @@ export const enUsMessages = {
       edit: 'Edit Stocks order',
     },
   },
+  insights: {
+    title: 'Insights',
+    types: {
+      title: {
+        nearMovingAverages: 'Near moving averages',
+        highShortInterest: 'High short interest',
+        near52WeekLow: 'Near 52 week low',
+        below52WeekHigh: 'Below 52 week high',
+      },
+      description: {
+        nearMovingAverages:
+          "<i>{name}</i> is <b>{deltaPercent} {direction}</b> it's <b>{movingAverageDays}</b> day's moving average.",
+        highShortInterest:
+          '<i>{name}</i> short interest is <b>{shortRatio}</b> which is <b>{deltaPercent}</b> above expected.',
+        near52WeekLow: '<i>{name}</i> is near its 52 week low.',
+        below52WeekHigh:
+          "<i>{name}</i> is <b>{deltaPercent} {direction}</b> its 52-week-high and is <b>above</b> it's moving averages.",
+      },
+    },
+    tags: {
+      marketPrice: 'Market Price',
+      fiftyTwoWeekHigh: '52w High',
+      twoHundredDayAverage: '200d Avg',
+      fiftyTwoWeekLow: '52w Low',
+      fiftyDayAverage: '50d Avg',
+    },
+  },
   no_results: 'No results',
   cancel: 'Cancel',
   save: 'Save',

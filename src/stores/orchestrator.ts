@@ -26,6 +26,7 @@ export const useOrchestratorStore = defineStore('orchestrator', {
         );
 
         await quotesStore.getTickersQuotes(holdingsTickers);
+        await quotesStore.setFearAndGreed();
 
         holdingsStore.setPortfoliosHoldings(holdings);
       });

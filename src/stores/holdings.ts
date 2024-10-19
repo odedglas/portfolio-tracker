@@ -5,7 +5,13 @@ import holdingsAPI from 'src/service/holdings';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useTransactionsStore } from 'stores/transactions';
 import { useQuotesStore } from 'stores/quotes';
-import { Holding, Transaction, HoldingsSummary } from 'app/shared/types';
+import {
+  Holding,
+  Transaction,
+  HoldingsSummary,
+  PortfolioInsight,
+} from 'app/shared/types';
+import { calculateInsights } from 'src/service/insights';
 
 interface HoldingsStoreState {
   holdings: Holding[];
@@ -47,6 +53,15 @@ export const useHoldingsStore = defineStore('holdings', {
     },
     summary(): HoldingsSummary {
       return holdingsTransformer.summary(this.portfolioHoldings);
+    },
+    insights(): PortfolioInsight[] {
+      return this.portfolioHoldings
+        .map((holding) => {
+          const quote = useQuotesStore().tickerQuotes[holding.ticker];
+
+          return calculateInsights(holding, quote);
+        })
+        .flat();
     },
   },
   actions: {
