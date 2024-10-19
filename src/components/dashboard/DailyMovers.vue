@@ -1,12 +1,12 @@
 <template>
-  <q-card flat bordered class="daily-movers q-mt-lg">
+  <q-card flat bordered class="daily-movers q-mt-lg q-pb-md">
     <q-card-section class="flex justify-between">
       <div class="flex items-center">
         <q-icon name="timeline" class="dashboard-icon q-mr-sm" size="sm" />
         <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
       </div>
       <q-chip outline size="md" color="primary"
-        >Fear and Greed Index: {{ quotesStore.fearAndGreed?.now?.valueText }} |
+        >Fear and Greed Index: {{ quotesStore.fearAndGreed?.now?.valueText }} /
         {{ quotesStore.fearAndGreed.now?.value }}</q-chip
       >
     </q-card-section>
@@ -27,7 +27,6 @@ import { useHoldingsStore } from 'stores/holdings';
 import DailyMoversSwiper from 'components/dashboard/DailyMoversSwiper.vue';
 import { useQuotesStore } from 'stores/quotes';
 
-import 'swiper/css';
 import { dailyMoversBenchmarks } from './constants';
 import { getQuotes } from 'src/service/stocks';
 

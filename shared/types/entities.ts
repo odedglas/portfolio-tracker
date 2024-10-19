@@ -155,8 +155,12 @@ export type HoldingWithProfits = Holding & {
 type InsightType = (typeof INSIGHT_TYPE)[keyof typeof INSIGHT_TYPE];
 
 export type PortfolioInsight = {
-  title: string;
   type: InsightType;
-  inputs: Record<string, unknown>;
+  inputs: Record<string, string | number | boolean>;
+  tags?: {
+    name: string;
+    value: number;
+    format?: string;
+  }[];
   holding: Holding;
 };
