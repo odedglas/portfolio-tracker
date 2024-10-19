@@ -4,7 +4,6 @@ import { usePortfolioStore } from 'stores/portfolios';
 import { useHoldingsStore } from 'stores/holdings';
 import { useQuotesStore } from 'stores/quotes';
 import { queries } from 'src/service/firebase/collections';
-import { calculateInsights } from 'src/service/insights';
 
 export const useOrchestratorStore = defineStore('orchestrator', {
   state: () => ({}),
@@ -28,10 +27,6 @@ export const useOrchestratorStore = defineStore('orchestrator', {
 
         await quotesStore.getTickersQuotes(holdingsTickers);
         await quotesStore.setFearAndGreed();
-
-        holdings.forEach((holding) => {
-          calculateInsights(holding, quotesStore.tickerQuotes[holding.ticker]);
-        });
 
         holdingsStore.setPortfoliosHoldings(holdings);
       });

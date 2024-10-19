@@ -38,7 +38,7 @@
           size="sm"
           outline
           icon="add"
-          color="secondary"
+          color="primary"
           @click="showPortfolioDialog = true"
         >
           {{ $t('create') }}
@@ -50,7 +50,7 @@
           class="col q-mr-sm"
           icon="settings"
           outline
-          color="secondary"
+          color="primary"
           @click="gotoManagePortfolios"
         >
           {{ $t('header.manage_portfolios') }}

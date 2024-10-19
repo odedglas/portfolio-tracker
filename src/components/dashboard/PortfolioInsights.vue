@@ -6,9 +6,13 @@
     </q-card-section>
     <q-card-section class="q-py-sm row">
       <swiper
-        :pagination="{
-          dynamicBullets: true,
-        }"
+        :pagination="
+          hasPagination
+            ? {
+                dynamicBullets: true,
+              }
+            : false
+        "
         :modules="swiperModules"
         :slides-per-view="3"
         :vertical="true"
@@ -89,8 +93,14 @@ export default defineComponent({
       return holdingsStore.insights;
     });
 
+    const insightsPerPage = 3;
+    const hasPagination = computed(
+      () => insights.value.length >= insightsPerPage
+    );
+
     return {
       insights,
+      hasPagination,
       swiperModules: [Pagination],
     };
   },
