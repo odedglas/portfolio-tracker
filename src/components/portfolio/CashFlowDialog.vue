@@ -37,33 +37,10 @@
             :rules="[(val) => !!val || 'Please enter a valid amount']"
           />
 
-          <q-input
-            class="col"
-            v-model="formattedDate"
-            placeholder="Date"
-            lazy-rules
-            :rules="[
-              (val) =>
-                (val && typeof new Date(val).getTime === 'function') ||
-                'Please set a valid date',
-            ]"
-          >
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy
-                  cover
-                  transition-show="scale"
-                  transition-hide="scale"
-                >
-                  <q-date v-model="formattedDate" mask="MM/DD/YYYY">
-                    <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="Close" color="primary" flat />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
+          <date-input
+            :date="localCashFlowEntry.date ?? 0"
+            @date-change="(date) => (localCashFlowEntry.date = date)"
+          />
 
           <q-input
             v-model="localCashFlowEntry.notes"
@@ -94,6 +71,7 @@ import { useLoadingStore } from 'stores/loading';
 import { usePortfolioStore } from 'src/stores/portfolios';
 import { DepositEntity } from 'app/shared/types';
 import { useI18n } from 'vue-i18n';
+import DateInput from 'components/common/DateInput.vue';
 
 const emptyDeposit = (): DepositEntity => ({
   id: '',
@@ -105,6 +83,7 @@ const emptyDeposit = (): DepositEntity => ({
 
 export default defineComponent({
   name: 'CashFlowDialog',
+  components: { DateInput },
   props: {
     show: {
       type: Boolean,
@@ -132,14 +111,6 @@ export default defineComponent({
         if (!value) {
           emit('close', undefined);
         }
-      },
-    });
-
-    const formattedDate = computed({
-      get: () =>
-        dateUtils.formatDate(localCashFlowEntry.value.date, 'MM/DD/YYYY'),
-      set: (date: string) => {
-        localCashFlowEntry.value.date = new Date(date).getTime();
       },
     });
 
@@ -172,7 +143,6 @@ export default defineComponent({
       localCashFlowEntry,
       submitForm,
       clearLocalCashFlow,
-      formattedDate,
       cashTypeOptions,
     };
   },
