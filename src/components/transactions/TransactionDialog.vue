@@ -106,7 +106,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
-import { date as dateUtils } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useTransactionsStore } from 'stores/transactions';

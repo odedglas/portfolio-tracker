@@ -66,7 +66,6 @@
 
 <script lang="ts">
 import { defineComponent, computed, ref, Ref } from 'vue';
-import { date as dateUtils } from 'quasar';
 import { useLoadingStore } from 'stores/loading';
 import { usePortfolioStore } from 'src/stores/portfolios';
 import { DepositEntity } from 'app/shared/types';
