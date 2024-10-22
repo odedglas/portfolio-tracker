@@ -160,6 +160,13 @@ export const enUsCurrency = {
     maximumFractionDigits: 2,
     minimumFractionDigits: 0,
   },
+  noneSensitiveCurrency: {
+    style: 'currency',
+    currency: 'USD',
+    currencyDisplay: 'symbol',
+    minimumFractionDigits: 0, // set fraction digits to 0 to remove cents
+    maximumFractionDigits: 0,
+  },
   noneSensitiveDecimal: {
     style: 'currency',
     currency: 'USD',
