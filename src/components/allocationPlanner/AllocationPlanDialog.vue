@@ -38,7 +38,7 @@
             lazy-rules
             label="Shares amount"
             :rules="[
-              (val) => (val && val > 0) || 'Please enter a valid shares amount',
+              (val) => validateTotalValue(val, localPlan.targetPrice, true),
             ]"
           />
 
@@ -49,9 +49,7 @@
             lazy-rules
             suffix="$"
             label="Target Price"
-            :rules="[
-              (val) => (val && val > 0) || 'Please enter a valid target price',
-            ]"
+            :rules="[(val) => validateTotalValue(localPlan.shares, val)]"
           />
 
           <div class="flex column q-gap-sm">
@@ -158,6 +156,25 @@ export default defineComponent({
       localPlan.value.logoImage = tickerOption?.logoImage ?? '';
     };
 
+    const validateTotalValue = (
+      shares: number,
+      price: number,
+      isShares = false
+    ) => {
+      if (!shares && isShares) {
+        return 'Please enter a valid shares amount';
+      }
+
+      if (!price && !isShares) {
+        return 'Please enter a valid target price';
+      }
+
+      return (
+        shares * price <= props.availableAllocationAmount ||
+        'Total value exceeds available funds'
+      );
+    };
+
     return {
       formRef,
       syntheticShow,
@@ -166,6 +183,7 @@ export default defineComponent({
       setLocalPlan,
       submitForm,
       onTickerOptionSelect,
+      validateTotalValue,
     };
   },
 });

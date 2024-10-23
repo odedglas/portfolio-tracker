@@ -92,7 +92,9 @@
       :show="showModal"
       @close="hideEntityModal"
       :plan="editEntity"
-      :available-allocation-amount="freeCashFlow"
+      :available-allocation-amount="
+        allocationPlansStore.allocationsSummary.availableCash
+      "
     />
   </q-page>
 </template>
@@ -134,16 +136,14 @@ export default defineComponent({
       },
     });
 
-    const freeCashFlow = computed(() => portfolioStore.freeCashFlow);
-
     const allocationPlans = computed(
       () => allocationPlansStore.allocationPlans
     );
 
     return {
       columns,
-      freeCashFlow,
       allocationPlans,
+      allocationPlansStore,
       showModal,
       editEntity,
       openEntityModal,
