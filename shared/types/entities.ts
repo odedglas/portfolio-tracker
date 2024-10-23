@@ -95,6 +95,10 @@ export type AllocationPlan = Entity & {
   targetPrice: number;
   shares: number;
   alertBufferPercent?: number;
+
+  // Computed
+  totalValue?: number;
+  allocationUsage?: number;
 };
 
 export type Portfolio = Entity &

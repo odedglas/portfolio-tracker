@@ -91,7 +91,7 @@ import { usePortfolioStore } from 'stores/portfolios';
 import { uid } from 'src/utils';
 
 const emptyPlan = (): AllocationPlan => ({
-  id: uid(),
+  id: '',
   shares: 0,
   targetPrice: 0,
   name: '',
@@ -141,6 +141,8 @@ export default defineComponent({
       };
     };
     const submitForm = async () => {
+      localPlan.value.id ||= uid();
+
       if (await formRef.value?.validate()) {
         const plan = localPlan.value;
 

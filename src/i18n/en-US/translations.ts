@@ -36,12 +36,14 @@ export const enUsMessages = {
     allocation_planner: {
       title: 'Allocation Planner',
       free_cash: 'Free cash flow',
-      current_planned: 'Current planned allocation',
+      current_planned: 'Planned allocations',
       allocation_usage: 'Allocation usage',
-      missing_cash: 'Missing cash flow',
+      available_cash: 'Available cash',
       add_new_allocation: 'Create New Allocation',
       new_allocation: 'New Allocation',
       edit_allocation: 'Edit Allocation',
+      empty_plans:
+        'There are no planned allocations yet.. Start planning your allocation by creating a new one',
     },
   },
   transactions: {

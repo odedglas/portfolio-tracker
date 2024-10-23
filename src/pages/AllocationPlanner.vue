@@ -6,33 +6,7 @@
       </p>
       <q-card class="q-px-lg q-my-md">
         <q-card-section class="flex justify-between">
-          <div class="flex q-gap-md items-center text-subtitle1">
-            <span class="text-grey-7"
-              >{{ $t('portfolios.allocation_planner.free_cash') }}:</span
-            >
-            <span>{{ $n(freeCashFlow, 'currency') }}</span>
-          </div>
-          <q-separator vertical />
-          <div class="flex q-gap-md items-center text-subtitle1">
-            <span class="text-grey-7"
-              >{{ $t('portfolios.allocation_planner.current_planned') }}:</span
-            >
-            <span>{{ $n(allocationDetails.plannedValue, 'currency') }}</span>
-          </div>
-          <q-separator vertical />
-          <div class="flex q-gap-md items-center text-subtitle1">
-            <span class="text-grey-7"
-              >{{ $t('portfolios.allocation_planner.allocation_usage') }}:</span
-            >
-            <span>{{ $n(allocationDetails.allocationUsage, 'percent') }}</span>
-          </div>
-          <q-separator vertical />
-          <div class="flex q-gap-md items-center text-subtitle1">
-            <span class="text-grey-7"
-              >{{ $t('portfolios.allocation_planner.missing_cash') }}:</span
-            >
-            <span>{{ $n(allocationDetails.missingCashFlow, 'currency') }}</span>
-          </div>
+          <allocations-panner-summary />
         </q-card-section>
       </q-card>
       <q-card class="q-px-lg q-pb-md q-my-md">
@@ -49,6 +23,7 @@
 
         <q-card-section class="q-py-md">
           <q-table
+            v-if="allocationPlans.length"
             :rows="allocationPlans"
             :columns="columns"
             hide-pagination
@@ -75,7 +50,7 @@
                   {{ $n(props.row.targetPrice, 'decimal') }}
                 </q-td>
                 <q-td key="usage" :props="props">
-                  {{ $n(props.row.allocationsUsage, 'percent') }}
+                  {{ $n(props.row.allocationUsage, 'percent') }}
                 </q-td>
                 <q-td key="total" :props="props">
                   {{ $n(props.row.totalValue, 'decimal') }}
@@ -105,6 +80,11 @@
               </q-tr>
             </template>
           </q-table>
+          <div v-else>
+            <span class="text-grey-7 text-caption">{{
+              $t('portfolios.allocation_planner.empty_plans')
+            }}</span>
+          </div>
         </q-card-section>
       </q-card>
     </div>
@@ -120,21 +100,24 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import { usePortfolioStore } from 'stores/portfolios';
-import { portfoliosTransformer } from 'app/shared/transformers';
 import AllocationPlanDialog from 'components/allocationPlanner/AllocationPlanDialog.vue';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import { AllocationPlan } from 'app/shared/types';
 import { columns } from './columns';
+import AllocationsPannerSummary from 'components/allocationPlanner/AllocationsPannerSummary.vue';
+import { useAllocationPlansStore } from 'stores/allocationPlans';
 
 export default defineComponent({
   name: 'AllocationPlannerPage',
   components: {
+    AllocationsPannerSummary,
     TickerLogo,
     AllocationPlanDialog,
   },
   setup() {
     const portfolioStore = usePortfolioStore();
+    const allocationPlansStore = useAllocationPlansStore();
     const {
       showModal,
       openEntityModal,
@@ -151,53 +134,15 @@ export default defineComponent({
       },
     });
 
-    const freeCashFlow = computed(() => {
-      const portfolio = portfolioStore.selectedPortfolioWithHoldings;
-      if (!portfolio) {
-        return 0;
-      }
+    const freeCashFlow = computed(() => portfolioStore.freeCashFlow);
 
-      return portfoliosTransformer.cashFlow(
-        portfolioStore.selectedPortfolioWithHoldings
-      );
-    });
-
-    const allocationPlans = computed(() => {
-      const plans = portfolioStore.selectedPortfolio?.allocationPlans ?? [];
-
-      return plans.map((plan) => {
-        const totalValue = plan.shares * plan.targetPrice;
-        const allocationsUsage = totalValue / freeCashFlow.value;
-
-        return { ...plan, totalValue, allocationsUsage };
-      });
-    });
-
-    const allocationDetails = computed(() => {
-      const plans = allocationPlans.value;
-      const plannedValue = plans.reduce(
-        (acc, plan) => acc + plan.totalValue,
-        0
-      );
-
-      const missingCashFlow =
-        plannedValue > freeCashFlow.value
-          ? plannedValue - freeCashFlow.value
-          : 0;
-      const allocationUsage =
-        freeCashFlow.value > 0 ? plannedValue / freeCashFlow.value : 0;
-
-      return {
-        plannedValue,
-        allocationUsage,
-        missingCashFlow,
-      };
-    });
+    const allocationPlans = computed(
+      () => allocationPlansStore.allocationPlans
+    );
 
     return {
       columns,
       freeCashFlow,
-      allocationDetails,
       allocationPlans,
       showModal,
       editEntity,
