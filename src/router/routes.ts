@@ -7,6 +7,7 @@ export const ROUTE_PATHS = {
   TRANSACTIONS: '/transactions',
   HOLDINGS: '/holdings',
   CASH: '/cash',
+  ALLOCATION_PLANNER: '/allocation-planner',
   ANALYTICS: '/analytics',
   STOCK_PLANS: '/stock-plans',
 };
@@ -55,6 +56,10 @@ const routes: RouteRecordRaw[] = [
       {
         path: ROUTE_PATHS.STOCK_PLANS,
         component: () => import('pages/StockPlans.vue'),
+      },
+      {
+        path: ROUTE_PATHS.ALLOCATION_PLANNER,
+        component: () => import('pages/AllocationPlanner.vue'),
       },
     ],
   },

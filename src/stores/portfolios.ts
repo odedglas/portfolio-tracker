@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { holdingsTransformer } from 'app/shared/transformers';
 import portfolioAPI from 'src/service/portfolio';
 import {
+  AllocationPlan,
   Deposit,
   Portfolio,
   PortfolioHistory,
@@ -221,6 +222,24 @@ export const usePortfolioStore = defineStore('portfolios', {
       plan.orders = plan.orders?.filter((order) => order.id !== orderId);
 
       return this.updateStocksPlan(plan);
+    },
+    async updateAllocationPlan(plan: AllocationPlan, remove = false) {
+      const portfolio = this.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      const filteredPlans = portfolio.allocationPlans?.filter(
+        (allocationPlan) => allocationPlan.id !== plan.id
+      );
+
+      portfolio.allocationPlans = [...(filteredPlans ?? [])];
+
+      if (!remove) {
+        portfolio.allocationPlans.push(plan as AllocationPlan);
+      }
+
+      return portfolioAPI.update(portfolio, portfolio.id);
     },
   },
 });

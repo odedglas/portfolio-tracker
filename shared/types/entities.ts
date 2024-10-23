@@ -88,6 +88,15 @@ export type StocksPlan = Entity & {
   marketPrice?: number;
 };
 
+export type AllocationPlan = Entity & {
+  name: string;
+  ticker: string;
+  logoImage: string;
+  targetPrice: number;
+  shares: number;
+  alertBufferPercent?: number;
+};
+
 export type Portfolio = Entity &
   Timestamped &
   Profitable & {
@@ -96,6 +105,7 @@ export type Portfolio = Entity &
     target: number;
     deposits: Deposit[];
     stocksPlans?: StocksPlan[];
+    allocationPlans?: AllocationPlan[];
   };
 
 export type PortfolioHistory = Profitable & {

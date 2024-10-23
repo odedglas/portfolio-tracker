@@ -33,6 +33,16 @@ export const enUsMessages = {
       'The initial value will be converted to a "Deposit" item you can later manage',
     target_explain: 'The Target will be used to track your portfolio progress',
     empty: 'Still quiet here...',
+    allocation_planner: {
+      title: 'Allocation Planner',
+      free_cash: 'Free cash flow',
+      current_planned: 'Current planned allocation',
+      allocation_usage: 'Allocation usage',
+      missing_cash: 'Missing cash flow',
+      add_new_allocation: 'Create New Allocation',
+      new_allocation: 'New Allocation',
+      edit_allocation: 'Edit Allocation',
+    },
   },
   transactions: {
     header: 'Transactions',

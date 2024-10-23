@@ -62,6 +62,7 @@ export default defineComponent({
           ROUTE_PATHS.TRANSACTIONS,
           ROUTE_PATHS.HOLDINGS,
           ROUTE_PATHS.CASH,
+          ROUTE_PATHS.ALLOCATION_PLANNER,
         ],
         menuOptions: [
           {
@@ -81,6 +82,12 @@ export default defineComponent({
             text: 'Cash Flow',
             icon: 'attach_money',
             route: ROUTE_PATHS.CASH,
+          },
+          {
+            id: 'planner',
+            text: 'Allocation Planner',
+            icon: 'list_alt',
+            route: ROUTE_PATHS.ALLOCATION_PLANNER,
           },
         ],
       },
