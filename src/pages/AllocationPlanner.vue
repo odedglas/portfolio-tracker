@@ -136,9 +136,7 @@ export default defineComponent({
       },
     });
 
-    const allocationPlans = computed(
-      () => allocationPlansStore.allocationPlans
-    );
+    const allocationPlans = computed(() => allocationPlansStore.plans);
 
     return {
       columns,

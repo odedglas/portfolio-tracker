@@ -140,6 +140,8 @@ export default defineComponent({
     };
     const submitForm = async () => {
       localPlan.value.id ||= uid();
+      localPlan.value.totalValue =
+        localPlan.value.shares * localPlan.value.targetPrice;
 
       if (await formRef.value?.validate()) {
         const plan = localPlan.value;

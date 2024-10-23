@@ -108,7 +108,7 @@ export const usePortfolioStore = defineStore('portfolios', {
       );
 
       allocationPlanStore.setAllocationsPlans(
-        this.selectedPortfolio as Portfolio
+        this.selectedPortfolio?.allocationPlans ?? []
       );
     },
     async list() {
@@ -260,7 +260,7 @@ export const usePortfolioStore = defineStore('portfolios', {
         portfolio.allocationPlans.push(plan as AllocationPlan);
       }
 
-      allocationsPlansStore.setAllocationsPlans(portfolio);
+      allocationsPlansStore.setAllocationsPlans(portfolio.allocationPlans);
 
       return portfolioAPI.update(portfolio, portfolio.id);
     },
