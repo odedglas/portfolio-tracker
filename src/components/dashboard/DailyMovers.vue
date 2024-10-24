@@ -5,9 +5,9 @@
         <q-icon name="timeline" class="dashboard-icon q-mr-sm" size="sm" />
         <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
       </div>
-      <q-chip outline size="md" color="primary"
-        >Fear and Greed Index: {{ quotesStore.fearAndGreed?.now?.valueText }} /
-        {{ quotesStore.fearAndGreed.now?.value }}</q-chip
+      <q-chip outline size="md" color="primary" :icon="featAndGreed.emoji"
+        >Fear and Greed Index: {{ featAndGreed.text }} /
+        {{ featAndGreed.value }}</q-chip
       >
     </q-card-section>
     <q-card-section class="q-py-sm">
@@ -55,6 +55,19 @@ export default defineComponent({
         .sort((a, b) => b.dailyChange.percent - a.dailyChange.percent)
     );
 
+    const featAndGreed = computed(() => {
+      const { value = 0, valueText } = quotesStore.fearAndGreed?.now ?? {};
+
+      const emoji =
+        value < 35
+          ? 'sentiment_dissatisfied'
+          : value > 65
+          ? 'sentiment_very_satisfied'
+          : 'sentiment_neutral';
+
+      return { value, text: valueText, emoji };
+    });
+
     onMounted(async () => {
       const { quoteResponse } = await getQuotes(
         benchmarks.value.map((b) => b.ticker)
@@ -77,6 +90,7 @@ export default defineComponent({
     return {
       holdingsStore,
       quotesStore,
+      featAndGreed,
       viewHoldings,
       benchmarks,
     };

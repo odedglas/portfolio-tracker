@@ -94,9 +94,10 @@ import { useLoadingStore } from 'stores/loading';
 import { StockPlanOrder, StocksPlan } from 'app/shared/types';
 import { formatPlanDate } from 'src/service/date';
 import { usePortfolioStore } from 'stores/portfolios';
+import { uid } from 'src/utils';
 
 const emptyOrder = (): StockPlanOrder => ({
-  id: (Math.random() + 1).toString(36).substring(7),
+  id: uid(),
   date: 0,
   price: 0,
   shares: 0,

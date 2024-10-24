@@ -33,6 +33,18 @@ export const enUsMessages = {
       'The initial value will be converted to a "Deposit" item you can later manage',
     target_explain: 'The Target will be used to track your portfolio progress',
     empty: 'Still quiet here...',
+    allocation_planner: {
+      title: 'Allocation Planner',
+      free_cash: 'Free cash flow',
+      current_planned: 'Planned allocations',
+      allocation_usage: 'Allocation usage',
+      available_cash: 'Available cash',
+      add_new_allocation: 'Create New Allocation',
+      new_allocation: 'New Allocation',
+      edit_allocation: 'Edit Allocation',
+      empty_plans:
+        'There are no planned allocations yet.. Start planning your allocation by creating a new one',
+    },
   },
   transactions: {
     header: 'Transactions',
@@ -159,6 +171,13 @@ export const enUsCurrency = {
     style: 'decimal',
     maximumFractionDigits: 2,
     minimumFractionDigits: 0,
+  },
+  noneSensitiveCurrency: {
+    style: 'currency',
+    currency: 'USD',
+    currencyDisplay: 'symbol',
+    minimumFractionDigits: 0, // set fraction digits to 0 to remove cents
+    maximumFractionDigits: 0,
   },
   noneSensitiveDecimal: {
     style: 'currency',

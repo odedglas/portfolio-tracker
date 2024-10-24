@@ -14,7 +14,7 @@
             : false
         "
         :modules="swiperModules"
-        :slides-per-view="3"
+        :slides-per-view="hasPagination ? 3 : insights.length"
         :vertical="true"
         class="insights-swiper-wrapper"
         wrapper-class="q-pb-xl"
@@ -61,7 +61,11 @@
                 :key="tagIndex"
               >
                 {{ $t(`insights.tags.${tag.name}`) }}:&nbsp;
-                <b> {{ $n(Number(tag.value), tag.format ?? 'decimal') }} </b>
+                <b>
+                  {{
+                    $n(Number(tag.value), tag.format ?? 'noneSensitiveDecimal')
+                  }}
+                </b>
               </q-chip>
             </div>
           </div>

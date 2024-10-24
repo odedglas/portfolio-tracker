@@ -1,8 +1,12 @@
 import omit from 'lodash/omit';
 import { defineStore } from 'pinia';
-import { holdingsTransformer } from 'app/shared/transformers';
+import {
+  holdingsTransformer,
+  portfoliosTransformer,
+} from 'app/shared/transformers';
 import portfolioAPI from 'src/service/portfolio';
 import {
+  AllocationPlan,
   Deposit,
   Portfolio,
   PortfolioHistory,
@@ -13,6 +17,7 @@ import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
 import { queries } from 'src/service/firebase/collections';
 import { useStocksPlansStore } from 'stores/stocksPlans';
+import { useAllocationPlansStore } from 'stores/allocationPlans';
 
 const selectedPortfolioStorageKey = 'selected_portfolio_id';
 
@@ -71,11 +76,22 @@ export const usePortfolioStore = defineStore('portfolios', {
         };
       });
     },
+    freeCashFlow(): number {
+      const portfolio = this.selectedPortfolioWithHoldings;
+
+      if (!portfolio) {
+        return 0;
+      }
+
+      return portfoliosTransformer.cashFlow(portfolio);
+    },
   },
   actions: {
     async selectPortfolio(portfolioId: string) {
       const transactionsStore = useTransactionsStore();
       const stocksPlansStore = useStocksPlansStore();
+      const allocationPlanStore = useAllocationPlansStore();
+
       localStorage.setItem(selectedPortfolioStorageKey, portfolioId);
 
       this.selectedPortfolioId = portfolioId;
@@ -89,6 +105,10 @@ export const usePortfolioStore = defineStore('portfolios', {
 
       await stocksPlansStore.setStocksPlans(
         this.selectedPortfolio?.stocksPlans ?? []
+      );
+
+      allocationPlanStore.setAllocationsPlans(
+        this.selectedPortfolio?.allocationPlans ?? []
       );
     },
     async list() {
@@ -221,6 +241,28 @@ export const usePortfolioStore = defineStore('portfolios', {
       plan.orders = plan.orders?.filter((order) => order.id !== orderId);
 
       return this.updateStocksPlan(plan);
+    },
+    async updateAllocationPlan(plan: AllocationPlan, remove = false) {
+      const allocationsPlansStore = useAllocationPlansStore();
+
+      const portfolio = this.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      const filteredPlans = portfolio.allocationPlans?.filter(
+        (allocationPlan) => allocationPlan.id !== plan.id
+      );
+
+      portfolio.allocationPlans = [...(filteredPlans ?? [])];
+
+      if (!remove) {
+        portfolio.allocationPlans.push(plan as AllocationPlan);
+      }
+
+      allocationsPlansStore.setAllocationsPlans(portfolio.allocationPlans);
+
+      return portfolioAPI.update(portfolio, portfolio.id);
     },
   },
 });

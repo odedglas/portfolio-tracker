@@ -85,32 +85,6 @@ const fiftyTwoWeekLowInsightCalculator = {
   },
 };
 
-const highShortInterestInsightCalculator = {
-  getInsight: (options: CalculateInsightOptions) => {
-    const SHORT_INTEREST_THRESHOLD = 10;
-
-    const { quote } = options;
-
-    const { shortRatio } = quote;
-
-    if (!shortRatio || shortRatio < SHORT_INTEREST_THRESHOLD) {
-      return undefined;
-    }
-
-    const deltaPercent =
-      (shortRatio - SHORT_INTEREST_THRESHOLD) / SHORT_INTEREST_THRESHOLD;
-
-    return {
-      type: INSIGHT_TYPE.HIGH_SHORT_INTEREST,
-      inputs: {
-        shortRatio,
-        threshold: [SHORT_INTEREST_THRESHOLD, '%'].join(''),
-        deltaPercent,
-      },
-    };
-  },
-};
-
 const MOVING_AVERAGE_THRESHOLD = 0.025;
 
 const movingAveragesInsightCalculator = {
@@ -174,7 +148,6 @@ const movingAveragesInsightCalculator = {
 const insightsCalculators: InsightCalculator[] = [
   fiftyTwoWeekHighInsightCalculator,
   fiftyTwoWeekLowInsightCalculator,
-  highShortInterestInsightCalculator,
   movingAveragesInsightCalculator,
 ];
 

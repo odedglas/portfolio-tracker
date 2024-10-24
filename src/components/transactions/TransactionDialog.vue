@@ -37,38 +37,10 @@
               label="Operation"
             />
 
-            <q-input
-              class="col"
-              v-model="formattedDate"
-              placeholder="Date"
-              lazy-rules
-              :rules="[
-                (val) =>
-                  (val && typeof new Date(val).getTime === 'function') ||
-                  'Please set a valid transcation date',
-              ]"
-            >
-              <template v-slot:append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-date v-model="formattedDate" mask="MM/DD/YYYY">
-                      <div class="row items-center justify-end">
-                        <q-btn
-                          v-close-popup
-                          label="Close"
-                          color="primary"
-                          flat
-                        />
-                      </div>
-                    </q-date>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
+            <date-input
+              :date="localTransaction.date"
+              @date-change="(date) => (localTransaction.date = date)"
+            />
           </div>
 
           <div class="row" style="gap: 12px">
@@ -134,7 +106,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
-import { date as dateUtils } from 'quasar';
 import { useI18n } from 'vue-i18n';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useTransactionsStore } from 'stores/transactions';
@@ -143,6 +114,7 @@ import { useQuotesStore } from 'stores/quotes';
 import { Transaction } from 'app/shared/types';
 import { TRANSACTIONS_TYPES } from 'app/shared/constants';
 import TickerSearch, { TickerOption } from '../common/TickerSearch.vue';
+import DateInput from 'components/common/DateInput.vue';
 
 const emptyTransaction = (): Transaction => {
   const selectedPortfolioId = usePortfolioStore().selectedPortfolio?.id;
@@ -174,6 +146,7 @@ export default defineComponent({
     },
   },
   components: {
+    DateInput,
     TickerSearch,
   },
   emits: ['close'],
@@ -193,14 +166,6 @@ export default defineComponent({
         if (!value) {
           emit('close', undefined);
         }
-      },
-    });
-
-    const formattedDate = computed({
-      get: () =>
-        dateUtils.formatDate(localTransaction.value.date, 'MM/DD/YYYY'),
-      set: (date: string) => {
-        localTransaction.value.date = new Date(date).getTime();
       },
     });
 
@@ -263,7 +228,6 @@ export default defineComponent({
       formRef,
       syntheticShow,
       syntheticShares,
-      formattedDate,
       isNew,
       localTransaction,
       setLocalTransaction,
