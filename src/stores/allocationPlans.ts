@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { AllocationPlan, Portfolio } from 'app/shared/types';
+import { AllocationPlan } from 'app/shared/types';
 import { portfoliosTransformer } from 'app/shared/transformers';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useHoldingsStore } from 'stores/holdings';
