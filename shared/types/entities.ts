@@ -35,7 +35,7 @@ export type AppUser = {
   };
 };
 
-export type User = FirebaseUser & AppUser;
+export type User = FirebaseUser & AppUser & Entity;
 
 export type Deposit = {
   date: number;

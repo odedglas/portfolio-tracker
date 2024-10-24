@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { User } from 'app/shared/types';
+import userAPI from 'src/service/user';
 import { getMessagingToken } from 'src/service/firebase/messaging';
 
 export const useUserStore = defineStore('user', {
@@ -18,16 +19,22 @@ export const useUserStore = defineStore('user', {
       this.user.settings.notificationsEnabled =
         !this.user.settings.notificationsEnabled;
 
+      const updatePayload: Partial<User> = {
+        uid: this.user.uid,
+        settings: {
+          notificationsEnabled: this.user.settings.notificationsEnabled,
+        },
+      };
+
       // Subscribe to Firebase FCM
       if (
         this.user.settings.notificationsEnabled &&
         !this.user.messagingToken
       ) {
-        const token = await getMessagingToken();
-
-        // TODO - Persist messagingToken into User record here.
-        console.log('************* Token', token);
+        updatePayload.messagingToken = await getMessagingToken();
       }
+
+      await userAPI.update(updatePayload, this.user.id);
     },
   },
 });
