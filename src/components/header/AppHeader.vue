@@ -7,6 +7,7 @@
         <app-navigation class="desktop-only" />
       </q-toolbar-title>
 
+      <q-btn icon="notifications_none" flat />
       <q-btn
         :icon="visibilityIcon"
         flat

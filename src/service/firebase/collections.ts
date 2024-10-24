@@ -30,6 +30,7 @@ export const getCollections = () => ({
   portfolioHistory: createCollection('portfolioHistory'),
   transaction: createCollection('transactions'),
   holding: createCollection('holdings'),
+  user: createCollection('users'),
 });
 
 /**

@@ -20,11 +20,16 @@
           </q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable v-close-popup>
-          <q-item-section side>
-            <q-icon name="settings" />
+        <q-item>
+          <q-item-section>
+            <q-toggle
+              @click="userStore.toggleNotificationEnabledSetting"
+              class="q-px-none"
+              :model-value="userStore.user?.settings.notificationsEnabled"
+              label="Enable Notifications"
+              icon="notifications_none"
+            />
           </q-item-section>
-          <q-item-section>Settings</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable v-close-popup @click="logout">
@@ -40,7 +45,7 @@
 
 <script lang="ts">
 import { format } from 'quasar';
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, ref } from 'vue';
 import { authentication } from 'src/service/firebase/authentication';
 import { useUserStore } from 'stores/user';
 
@@ -50,6 +55,7 @@ export default defineComponent({
   name: 'UserProfile',
   setup() {
     const userStore = useUserStore();
+    const enableNotifications = ref(false);
 
     const displayName = computed(() => {
       const userDisplayNameParts =
@@ -69,11 +75,17 @@ export default defineComponent({
 
     const logout = () => authentication.signOut();
 
+    const enableNotificationsSetting = () => {
+      console.log('Enabling notifications to :', enableNotifications.value);
+    };
+
     return {
       userStore,
       displayName,
       userInitials,
       logout,
+      enableNotifications,
+      enableNotificationsSetting,
     };
   },
 });

@@ -14,6 +14,7 @@
     "build": "quasar build -m pwa",
     "postbuild": "cp -r src/assets/* dist/pwa/assets && cp src-pwa/firebase-messaging-sw.js dist/pwa",
     "predeploy": "npm run build",
+    "predeploy-l": "npm run build",
     "deploy": "firebase deploy",
     "deploy-l": "firebase deploy --only hosting",
     "precommit-msg": "echo 'Pre-commit checks...' && exit 0"

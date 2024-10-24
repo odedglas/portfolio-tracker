@@ -1,3 +1,4 @@
+import { User as FirebaseUser } from 'firebase/auth';
 import { INSIGHT_TYPE, LOGIN_META, TRANSACTIONS_TYPES } from '../constants';
 
 // Shared types
@@ -25,6 +26,16 @@ type TransactionAction =
   (typeof TRANSACTIONS_TYPES)[keyof typeof TRANSACTIONS_TYPES];
 
 export type LoginMode = keyof typeof LOGIN_META;
+
+export type AppUser = {
+  uid: string;
+  messagingToken?: string;
+  settings: {
+    notificationsEnabled: boolean;
+  };
+};
+
+export type User = FirebaseUser & AppUser;
 
 export type Deposit = {
   date: number;

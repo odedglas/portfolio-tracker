@@ -11,9 +11,6 @@
       <portfolio-heat-map class="dashboard-portfolio-heat-map" />
       <daily-movers class="dashboard-daily-movers" />
       <portfolio-insights class="dashboard-portfolio-insights" />
-      <div>
-        <q-btn @click="getToken" label="Request Permission" />
-      </div>
     </div>
     <quick-add />
   </q-page>
@@ -29,7 +26,6 @@ import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
 import PortfolioInsights from 'components/dashboard/PortfolioInsights.vue';
 import QuickAdd from 'components/dashboard/QuickAdd.vue';
 import DailyMovers from 'components/dashboard/DailyMovers.vue';
-import { getMessagingToken } from 'src/service/firebase/messaging';
 
 export default defineComponent({
   name: 'DashboardPage',
@@ -52,7 +48,6 @@ export default defineComponent({
     return {
       viewPortfolio,
       kpis,
-      getToken: getMessagingToken,
     };
   },
 });

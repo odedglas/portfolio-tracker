@@ -91,11 +91,7 @@ export default defineComponent({
   setup() {
     const holdingsStore = useHoldingsStore();
 
-    const insights = computed(() => {
-      console.log(holdingsStore.insights);
-
-      return holdingsStore.insights;
-    });
+    const insights = computed(() => holdingsStore.insights);
 
     const insightsPerPage = 3;
     const hasPagination = computed(
