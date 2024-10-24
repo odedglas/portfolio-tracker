@@ -16,6 +16,7 @@ const env = {
     process.env.RAPID_YAHOO_API_KEY ?? dotenvConfig.RAPID_YAHOO_API_KEY,
   STOCKS_QUOTE_CACHE_TTL:
     process.env.STOCKS_QUOTE_CACHE_TTL ?? dotenvConfig.STOCKS_QUOTE_CACHE_TTL,
+  MESSAGING_PK: process.env.MESSAGING_PK ?? dotenvConfig.MESSAGING_PK,
 };
 
 /**
