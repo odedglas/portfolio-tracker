@@ -43,35 +43,6 @@ export const portfolioScheduler = onSchedule(
   }
 );
 
-export const subscribeToNotifications = onCall(async (request) => {
-  const { uid } = request.data;
-
-  logger.info('Subscribe user to portfolios notifications', {
-    uid,
-    test: true,
-  });
-
-  // Getting user
-  const user = (await getCollection<User>('users')).find(
-    (user) => user.uid === uid
-  );
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  // Subscribe given user to its corresponding topic
-  const topic = `portfolios-${uid}`;
-
-  if (!user.messagingToken) {
-    throw new Error('User does not have a messaging token');
-  }
-
-  logger.info('Subscribing user to topic', { uid, topic });
-
-  await admin.messaging().subscribeToTopic(user.messagingToken, topic);
-});
-
 export const pushDummyzNotification = onCall(async (request) => {
   const { uid } = request.data;
 
