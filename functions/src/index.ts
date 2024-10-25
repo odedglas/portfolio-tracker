@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { onRequest } from 'firebase-functions/v2/https';
+import { onRequest, onCall } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { User } from '../../shared/types';
@@ -43,35 +43,66 @@ export const portfolioScheduler = onSchedule(
   }
 );
 
-export const subscribeToPortfoliosNotifications = onRequest(
-  async (request, response) => {
-    const { uid } = request.body;
+export const subscribeToNotifications = onCall(async (request) => {
+  const { uid } = request.data;
 
-    logger.info('Subscribe user to portfolios notifications', { uid });
+  logger.info('Subscribe user to portfolios notifications', {
+    uid,
+    test: true,
+  });
 
-    // Getting user
-    const user = (await getCollection<User>('users')).find(
-      (user) => user.uid === uid
-    );
+  // Getting user
+  const user = (await getCollection<User>('users')).find(
+    (user) => user.uid === uid
+  );
 
-    if (!user) {
-      response.status(400).send({ message: 'User not found' });
-
-      return;
-    }
-
-    // Subscribe given user to its corresponding topic
-    const topic = `portfolios-${uid}`;
-
-    if (!user.messagingToken) {
-      response
-        .status(500)
-        .send({ message: 'User does not have a messaging token' });
-      return;
-    }
-
-    await admin.messaging().subscribeToTopic(user.messagingToken, topic);
-
-    response.send({ success: true });
+  if (!user) {
+    throw new Error('User not found');
   }
-);
+
+  // Subscribe given user to its corresponding topic
+  const topic = `portfolios-${uid}`;
+
+  if (!user.messagingToken) {
+    throw new Error('User does not have a messaging token');
+  }
+
+  logger.info('Subscribing user to topic', { uid, topic });
+
+  await admin.messaging().subscribeToTopic(user.messagingToken, topic);
+});
+
+export const pushDummyzNotification = onCall(async (request) => {
+  const { uid } = request.data;
+
+  logger.info('Pushing dummy notifications', { uid, test: true });
+
+  // Getting user
+  const user = (await getCollection<User>('users')).find(
+    (user) => user.uid === uid
+  );
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  const topic = `portfolios-${uid}`;
+
+  const message = {
+    notification: {
+      title: 'Dummy notification',
+      body: 'This is a dummy notification',
+    },
+    token: user.messagingToken ?? '',
+  };
+
+  logger.info('Sending dummy message ', {
+    uid,
+    topic,
+    messagingToken: user.messagingToken,
+  });
+
+  const res = await admin.messaging().send(message);
+
+  logger.info('Finished sending dummy message', { res });
+});

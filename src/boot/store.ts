@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import { authentication } from 'src/service/firebase';
+import { initializeMessaging } from 'src/service/firebase/messaging';
 import userAPI from 'src/service/user';
 import { useUserStore } from 'stores/user';
 
@@ -16,6 +17,11 @@ export default boot(async () => {
     }
 
     const appUser = await userAPI.get(user.uid);
+
+    if (appUser.messagingToken) {
+      await initializeMessaging();
+    }
+
     await userStore.setUser({ ...user, ...appUser });
   });
 });
