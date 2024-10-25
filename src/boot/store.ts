@@ -24,6 +24,10 @@ export default boot(async () => {
       freshToken = await initializeMessaging();
     }
 
-    await userStore.setUser({ ...user, ...appUser, messagingToken: freshToken });
+    await userStore.setUser({
+      ...user,
+      ...appUser,
+      messagingToken: freshToken,
+    });
   });
 });

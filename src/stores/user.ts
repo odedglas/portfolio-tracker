@@ -14,7 +14,10 @@ export const useUserStore = defineStore('user', {
 
       // Ensures user token is freshly saved every time user object is set.
       if (user?.messagingToken) {
-        await userAPI.update({ messagingToken: user.messagingToken, uid: user.uid }, user.id);
+        await userAPI.update(
+          { messagingToken: user.messagingToken, uid: user.uid },
+          user.id
+        );
       }
     },
     async toggleNotificationEnabledSetting() {
