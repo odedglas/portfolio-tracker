@@ -9,7 +9,7 @@ buildSync({
   entryPoints: [
     path.join(process.cwd(), 'src-pwa', 'firebase-messaging-sw.js'),
   ],
-  outfile: path.join(process.cwd(), 'dist', 'pwa', 'firebase-messaging-sw.js'),
+  outfile: path.join(process.cwd(), 'public', 'firebase-messaging-sw.js'),
   define: {
     'process.env.MESSAGING_PK': `"${
       process.env.MESSAGING_PK ?? dotenvConfig.MESSAGING_PK
