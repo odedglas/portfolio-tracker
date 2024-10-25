@@ -18,10 +18,12 @@ export default boot(async () => {
 
     const appUser = await userAPI.get(user.uid);
 
-    if (appUser.messagingToken) {
-      await initializeMessaging();
+    let freshToken = appUser.messagingToken;
+
+    if (freshToken) {
+      freshToken = await initializeMessaging();
     }
 
-    await userStore.setUser({ ...user, ...appUser });
+    await userStore.setUser({ ...user, ...appUser, messagingToken: freshToken });
   });
 });

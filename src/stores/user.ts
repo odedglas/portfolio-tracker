@@ -11,6 +11,11 @@ export const useUserStore = defineStore('user', {
   actions: {
     async setUser(user: User | null) {
       this.user = user;
+
+      // Ensures user token is freshly saved every time user object is set.
+      if (user?.messagingToken) {
+        await userAPI.update({ messagingToken: user.messagingToken, uid: user.uid }, user.id);
+      }
     },
     async toggleNotificationEnabledSetting() {
       if (!this.user) {
