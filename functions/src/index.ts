@@ -30,7 +30,8 @@ export const migrationsRunner = onRequest(async (request, response) => {
 
 export const portfolioScheduler = onSchedule(
   {
-    schedule: 'every day 23:00',
+    schedule: 'every day 23:50',
+    timeZone: 'Asia/Jerusalem',
     secrets: ['RAPID_YAHOO_API_KEY'],
   },
   async (event) => {
