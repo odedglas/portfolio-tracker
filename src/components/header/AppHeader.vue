@@ -14,12 +14,12 @@
         @click="() => $emit('notifications-click')"
       >
         <q-badge
-          v-if="unreadNotifications"
+          v-if="notificationsStore.unreadNotifications.length"
           color="white"
           text-color="primary"
           floating
           rounded
-          >{{ unreadNotifications }}</q-badge
+          >{{ notificationsStore.unreadNotifications.length }}</q-badge
         >
       </q-btn>
       <q-btn
@@ -62,18 +62,11 @@ export default defineComponent({
       featuresStore.stealthMode ? 'Show' : 'Hide'
     );
 
-    const unreadNotifications = computed(
-      () =>
-        notificationsStore.notifications.filter(
-          (notification) => notification.unread
-        ).length
-    );
-
     return {
       visibilityIcon,
       visibilityHelper,
       featuresStore,
-      unreadNotifications,
+      notificationsStore,
     };
   },
 });

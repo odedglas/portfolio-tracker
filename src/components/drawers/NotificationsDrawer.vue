@@ -18,7 +18,7 @@
     </q-toolbar>
     <q-list class="notifications-list q-py-lg q-px-md">
       <q-item
-        v-for="notification in notificationsStore.notifications"
+        v-for="notification in notificationsStore.portfolioNotifications"
         :key="notification.id"
         :class="`notification column q-gap-md ${
           notification.unread ? 'unread' : 'read'
