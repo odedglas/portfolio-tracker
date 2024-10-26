@@ -16,7 +16,10 @@
       </q-toolbar-title>
       <q-btn flat round dense icon="close" @click="$emit('close-drawer')" />
     </q-toolbar>
-    <q-list class="notifications-list q-py-lg q-px-md">
+    <q-list
+      class="notifications-list q-py-lg q-px-md"
+      v-if="notificationsStore.portfolioNotifications.length"
+    >
       <q-item
         v-for="notification in notificationsStore.portfolioNotifications"
         :key="notification.id"
@@ -43,6 +46,12 @@
         </q-item-section>
       </q-item>
     </q-list>
+    <div
+      class="q-pa-lg text-grey-8 text-subtitle1 flex column items-center q-gap-lg"
+    >
+      There are no notifications yet...
+      <img src="~assets/no-alarm.png" width="64" />
+    </div>
   </q-drawer>
 </template>
 

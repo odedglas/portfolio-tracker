@@ -111,7 +111,7 @@ export type AllocationPlan = Entity & {
   logoImage: string;
   targetPrice: number;
   shares: number;
-  alertBufferPercent?: number;
+  alertId?: string;
 
   // Computed
   totalValue?: number;

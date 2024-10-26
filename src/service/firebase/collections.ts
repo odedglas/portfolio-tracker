@@ -32,6 +32,7 @@ export const getCollections = () => ({
   holding: createCollection('holdings'),
   user: createCollection('users'),
   notifications: createCollection('notifications'),
+  alerts: createCollection('alerts'),
 });
 
 /**

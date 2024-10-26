@@ -47,12 +47,11 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import groupBy from 'lodash/groupBy';
-import { useStocksPlansStore } from 'stores/stocksPlans';
 import StocksPlansGroupDetails from 'components/stocksPlan/StocksPlansGroupDetails.vue';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
 import { StocksPlan } from 'app/shared/types';
 import StocksPlanDialog from 'components/stocksPlan/StocksPlanDialog.vue';
-import { usePortfolioStore } from 'stores/portfolios';
+import { useStocksPlansStore } from 'stores/stocksPlans';
 import StocksPlanSimulator from 'components/stocksPlan/StocksPlanSimulator.vue';
 
 export default defineComponent({
@@ -63,7 +62,6 @@ export default defineComponent({
     StocksPlansGroupDetails,
   },
   setup() {
-    const portfolioStore = usePortfolioStore();
     const stocksPlansStore = useStocksPlansStore();
 
     const {
@@ -77,7 +75,7 @@ export default defineComponent({
         title: 'Delete Stocks Plan',
         message: (plan) =>
           `Are you sure you want to delete the following stocks plan: ${plan.identifier} of "${plan.name}"?`,
-        callback: async (plan) => portfolioStore.updateStocksPlan(plan, true),
+        callback: async (plan) => stocksPlansStore.updateStocksPlan(plan, true),
       },
     });
 
