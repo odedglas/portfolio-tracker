@@ -22,6 +22,14 @@ export default boot(async () => {
 
     if (freshToken) {
       freshToken = await initializeMessaging();
+
+      // Ensures user token is freshly saved every time user object is set.
+      if (appUser.messagingToken !== freshToken) {
+        await userAPI.update(
+          { messagingToken: freshToken, uid: user.uid },
+          appUser.id
+        );
+      }
     }
 
     await userStore.setUser({

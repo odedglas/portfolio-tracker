@@ -47,6 +47,10 @@ export default defineComponent({
         selectedBenchmark.value = [...selectedBenchmark.value, option];
       }
 
+      selectedBenchmark.value = selectedBenchmark.value.sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0)
+      );
+
       emitSelectedBenchmark();
     };
 

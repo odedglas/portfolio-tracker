@@ -1,5 +1,11 @@
 import { User as FirebaseUser } from 'firebase/auth';
-import { INSIGHT_TYPE, LOGIN_META, TRANSACTIONS_TYPES } from '../constants';
+import { NotificationPayload } from 'firebase/messaging';
+import {
+  INSIGHT_TYPE,
+  LOGIN_META,
+  NOTIFICATION_TYPE,
+  TRANSACTIONS_TYPES,
+} from '../constants';
 
 // Shared types
 export type Entity = {
@@ -189,3 +195,14 @@ export type PortfolioInsight = {
   }[];
   holding: Holding;
 };
+
+export type NotificationType =
+  (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];
+
+export type Notification = Entity &
+  NotificationPayload & {
+    portfolioId: string;
+    unread: boolean;
+    type: NotificationType;
+    data: Record<string, string>;
+  };

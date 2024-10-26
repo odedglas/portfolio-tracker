@@ -157,8 +157,17 @@ const planTaxMapping = {
   rsu: {
     base: (isTerminated: boolean) => (isTerminated ? 0.62 : 0.48),
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    capital: (isTerminated: boolean, _: boolean) =>
-      isTerminated ? 0.62 : 0.25,
+    capital: (isTerminated: boolean, isAbove102Entitlement: boolean) => {
+      if (isTerminated) {
+        return 0.62;
+      }
+
+      if (isAbove102Entitlement) {
+        return 0.25;
+      }
+
+      return 0.48;
+    },
   },
 } as const;
 

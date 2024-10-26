@@ -1,11 +1,10 @@
 import * as admin from 'firebase-admin';
-import { onRequest, onCall } from 'firebase-functions/v2/https';
+import { onRequest, onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import { User } from '../../shared/types';
 import { portfolioHistoryTracker } from './portfolioHistoryTracker';
 import { migrations } from './migrations';
-import { getCollection } from './utils/getCollection';
+import { pushDummyNotification } from './notifications';
 
 admin.initializeApp();
 
@@ -44,37 +43,12 @@ export const portfolioScheduler = onSchedule(
   }
 );
 
-export const pushDummyzNotification = onCall(async (request) => {
-  const { uid } = request.data;
+export const pushDummyzNotification = onCall((request) => {
+  const { uid } = request.data ?? request.auth?.uid ?? {};
 
-  logger.info('Pushing dummy notifications', { uid, test: true });
-
-  // Getting user
-  const user = (await getCollection<User>('users')).find(
-    (user) => user.uid === uid
-  );
-
-  if (!user) {
-    throw new Error('User not found');
+  if (!uid) {
+    throw new HttpsError('invalid-argument', 'uid is required');
   }
 
-  const topic = `portfolios-${uid}`;
-
-  const message = {
-    notification: {
-      title: 'Dummy notification',
-      body: 'This is a dummy notification',
-    },
-    token: user.messagingToken ?? '',
-  };
-
-  logger.info('Sending dummy message ', {
-    uid,
-    topic,
-    messagingToken: user.messagingToken,
-  });
-
-  const res = await admin.messaging().send(message);
-
-  logger.info('Finished sending dummy message', { res });
+  return pushDummyNotification(uid);
 });
