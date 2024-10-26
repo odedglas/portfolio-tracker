@@ -4,6 +4,7 @@ import {
   PortfolioHistory,
   Transaction,
   User,
+  Notification,
 } from './entities';
 
 export interface AppCollections {
@@ -12,6 +13,7 @@ export interface AppCollections {
   holdings: Holding;
   portfolioHistory: PortfolioHistory;
   users: User;
+  notifications: Notification;
 }
 
 export type AppCollectionsNames = keyof AppCollections;

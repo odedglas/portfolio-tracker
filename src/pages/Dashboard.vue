@@ -11,7 +11,6 @@
       <portfolio-heat-map class="dashboard-portfolio-heat-map" />
       <daily-movers class="dashboard-daily-movers" />
       <portfolio-insights class="dashboard-portfolio-insights" />
-      <q-btn label="Push dummy!" @click="dummy" />
     </div>
     <quick-add />
   </q-page>
@@ -27,8 +26,6 @@ import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
 import PortfolioInsights from 'components/dashboard/PortfolioInsights.vue';
 import QuickAdd from 'components/dashboard/QuickAdd.vue';
 import DailyMovers from 'components/dashboard/DailyMovers.vue';
-import { pushDummy } from 'src/service/firebase/cloudRequest';
-import { useUserStore } from 'stores/user';
 
 export default defineComponent({
   name: 'DashboardPage',
@@ -41,7 +38,6 @@ export default defineComponent({
     PortfolioInsights,
   },
   setup() {
-    const userStore = useUserStore();
     const portfolioStore = usePortfolioStore();
     const { kpis } = usePortfolioKpis();
 
@@ -49,14 +45,9 @@ export default defineComponent({
       () => portfolioStore.selectedPortfolioWithHoldings
     );
 
-    const dummy = () => {
-      pushDummy(userStore.user?.uid || '');
-    };
-
     return {
       viewPortfolio,
       kpis,
-      dummy,
     };
   },
 });

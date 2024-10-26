@@ -199,10 +199,15 @@ export type PortfolioInsight = {
 export type NotificationType =
   (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];
 
+interface RequiredNotificationData extends Record<string, string> {
+  portfolioId: string;
+}
+
 export type Notification = Entity &
   NotificationPayload & {
-    portfolioId: string;
+    owner: string;
+    createdAt: number;
     unread: boolean;
     type: NotificationType;
-    data: Record<string, string>;
+    data: RequiredNotificationData;
   };
