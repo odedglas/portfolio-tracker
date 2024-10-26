@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import { format } from 'quasar';
-import { defineComponent, computed, ref } from 'vue';
+import { defineComponent, computed } from 'vue';
 import { authentication } from 'src/service/firebase/authentication';
 import { useUserStore } from 'stores/user';
 
@@ -55,7 +55,6 @@ export default defineComponent({
   name: 'UserProfile',
   setup() {
     const userStore = useUserStore();
-    const enableNotifications = ref(false);
 
     const displayName = computed(() => {
       const userDisplayNameParts =
@@ -75,17 +74,11 @@ export default defineComponent({
 
     const logout = () => authentication.signOut();
 
-    const enableNotificationsSetting = () => {
-      console.log('Enabling notifications to :', enableNotifications.value);
-    };
-
     return {
       userStore,
       displayName,
       userInitials,
       logout,
-      enableNotifications,
-      enableNotificationsSetting,
     };
   },
 });

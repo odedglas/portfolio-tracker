@@ -20,21 +20,20 @@
       <q-item
         v-for="notification in notificationsStore.notifications"
         :key="notification.id"
-        :class="`notification column ${
+        :class="`notification column q-gap-md ${
           notification.unread ? 'unread' : 'read'
         }`"
       >
-        <q-item-section>
-          <q-item-label>{{ notification.owner }}</q-item-label>
-          <q-item-label caption>{{
-            notification.data?.portfolioId
-          }}</q-item-label>
-          <q-item-label caption
-            >At:
+        <component
+          :is="getNotificationComponent(notification)"
+          :payload="notification.data"
+        />
+
+        <q-item-section class="row justify-between items-center flex-row">
+          <q-item-label caption class="q-ml-none"
+            >Sent at:
             {{ formatNotificationDate(notification.createdAt) }}</q-item-label
           >
-        </q-item-section>
-        <q-item-section side>
           <q-btn
             flat
             :label="`Mark as ${notification.unread ? 'read' : 'unread'}`"
@@ -52,9 +51,13 @@ import { defineComponent } from 'vue';
 import { Notification } from 'shared/types/entities';
 import { useNotificationsStore } from 'stores/notifications';
 import { formatNotificationDate } from 'src/service/date';
+import PriceAlertNotification from './PriceAlertNotification.vue';
 
 export default defineComponent({
   name: 'NotificationsDrawer',
+  components: {
+    PriceAlertNotification,
+  },
   emits: ['close-drawer'],
   props: {
     open: {
@@ -71,10 +74,20 @@ export default defineComponent({
       notificationsStore.markAsRead(id, !unread);
     };
 
+    const getNotificationComponent = (notification: Notification) => {
+      switch (notification.type) {
+        case 'priceAlert':
+          return PriceAlertNotification;
+        default:
+          return null;
+      }
+    };
+
     return {
       notificationsStore,
       formatNotificationDate,
       markAsRead,
+      getNotificationComponent,
     };
   },
 });
@@ -96,6 +109,10 @@ export default defineComponent({
       &.unread {
         background: $grey-2;
       }
+    }
+
+    .q-item__section--main + .q-item__section--main {
+      margin-left: 0;
     }
   }
 }
