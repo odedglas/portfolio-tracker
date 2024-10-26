@@ -3,6 +3,7 @@ import { AllocationPlan } from 'app/shared/types';
 import { portfoliosTransformer } from 'app/shared/transformers';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useHoldingsStore } from 'stores/holdings';
+import portfolioAPI from 'src/service/portfolio';
 
 export const useAllocationPlansStore = defineStore('allocationPlans', {
   state: (): { allocationPlans: AllocationPlan[] } => ({
@@ -55,6 +56,28 @@ export const useAllocationPlansStore = defineStore('allocationPlans', {
   actions: {
     setAllocationsPlans(plans: AllocationPlan[]) {
       this.allocationPlans = plans;
+    },
+    async updateAllocationPlan(plan: AllocationPlan, remove = false) {
+      const portfolioStore = usePortfolioStore();
+
+      const portfolio = portfolioStore.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      const filteredPlans = portfolio.allocationPlans?.filter(
+        (allocationPlan) => allocationPlan.id !== plan.id
+      );
+
+      portfolio.allocationPlans = [...(filteredPlans ?? [])];
+
+      if (!remove) {
+        portfolio.allocationPlans.push(plan as AllocationPlan);
+      }
+
+      this.setAllocationsPlans(portfolio.allocationPlans);
+
+      return portfolioAPI.update(portfolio, portfolio.id);
     },
   },
 });

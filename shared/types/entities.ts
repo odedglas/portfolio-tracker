@@ -218,3 +218,21 @@ export type Notification = Entity &
     type: NotificationType;
     data: PriceAlertNotificationData;
   };
+
+type AlertCondition = 'above' | 'below';
+type AlertValueProperty =
+  | 'regularMarketPrice'
+  | 'fiftyDayAverage'
+  | 'twoHundredDayAverage';
+
+export type Alert = Entity & {
+  value: number;
+  valueProperty: AlertValueProperty;
+  once: boolean;
+  active: boolean;
+  ticker: string;
+  logoImage?: string;
+  portfolioId: string;
+  condition: AlertCondition;
+  expiration: number;
+};

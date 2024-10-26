@@ -60,8 +60,8 @@
               }}</span
             >
             <span class="text-caption text-grey-7"
-              >Available Cash:
-              {{ $n(availableAllocationAmount, 'decimal') }}</span
+              >Available allocation flow:
+              {{ $n(enforcedAllocationAmount, 'decimal') }}</span
             >
           </div>
         </q-form>
@@ -85,8 +85,8 @@ import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
 import { useLoadingStore } from 'stores/loading';
 import { AllocationPlan } from 'app/shared/types';
 import TickerSearch, { TickerOption } from 'components/common/TickerSearch.vue';
-import { usePortfolioStore } from 'stores/portfolios';
 import { uid } from 'src/utils';
+import { useAllocationPlansStore } from 'stores/allocationPlans';
 
 const emptyPlan = (): AllocationPlan => ({
   id: '',
@@ -116,7 +116,7 @@ export default defineComponent({
   emits: ['close'],
   setup(props, { emit }) {
     const { emitLoadingTask } = useLoadingStore();
-    const portfolioStore = usePortfolioStore();
+    const allocationPlansStore = useAllocationPlansStore();
 
     const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
       ref(undefined);
@@ -138,6 +138,17 @@ export default defineComponent({
         ...(props.plan || emptyPlan()),
       };
     };
+
+    const enforcedAllocationAmount = computed(() => {
+      if (!isNew.value) {
+        return (
+          props.availableAllocationAmount + (localPlan.value.totalValue ?? 0)
+        );
+      }
+
+      return props.availableAllocationAmount;
+    });
+
     const submitForm = async () => {
       localPlan.value.id ||= uid();
       localPlan.value.totalValue =
@@ -146,7 +157,9 @@ export default defineComponent({
       if (await formRef.value?.validate()) {
         const plan = localPlan.value;
 
-        await emitLoadingTask(() => portfolioStore.updateAllocationPlan(plan));
+        await emitLoadingTask(() =>
+          allocationPlansStore.updateAllocationPlan(plan)
+        );
 
         emit('close');
       }
@@ -172,7 +185,7 @@ export default defineComponent({
       }
 
       return (
-        shares * price <= props.availableAllocationAmount ||
+        shares * price <= enforcedAllocationAmount.value ||
         'Total value exceeds available funds'
       );
     };
@@ -186,6 +199,7 @@ export default defineComponent({
       submitForm,
       onTickerOptionSelect,
       validateTotalValue,
+      enforcedAllocationAmount,
     };
   },
 });

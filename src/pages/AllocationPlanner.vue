@@ -118,7 +118,6 @@ export default defineComponent({
     AllocationPlanDialog,
   },
   setup() {
-    const portfolioStore = usePortfolioStore();
     const allocationPlansStore = useAllocationPlansStore();
     const {
       showModal,
@@ -132,7 +131,7 @@ export default defineComponent({
         message: (plan) =>
           `Are you sure you want to delete allocation plan of "${plan.ticker}"?`,
         callback: async (plan) =>
-          portfolioStore.updateAllocationPlan(plan, true),
+          allocationPlansStore.updateAllocationPlan(plan, true),
       },
     });
 

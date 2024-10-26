@@ -53,7 +53,17 @@ export const pushDummyzNotification = onCall((request) => {
   return sendNotification(uid, {
     title: 'Hello',
     body: 'Testme',
-    data: { ticker: 'SS', portfolioId: 'hSW0BwsmD3ELogXt95Br', targetPrice: '120', },
+    data: {
+      ticker: 'SS',
+      portfolioId: 'hSW0BwsmD3ELogXt95Br',
+      targetPrice: '120',
+    },
     type: 'priceAlert',
   });
+});
+
+export const runNotificationsScheduler = onCall((request) => {
+  // TODO - Run alerts triggering flow.
+  // TODO - Run insights detection
+  // Send all processed notifications.
 });
