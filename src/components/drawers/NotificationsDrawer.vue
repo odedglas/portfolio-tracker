@@ -20,7 +20,7 @@
       <q-item
         v-for="notification in notificationsStore.portfolioNotifications"
         :key="notification.id"
-        :class="`notification column q-gap-md ${
+        :class="`notification column q-gap-sm ${
           notification.unread ? 'unread' : 'read'
         }`"
       >

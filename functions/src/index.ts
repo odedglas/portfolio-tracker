@@ -4,7 +4,7 @@ import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { portfolioHistoryTracker } from './portfolioHistoryTracker';
 import { migrations } from './migrations';
-import { pushDummyNotification } from './notifications';
+import { sendNotification } from './utils/notifications';
 
 admin.initializeApp();
 
@@ -50,5 +50,10 @@ export const pushDummyzNotification = onCall((request) => {
     throw new HttpsError('invalid-argument', 'uid is required');
   }
 
-  return pushDummyNotification(uid);
+  return sendNotification(uid, {
+    title: 'Hello',
+    body: 'Testme',
+    data: { ticker: 'SS', portfolioId: 'hSW0BwsmD3ELogXt95Br', targetPrice: '120', },
+    type: 'priceAlert',
+  });
 });

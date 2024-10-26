@@ -205,10 +205,9 @@ type RequiredNotificationData = {
 
 export type PriceAlertNotificationData = RequiredNotificationData & {
   ticker: string;
-  tickerName: string;
   logo?: string;
-  targetPrice: number;
-  triggerPrice: number;
+  targetPrice?: string;
+  triggerPrice?: string;
 };
 
 export type Notification = Entity &

@@ -7,7 +7,7 @@
         :size="18"
       />
       {{ payload.ticker }} Is crossing above
-      {{ $n(payload.targetPrice, 'decimal') }}
+      {{ $n(Number(payload.targetPrice ?? 0), 'decimal') }}
     </q-item-label>
   </q-item-section>
 </template>
