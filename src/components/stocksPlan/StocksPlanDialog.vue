@@ -160,7 +160,7 @@ import { useLoadingStore } from 'stores/loading';
 import { StocksPlan } from 'app/shared/types';
 import { formatPlanDate } from 'src/service/date';
 import TickerSearch, { TickerOption } from 'components/common/TickerSearch.vue';
-import { usePortfolioStore } from 'stores/portfolios';
+import { useStocksPlansStore } from 'stores/stocksPlans';
 
 const emptyPlan = (): StocksPlan => ({
   id: '',
@@ -193,7 +193,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const vestingYears = ref(4);
     const { emitLoadingTask } = useLoadingStore();
-    const portfolioStore = usePortfolioStore();
+    const stocksPlansStore = useStocksPlansStore();
 
     const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
       ref(undefined);
@@ -253,7 +253,7 @@ export default defineComponent({
         const plan = localPlan.value;
 
         await emitLoadingTask(async () => {
-          await portfolioStore.updateStocksPlan(plan);
+          await stocksPlansStore.updateStocksPlan(plan);
         });
 
         emit('close');

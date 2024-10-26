@@ -101,7 +101,6 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { usePortfolioStore } from 'stores/portfolios';
 import AllocationPlanDialog from 'components/allocationPlanner/AllocationPlanDialog.vue';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
 import TickerLogo from 'components/common/TickerLogo.vue';

@@ -77,7 +77,7 @@ import VueApexCharts from 'vue3-apexcharts';
 import { StockPlanOrder, StocksPlan } from 'app/shared/types';
 import { formatPlanDate } from 'src/service/date';
 import VestingPeriodsList from 'components/stocksPlan/VestingPeriodsList.vue';
-import { usePortfolioStore } from 'stores/portfolios';
+import { useStocksPlansStore } from 'stores/stocksPlans';
 import { useLoadingStore } from 'stores/loading';
 import { vestingPie } from 'src/service/charts';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
@@ -105,7 +105,7 @@ export default defineComponent({
     const $t = useI18n().t;
 
     const { emitLoadingTask } = useLoadingStore();
-    const portfolioStore = usePortfolioStore();
+    const stocksPlansStore = useStocksPlansStore();
 
     const {
       editEntity,
@@ -119,7 +119,7 @@ export default defineComponent({
         message: (order) =>
           `Are you sure you want to delete the following order: ${order.id} from plan: "${props.plan.identifier}"?`,
         callback: (order) =>
-          portfolioStore.removeStocksPlanOrder(props.plan, order.id),
+          stocksPlansStore.removeStocksPlanOrder(props.plan, order.id),
       },
     });
 
@@ -146,7 +146,7 @@ export default defineComponent({
         },
       }).onOk(async () =>
         emitLoadingTask(async () => {
-          await portfolioStore.terminateStocksPlan(props.plan);
+          await stocksPlansStore.terminateStocksPlan(props.plan);
         })
       );
     };

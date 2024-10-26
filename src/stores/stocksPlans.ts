@@ -1,6 +1,6 @@
 import { date as DateAPI } from 'quasar';
 import { defineStore } from 'pinia';
-import { StocksPlan } from 'app/shared/types';
+import { StockPlanOrder, StocksPlan } from 'app/shared/types';
 import { getQuotes } from 'src/service/stocks';
 import {
   calculateStocksPlanVestedPeriods,
@@ -9,6 +9,9 @@ import {
   findNextVestingPeriod,
   computePlanOrders,
 } from 'src/service/stocksPlans';
+import omit from 'lodash/omit';
+import portfolioAPI from 'src/service/portfolio';
+import { usePortfolioStore } from 'stores/portfolios';
 
 export const useStocksPlansStore = defineStore('stocksPlans', {
   state: (): { stocksPlans: StocksPlan[] } => ({
@@ -85,6 +88,57 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
           marketPrice: holdingMarketPrice,
         };
       });
+    },
+    async updateStocksPlan(plan: StocksPlan, remove = false) {
+      const rawPlan = omit(plan, [
+        'lastVested',
+        'nextVesting',
+        'sellableValue',
+        'potentialValue',
+        'vestedPeriods',
+        'vestingPeriods',
+      ]);
+
+      const portfolioStore = usePortfolioStore();
+
+      const portfolio = portfolioStore.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      const filteredPlans = portfolio.stocksPlans?.filter(
+        (stocksPlan) => stocksPlan.identifier !== plan.identifier
+      );
+
+      portfolio.stocksPlans = [...(filteredPlans ?? [])];
+
+      if (!remove) {
+        portfolio.stocksPlans.push(rawPlan as StocksPlan);
+      }
+
+      await this.setStocksPlans(portfolio.stocksPlans);
+
+      return portfolioAPI.update(portfolio, portfolio.id);
+    },
+    terminateStocksPlan(plan: StocksPlan) {
+      plan.terminationDate = Date.now();
+      return this.updateStocksPlan(plan);
+    },
+    updateStocksPlanOrder(plan: StocksPlan, order: StockPlanOrder) {
+      const currentIndex = plan.orders?.findIndex((o) => o.id === order.id);
+
+      if (currentIndex !== -1) {
+        plan.orders[currentIndex] = order;
+      } else {
+        plan.orders = [...(plan.orders ?? []), order];
+      }
+
+      return this.updateStocksPlan(plan);
+    },
+    removeStocksPlanOrder(plan: StocksPlan, orderId: string) {
+      plan.orders = plan.orders?.filter((order) => order.id !== orderId);
+
+      return this.updateStocksPlan(plan);
     },
   },
 });
