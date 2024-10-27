@@ -10,7 +10,10 @@ const messaging = getMessaging();
 
 // This handles messages when the app is in the background
 onBackgroundMessage(messaging, async (payload) => {
-  console.log('****** [Messaging SW] ********* Background message received', payload)
+  console.log(
+    '****** [Messaging SW] ********* Background message received',
+    payload
+  );
 
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
