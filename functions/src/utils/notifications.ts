@@ -2,7 +2,7 @@ import * as admin from 'firebase-admin';
 import * as logger from 'firebase-functions/logger';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { Message } from 'firebase-admin/messaging';
-import { getCollection } from './getCollection';
+import { getCollection, saveDocuments } from './getCollection';
 import { User, Notification } from '../../../shared/types';
 
 export const sendNotification = async (
@@ -13,6 +13,13 @@ export const sendNotification = async (
     uid,
     type: notification.type,
   });
+
+  await saveDocuments('notifications', [notification as Notification]);
+
+  // Early skip if there is no need to push towards user device.
+  if (!notification.sendPush) {
+    return;
+  }
 
   // Getting user
   const user = (await getCollection<User>('users')).find(
@@ -30,14 +37,15 @@ export const sendNotification = async (
       title,
       body,
     },
-    data: notification.data ?? {},
+    data: {
+      notificationPayload: JSON.stringify(notification),
+    },
     token: user.messagingToken ?? '',
   };
 
   logger.info('Sending Notification to user device ', {
     uid,
-    type: notification.type,
-    data: notification.data,
+    message,
     messagingToken: user.messagingToken,
   });
 

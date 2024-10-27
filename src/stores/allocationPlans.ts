@@ -81,7 +81,7 @@ export const useAllocationPlansStore = defineStore('allocationPlans', {
         if (isNew) {
           const alert = await alertAPI.createAllocationPlanTargetPriceAlert(
             plan,
-            portfolio.id
+            portfolio
           );
 
           alertId = alert.id;

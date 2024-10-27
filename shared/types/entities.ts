@@ -206,8 +206,8 @@ type RequiredNotificationData = {
 export type PriceAlertNotificationData = RequiredNotificationData & {
   ticker: string;
   logo?: string;
-  targetPrice?: string;
-  triggerPrice?: string;
+  targetPrice: number;
+  triggerPrice: number;
 };
 
 export type Notification = Entity &
@@ -216,6 +216,7 @@ export type Notification = Entity &
     createdAt: number;
     unread: boolean;
     type: NotificationType;
+    sendPush: boolean;
     data: PriceAlertNotificationData;
   };
 
@@ -227,6 +228,7 @@ type AlertValueProperty =
 
 export type Alert = Entity & {
   value: number;
+  owner: string;
   valueProperty: AlertValueProperty;
   once: boolean;
   active: boolean;
@@ -235,4 +237,5 @@ export type Alert = Entity & {
   portfolioId: string;
   condition: AlertCondition;
   expiration: number;
+  lastTriggered?: number;
 };

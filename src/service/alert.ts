@@ -1,5 +1,6 @@
+import { date as dateUtils } from 'quasar';
 import { getCollections, firestoreAPI } from 'src/service/firebase/collections';
-import { Alert, AllocationPlan } from 'app/shared/types';
+import { Alert, AllocationPlan, Portfolio } from 'app/shared/types';
 
 const alertsCollection = () => getCollections().alerts;
 
@@ -8,6 +9,7 @@ const api = {
     firestoreAPI.getDocument(alertsCollection(), alertId),
   update: async (data: Partial<Alert>, alertId?: string): Promise<Alert> => {
     if (!alertId) {
+      // TODO - Handle alert expiration if any
       const result = await firestoreAPI.addDocument(alertsCollection(), data);
       alertId = result.id;
     } else {
@@ -20,7 +22,7 @@ const api = {
     firestoreAPI.deleteDocument(alertId, alertsCollection()),
   createAllocationPlanTargetPriceAlert: (
     plan: AllocationPlan,
-    portfolioId: string
+    portfolio: Portfolio
   ) => {
     return api.update(
       {
@@ -31,7 +33,9 @@ const api = {
         once: true,
         active: true,
         condition: 'below',
-        portfolioId: portfolioId,
+        expiration: dateUtils.addToDate(new Date(), { years: 1 }).getTime(),
+        portfolioId: portfolio.id,
+        owner: portfolio.owner,
       },
       plan.alertId
     );

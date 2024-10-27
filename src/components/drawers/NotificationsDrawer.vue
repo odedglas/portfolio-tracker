@@ -23,7 +23,7 @@
       <q-item
         v-for="notification in notificationsStore.portfolioNotifications"
         :key="notification.id"
-        :class="`notification column q-gap-sm ${
+        :class="`notification column q-my-sm q-gap-sm ${
           notification.unread ? 'unread' : 'read'
         }`"
       >
@@ -47,6 +47,7 @@
       </q-item>
     </q-list>
     <div
+      v-else
       class="q-pa-lg text-grey-8 text-subtitle1 flex column items-center q-gap-lg"
     >
       There are no notifications yet...

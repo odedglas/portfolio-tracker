@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Notification } from 'app/shared/types';
+import { Notification } from 'app/shared/types/entities';
 import notificationsAPI from 'src/service/notifications';
 import { useUserStore } from 'stores/user';
 import { usePortfolioStore } from 'stores/portfolios';
@@ -47,6 +47,10 @@ export const useNotificationsStore = defineStore('notifications', {
       this.notifications[notificationIndex].unread = unread;
 
       await notificationsAPI.markRead(notificationId, unread);
+    },
+
+    addNotification(notification: Notification) {
+      this.notifications.push(notification);
     },
   },
 });

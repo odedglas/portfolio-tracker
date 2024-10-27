@@ -1,10 +1,10 @@
 import * as admin from 'firebase-admin';
-import { onRequest, onCall, HttpsError } from 'firebase-functions/v2/https';
+import { onRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { portfolioHistoryTracker } from './portfolioHistoryTracker';
 import { migrations } from './migrations';
-import { sendNotification } from './utils/notifications';
+import { alertsHandler } from './alertsHandler';
 
 admin.initializeApp();
 
@@ -43,27 +43,13 @@ export const portfolioScheduler = onSchedule(
   }
 );
 
-export const pushDummyzNotification = onCall((request) => {
-  const { uid } = request.data ?? request.auth?.uid ?? {};
+export const runNotificationsScheduler = onRequest(
+  { secrets: ['RAPID_YAHOO_API_KEY'] },
+  async (request, response) => {
+    await alertsHandler();
 
-  if (!uid) {
-    throw new HttpsError('invalid-argument', 'uid is required');
+    // TODO - Run insights detection
+
+    response.send({ success: true });
   }
-
-  return sendNotification(uid, {
-    title: 'Hello',
-    body: 'Testme',
-    data: {
-      ticker: 'SS',
-      portfolioId: 'hSW0BwsmD3ELogXt95Br',
-      targetPrice: '120',
-    },
-    type: 'priceAlert',
-  });
-});
-
-export const runNotificationsScheduler = onCall((request) => {
-  // TODO - Run alerts triggering flow.
-  // TODO - Run insights detection
-  // Send all processed notifications.
-});
+);

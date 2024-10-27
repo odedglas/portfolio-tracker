@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { User } from 'app/shared/types';
 import userAPI from 'src/service/user';
 import { requestMessagingPermission } from 'src/service/firebase/messaging';
+import { useNotificationsStore } from 'stores/notifications';
 
 export const useUserStore = defineStore('user', {
   state: (): { user: User | null } => ({
@@ -12,6 +13,8 @@ export const useUserStore = defineStore('user', {
       this.user = user;
     },
     async toggleNotificationEnabledSetting() {
+      const notificationsStore = useNotificationsStore();
+
       if (!this.user) {
         return;
       }
@@ -31,7 +34,9 @@ export const useUserStore = defineStore('user', {
         this.user.settings.notificationsEnabled &&
         !this.user.messagingToken
       ) {
-        updatePayload.messagingToken = await requestMessagingPermission();
+        updatePayload.messagingToken = await requestMessagingPermission(
+          (notification) => notificationsStore.addNotification(notification)
+        );
       }
 
       await userAPI.update(updatePayload, this.user.id);
