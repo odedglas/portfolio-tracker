@@ -36,6 +36,7 @@ export type LoginMode = keyof typeof LOGIN_META;
 export type AppUser = {
   uid: string;
   messagingToken?: string;
+  devicesTokenMap?: Record<string, string>;
   settings: {
     notificationsEnabled: boolean;
   };

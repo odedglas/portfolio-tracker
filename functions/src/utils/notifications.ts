@@ -9,11 +9,6 @@ export const sendNotification = async (
   uid: string,
   notification: Partial<Notification>
 ) => {
-  logger.info('Sending user device notifications', {
-    uid,
-    type: notification.type,
-  });
-
   await saveDocuments('notifications', [notification as Notification]);
 
   // Early skip if there is no need to push towards user device.
@@ -30,12 +25,13 @@ export const sendNotification = async (
     throw new HttpsError('not-found', 'User not found');
   }
 
-  const { body, title } = notification;
+  const { body, title, icon = '' } = notification;
 
   const message: Message = {
     notification: {
       title,
       body,
+      imageUrl: icon,
     },
     data: {
       notificationPayload: JSON.stringify(notification),

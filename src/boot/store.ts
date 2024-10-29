@@ -22,13 +22,14 @@ export default boot(async () => {
 
     let freshToken = appUser.messagingToken;
 
-    if (freshToken) {
+    if (appUser.settings.notificationsEnabled) {
       freshToken = await initializeMessaging((notification) =>
         notificationsStore.addNotification(notification)
       );
 
       // Ensures user token is freshly saved every time user object is set.
       if (appUser.messagingToken !== freshToken) {
+        // TODO - Should take into considerations the device ID to allow multiple devices push.
         await userAPI.update(
           { messagingToken: freshToken, uid: user.uid },
           appUser.id

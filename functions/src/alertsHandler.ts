@@ -17,6 +17,7 @@ const notificationsFactory = {
     title: `${alert.ticker} is ${alert.condition} ${alert.value}`,
     type: 'priceAlert',
     body: `The value of ${alert.ticker} is now ${quoteValue} which is under ${alert.value}`,
+    icon: alert.logoImage,
     owner: alert.owner,
     data: {
       ticker: alert.ticker,
