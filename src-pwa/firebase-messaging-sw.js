@@ -15,30 +15,6 @@ onBackgroundMessage(messaging, async (payload) => {
     payload
   );
 
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon:
-      payload.notification.icon ?? 'https://eodhd.com/img/logos/US/PLTR.png',
-  };
-
-  // TODO - Figure why this doesnt work yet.
-  try {
-    console.log('****** [Messaging SW] ********* Showing notification', {
-      notificationOptions,
-      notificationTitle,
-    });
-    await self.registration.showNotification(
-      notificationTitle,
-      notificationOptions
-    );
-  } catch (e) {
-    console.log(
-      '****** [Messaging SW] ********* Failed to show notification',
-      e
-    );
-  }
-
   // Transmit into foreground application if listening so app notification can actually be shown.
   swMessagingChannel.postMessage(payload);
 });

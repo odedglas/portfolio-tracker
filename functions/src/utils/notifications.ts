@@ -31,7 +31,21 @@ export const sendNotification = async (
     notification: {
       title,
       body,
-      imageUrl: icon,
+    },
+    webpush: {
+      notification: {
+        title,
+        body,
+        icon,
+        badge: 'https://portfolio-tracker-73341.firebaseapp.com/icons/logo-short-v3.svg',
+        vibrate: [200, 100, 200],
+        data: {
+          notificationPayload: JSON.stringify(notification),
+        },
+        fcmOptions: {
+          link: 'https://portfolio-tracker-73341.firebaseapp.com'
+        },
+      }
     },
     data: {
       notificationPayload: JSON.stringify(notification),
@@ -41,7 +55,7 @@ export const sendNotification = async (
 
   logger.info('Sending Notification to user device ', {
     uid,
-    message,
+    messagePayload: message,
     messagingToken: user.messagingToken,
   });
 

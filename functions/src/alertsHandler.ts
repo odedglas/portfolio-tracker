@@ -10,13 +10,22 @@ const notificationDefaults = {
   unread: true,
 };
 
+const formatCurrency = (value: number) => {
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  });
+
+  return formatter.format(value);
+};
+
 const notificationsFactory = {
   // TODO - Format notification Heading / Body.
   priceAlert: (alert: Alert, quoteValue: number): Partial<Notification> => ({
     ...notificationDefaults,
-    title: `${alert.ticker} is ${alert.condition} ${alert.value}`,
+    title: `${alert.ticker} is ${alert.condition} ${formatCurrency(alert.value)}`,
     type: 'priceAlert',
-    body: `The value of ${alert.ticker} is now ${quoteValue} which is under ${alert.value}`,
+    body: `The value of ${alert.ticker} is now ${formatCurrency(quoteValue)} which is under ${formatCurrency(alert.value)}`,
     icon: alert.logoImage,
     owner: alert.owner,
     data: {
