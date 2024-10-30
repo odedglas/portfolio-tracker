@@ -1,7 +1,10 @@
 {
   "orientation": "portrait",
   "background_color": "#ffffff",
+  "name": "Portfolio Tracker",
+  "short_name": "Portfolio Tracker",
   "theme_color": "#027be3",
+  "start_url": "/dashboard",
   "gcm_sender_id": "536377237793",
   "icons": [
     {
