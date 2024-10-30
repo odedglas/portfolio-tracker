@@ -32,3 +32,7 @@ export const INSIGHT_TYPE = {
   HIGH_SHORT_INTEREST: 'highShortInterest',
   NEAR_MOVING_AVERAGES: 'nearMovingAverages',
 } as const;
+
+export const NOTIFICATION_TYPE = {
+  PRICE_ALERT: 'priceAlert',
+} as const;

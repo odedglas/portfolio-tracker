@@ -39,3 +39,6 @@ yarn-error.log*
 # firebase build
 firebas
 .firebase
+
+# SW generated
+public/firebase-messaging-sw.js

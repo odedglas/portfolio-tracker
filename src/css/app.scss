@@ -28,6 +28,10 @@ body {
   cursor: pointer;
 }
 
+.q-gap-xs {
+  gap: 4px;
+}
+
 .q-gap-sm {
   gap: 8px;
 }
@@ -42,4 +46,8 @@ body {
 
 .dashboard-icon {
   color: lighten($primary, 15%);
+}
+
+.flex-row {
+  flex-direction: row;
 }

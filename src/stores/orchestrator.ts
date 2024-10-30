@@ -4,6 +4,7 @@ import { usePortfolioStore } from 'stores/portfolios';
 import { useHoldingsStore } from 'stores/holdings';
 import { useQuotesStore } from 'stores/quotes';
 import { queries } from 'src/service/firebase/collections';
+import { useNotificationsStore } from 'stores/notifications';
 
 export const useOrchestratorStore = defineStore('orchestrator', {
   state: () => ({}),
@@ -13,6 +14,7 @@ export const useOrchestratorStore = defineStore('orchestrator', {
       const quotesStore = useQuotesStore();
       const holdingsStore = useHoldingsStore();
       const portfoliosStore = usePortfolioStore();
+      const notificationsStore = useNotificationsStore();
 
       await loadingStore.emitLoadingTask(async () => {
         const portfolios = await portfoliosStore.list();
@@ -29,6 +31,8 @@ export const useOrchestratorStore = defineStore('orchestrator', {
         await quotesStore.setFearAndGreed();
 
         holdingsStore.setPortfoliosHoldings(holdings);
+
+        await notificationsStore.listNotifications();
       });
     },
   },

@@ -8,6 +8,21 @@
       </q-toolbar-title>
 
       <q-btn
+        icon="notifications_none"
+        class="alerts-icon"
+        flat
+        @click="() => $emit('notifications-click')"
+      >
+        <q-badge
+          v-if="notificationsStore.unreadNotifications.length"
+          color="white"
+          text-color="primary"
+          floating
+          rounded
+          >{{ notificationsStore.unreadNotifications.length }}</q-badge
+        >
+      </q-btn>
+      <q-btn
         :icon="visibilityIcon"
         flat
         @click="featuresStore.toggleStealthMode"
@@ -26,6 +41,7 @@ import PortfolioDropdown from './PortfolioDropdown.vue';
 import AppNavigation from './Navigation.vue';
 import UserProfile from './UserProfile.vue';
 import { useFeaturesStore } from 'stores/features';
+import { useNotificationsStore } from 'stores/notifications';
 
 export default defineComponent({
   name: 'AppHeader',
@@ -34,8 +50,10 @@ export default defineComponent({
     PortfolioDropdown,
     UserProfile,
   },
+  emits: ['notifications-click'],
   setup() {
     const featuresStore = useFeaturesStore();
+    const notificationsStore = useNotificationsStore();
 
     const visibilityIcon = computed(() =>
       featuresStore.stealthMode ? 'visibility_off' : 'visibility'
@@ -48,6 +66,7 @@ export default defineComponent({
       visibilityIcon,
       visibilityHelper,
       featuresStore,
+      notificationsStore,
     };
   },
 });
@@ -58,17 +77,12 @@ export default defineComponent({
   width: 225px;
 }
 
-.navigation-buttons-container {
-  .nav-btn:hover,
-  .nav-btn.active {
-    color: white !important;
-  }
-
-  .nav-btn.active {
-    .q-focus-helper {
-      background: currentColor;
-      opacity: 0.15;
-    }
+.alerts-icon {
+  .q-badge.q-badge--floating {
+    top: -2px;
+    font-size: 10px;
+    line-height: 10px;
+    min-height: 10px;
   }
 }
 </style>

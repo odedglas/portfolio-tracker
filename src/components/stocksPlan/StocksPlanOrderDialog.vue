@@ -93,7 +93,7 @@ import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
 import { useLoadingStore } from 'stores/loading';
 import { StockPlanOrder, StocksPlan } from 'app/shared/types';
 import { formatPlanDate } from 'src/service/date';
-import { usePortfolioStore } from 'stores/portfolios';
+import { useStocksPlansStore } from 'stores/stocksPlans';
 import { uid } from 'src/utils';
 
 const emptyOrder = (): StockPlanOrder => ({
@@ -121,7 +121,7 @@ export default defineComponent({
   emits: ['close'],
   setup(props, { emit }) {
     const { emitLoadingTask } = useLoadingStore();
-    const portfolioStore = usePortfolioStore();
+    const stocksPlansStore = useStocksPlansStore();
 
     const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
       ref(undefined);
@@ -158,7 +158,10 @@ export default defineComponent({
     const submitForm = async () => {
       if (await formRef.value?.validate()) {
         await emitLoadingTask(() =>
-          portfolioStore.updateStocksPlanOrder(props.plan, localPlanOrder.value)
+          stocksPlansStore.updateStocksPlanOrder(
+            props.plan,
+            localPlanOrder.value
+          )
         );
 
         emit('close');

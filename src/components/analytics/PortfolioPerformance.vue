@@ -117,7 +117,7 @@ import { computed, defineComponent, PropType, Ref, ref, watch } from 'vue';
 import { date as DateAPI } from 'quasar';
 import VueApexCharts from 'vue3-apexcharts';
 import { getPortfolioPerformanceChart } from 'src/service/charts';
-import { StockChartResponse, Transaction } from 'app/shared/types';
+import { StockCharData, Transaction } from 'app/shared/types';
 import { usePortfolioStore } from 'stores/portfolios';
 import { buildDateRangeFromToday, midDay } from 'src/service/stocks/dates';
 import { SERIES_COLORS_PALLET } from 'src/service/charts/constants';
@@ -151,8 +151,8 @@ export default defineComponent({
       default: false,
     },
     benchmarkData: {
-      type: Object as PropType<StockChartResponse>,
-      default: {} as StockChartResponse,
+      type: Array as PropType<StockCharData[]>,
+      default: [] as StockCharData[],
     },
   },
   setup(props) {

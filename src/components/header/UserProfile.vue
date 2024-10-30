@@ -20,11 +20,16 @@
           </q-item-section>
         </q-item>
         <q-separator />
-        <q-item clickable v-close-popup>
-          <q-item-section side>
-            <q-icon name="settings" />
+        <q-item>
+          <q-item-section>
+            <q-toggle
+              @click="userStore.toggleNotificationEnabledSetting"
+              class="q-px-none"
+              :model-value="userStore.user?.settings.notificationsEnabled"
+              label="Enable Notifications"
+              icon="notifications_none"
+            />
           </q-item-section>
-          <q-item-section>Settings</q-item-section>
         </q-item>
         <q-separator />
         <q-item clickable v-close-popup @click="logout">

@@ -30,6 +30,9 @@ export const getCollections = () => ({
   portfolioHistory: createCollection('portfolioHistory'),
   transaction: createCollection('transactions'),
   holding: createCollection('holdings'),
+  user: createCollection('users'),
+  notifications: createCollection('notifications'),
+  alerts: createCollection('alerts'),
 });
 
 /**
@@ -93,6 +96,16 @@ export const queries = {
     );
 
     return firestoreAPI.getAll(portfolioHistoryQuery);
+  },
+  getUserNotifications: async (ownerId: string) => {
+    const notificationsCollection = getCollections().notifications;
+
+    const notificationsQuery = query(
+      notificationsCollection,
+      where('owner', '==', ownerId)
+    );
+
+    return firestoreAPI.getAll(notificationsQuery);
   },
 };
 

@@ -8,9 +8,11 @@ import {
   TwitterAuthProvider,
   FacebookAuthProvider,
   User,
+  UserCredential,
 } from 'firebase/auth';
 import { useLoadingStore } from 'stores/loading';
 import { FIREBASE_LOGIN_PROVIDERS } from 'app/shared/constants';
+import userAPI from 'src/service/user';
 import { auth } from './core';
 
 const AuthenticationProviders = {
@@ -23,10 +25,18 @@ const AuthenticationProviders = {
  * Executes a given authentication operations wrapped with loading store for splash screen.
  * @param authentication
  */
-const authenticationWithLoading = (authentication: () => Promise<unknown>) => {
+const authenticationWithLoading = (
+  authentication: () => Promise<UserCredential>
+) => {
   const loadingStore = useLoadingStore();
 
-  return loadingStore.emitLoadingTask(authentication);
+  return loadingStore.emitLoadingTask(async () => {
+    const { user } = await authentication();
+
+    if (user) {
+      await userAPI.createAppUser(user);
+    }
+  });
 };
 
 export const authentication = {
@@ -47,15 +57,17 @@ export const authentication = {
 
   async signUp(email: string, password: string, displayName: string) {
     return authenticationWithLoading(async () => {
-      const { user } = await createUserWithEmailAndPassword(
+      const credentials = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
 
-      await updateProfile(user, {
+      await updateProfile(credentials.user, {
         displayName,
       });
+
+      return credentials;
     });
   },
 

@@ -1,9 +1,5 @@
 import { midDay } from 'src/service/stocks/dates';
-import {
-  PortfolioHistory,
-  StockChartResponse,
-  Transaction,
-} from 'app/shared/types';
+import { PortfolioHistory, StockCharData, Transaction } from 'app/shared/types';
 import { ChartSeries, Formatter } from './base';
 import {
   COLOR_PALLET,
@@ -113,7 +109,7 @@ const normalizeBenchmarkValue = (
 
 const normalizePerformanceData = (
   portfolioHistory: PortfolioHistory[],
-  benchmarks: StockChartResponse,
+  benchmarks: StockCharData[],
   periodTimeRange: number[],
   mode: Mode
 ) => {
@@ -141,13 +137,13 @@ const normalizePerformanceData = (
     periodTimeRange
   );
 
-  const benchmarksSeries = Object.entries(benchmarks)
-    .map(([key, value]) => {
+  const benchmarksSeries = benchmarks
+    .map((benchmark) => {
       return {
-        name: key,
-        data: value.close.map((close: number, index: number) => {
+        name: benchmark.symbol,
+        data: benchmark.close.map((close: number, index: number) => {
           return {
-            x: midDay(new Date(value.timestamp[index])),
+            x: midDay(new Date(benchmark.timestamp[index])),
             y: close,
           };
         }),
@@ -243,7 +239,7 @@ const buildTransactionsAnnotations = (
 
 export const getPortfolioPerformanceChart = (
   portfolioHistory: PortfolioHistory[],
-  benchmarks: StockChartResponse,
+  benchmarks: StockCharData[],
   periodTimeRange: number[],
   transactionsMap: Map<number, Transaction[]>,
   formatter: Formatter,

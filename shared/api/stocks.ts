@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { FearAndGreedResponse } from 'app/shared/types';
+import { FearAndGreedResponse } from '../types';
 
 const axiosInstance = axios.create({
   baseURL: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com',

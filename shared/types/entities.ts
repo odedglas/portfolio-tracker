@@ -1,4 +1,11 @@
-import { INSIGHT_TYPE, LOGIN_META, TRANSACTIONS_TYPES } from '../constants';
+import { User as FirebaseUser } from 'firebase/auth';
+import { NotificationPayload } from 'firebase/messaging';
+import {
+  INSIGHT_TYPE,
+  LOGIN_META,
+  NOTIFICATION_TYPE,
+  TRANSACTIONS_TYPES,
+} from '../constants';
 
 // Shared types
 export type Entity = {
@@ -25,6 +32,17 @@ type TransactionAction =
   (typeof TRANSACTIONS_TYPES)[keyof typeof TRANSACTIONS_TYPES];
 
 export type LoginMode = keyof typeof LOGIN_META;
+
+export type AppUser = {
+  uid: string;
+  messagingToken?: string;
+  devicesTokenMap?: Record<string, string>;
+  settings: {
+    notificationsEnabled: boolean;
+  };
+};
+
+export type User = FirebaseUser & AppUser & Entity;
 
 export type Deposit = {
   date: number;
@@ -94,7 +112,7 @@ export type AllocationPlan = Entity & {
   logoImage: string;
   targetPrice: number;
   shares: number;
-  alertBufferPercent?: number;
+  alertId?: string;
 
   // Computed
   totalValue?: number;
@@ -177,4 +195,48 @@ export type PortfolioInsight = {
     format?: string;
   }[];
   holding: Holding;
+};
+
+export type NotificationType =
+  (typeof NOTIFICATION_TYPE)[keyof typeof NOTIFICATION_TYPE];
+
+type RequiredNotificationData = {
+  portfolioId: string;
+};
+
+export type PriceAlertNotificationData = RequiredNotificationData & {
+  ticker: string;
+  logo?: string;
+  targetPrice: number;
+  triggerPrice: number;
+};
+
+export type Notification = Entity &
+  NotificationPayload & {
+    owner: string;
+    createdAt: number;
+    unread: boolean;
+    type: NotificationType;
+    sendPush: boolean;
+    data: PriceAlertNotificationData;
+  };
+
+type AlertCondition = 'above' | 'below';
+type AlertValueProperty =
+  | 'regularMarketPrice'
+  | 'fiftyDayAverage'
+  | 'twoHundredDayAverage';
+
+export type Alert = Entity & {
+  value: number;
+  owner: string;
+  valueProperty: AlertValueProperty;
+  once: boolean;
+  active: boolean;
+  ticker: string;
+  logoImage?: string;
+  portfolioId: string;
+  condition: AlertCondition;
+  expiration: number;
+  lastTriggered?: number;
 };

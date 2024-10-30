@@ -3,6 +3,7 @@
 /src-cordova
 /.quasar
 /node_modules
-.eslintrc.cjs
+.eslintrc.*
 /quasar.config.*.temporary.compiled*
 /functions
+firebase-messaging-sw.js

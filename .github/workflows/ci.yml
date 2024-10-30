@@ -13,6 +13,7 @@ jobs:
       STORAGE_BUCKET: ${{ secrets.STORAGE_BUCKET }}
       MESSAGING_SENDER_ID: ${{ secrets.MESSAGING_SENDER_ID }}
       RAPID_YAHOO_API_KEY: ${{ secrets.RAPID_YAHOO_API_KEY }}
+      MESSAGING_PK: ${{ secrets.MESSAGING_PK }}
 
     steps:
       - uses: actions/checkout@v2

@@ -4,6 +4,7 @@ import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { portfolioHistoryTracker } from './portfolioHistoryTracker';
 import { migrations } from './migrations';
+import { alertsHandler } from './alertsHandler';
 
 admin.initializeApp();
 
@@ -28,7 +29,8 @@ export const migrationsRunner = onRequest(async (request, response) => {
 
 export const portfolioScheduler = onSchedule(
   {
-    schedule: 'every day 23:00',
+    schedule: 'every day 23:50',
+    timeZone: 'Asia/Jerusalem',
     secrets: ['RAPID_YAHOO_API_KEY'],
   },
   async (event) => {
@@ -38,5 +40,16 @@ export const portfolioScheduler = onSchedule(
     });
     await portfolioHistoryTracker();
     return;
+  }
+);
+
+export const runNotificationsScheduler = onRequest(
+  { secrets: ['RAPID_YAHOO_API_KEY'] },
+  async (request, response) => {
+    await alertsHandler();
+
+    // TODO - Run insights detection
+
+    response.send({ success: true });
   }
 );

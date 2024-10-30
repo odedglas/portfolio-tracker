@@ -1,18 +1,10 @@
-import omit from 'lodash/omit';
 import { defineStore } from 'pinia';
 import {
   holdingsTransformer,
   portfoliosTransformer,
 } from 'app/shared/transformers';
 import portfolioAPI from 'src/service/portfolio';
-import {
-  AllocationPlan,
-  Deposit,
-  Portfolio,
-  PortfolioHistory,
-  StockPlanOrder,
-  StocksPlan,
-} from 'app/shared/types';
+import { Deposit, Portfolio, PortfolioHistory } from 'app/shared/types';
 import { useTransactionsStore } from 'stores/transactions';
 import { useHoldingsStore } from 'stores/holdings';
 import { queries } from 'src/service/firebase/collections';
@@ -188,79 +180,6 @@ export const usePortfolioStore = defineStore('portfolios', {
       }
 
       portfolio.deposits.splice(index, 1);
-
-      return portfolioAPI.update(portfolio, portfolio.id);
-    },
-    async updateStocksPlan(plan: StocksPlan, remove = false) {
-      const rawPlan = omit(plan, [
-        'lastVested',
-        'nextVesting',
-        'sellableValue',
-        'potentialValue',
-        'vestedPeriods',
-        'vestingPeriods',
-      ]);
-
-      const stocksPlansStore = useStocksPlansStore();
-
-      const portfolio = this.selectedPortfolio;
-      if (!portfolio) {
-        return;
-      }
-
-      const filteredPlans = portfolio.stocksPlans?.filter(
-        (stocksPlan) => stocksPlan.identifier !== plan.identifier
-      );
-
-      portfolio.stocksPlans = [...(filteredPlans ?? [])];
-
-      if (!remove) {
-        portfolio.stocksPlans.push(rawPlan as StocksPlan);
-      }
-
-      await stocksPlansStore.setStocksPlans(portfolio.stocksPlans);
-
-      return portfolioAPI.update(portfolio, portfolio.id);
-    },
-    terminateStocksPlan(plan: StocksPlan) {
-      plan.terminationDate = Date.now();
-      return this.updateStocksPlan(plan);
-    },
-    updateStocksPlanOrder(plan: StocksPlan, order: StockPlanOrder) {
-      const currentIndex = plan.orders?.findIndex((o) => o.id === order.id);
-
-      if (currentIndex !== -1) {
-        plan.orders[currentIndex] = order;
-      } else {
-        plan.orders = [...(plan.orders ?? []), order];
-      }
-
-      return this.updateStocksPlan(plan);
-    },
-    removeStocksPlanOrder(plan: StocksPlan, orderId: string) {
-      plan.orders = plan.orders?.filter((order) => order.id !== orderId);
-
-      return this.updateStocksPlan(plan);
-    },
-    async updateAllocationPlan(plan: AllocationPlan, remove = false) {
-      const allocationsPlansStore = useAllocationPlansStore();
-
-      const portfolio = this.selectedPortfolio;
-      if (!portfolio) {
-        return;
-      }
-
-      const filteredPlans = portfolio.allocationPlans?.filter(
-        (allocationPlan) => allocationPlan.id !== plan.id
-      );
-
-      portfolio.allocationPlans = [...(filteredPlans ?? [])];
-
-      if (!remove) {
-        portfolio.allocationPlans.push(plan as AllocationPlan);
-      }
-
-      allocationsPlansStore.setAllocationsPlans(portfolio.allocationPlans);
 
       return portfolioAPI.update(portfolio, portfolio.id);
     },

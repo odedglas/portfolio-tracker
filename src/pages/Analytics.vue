@@ -34,7 +34,7 @@ import { defineComponent, ref } from 'vue';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
 import { usePortfolioKpis } from 'components/composables/usePortfolioKpis';
 import { benchmarkOptions } from 'components/analytics/constants';
-import { StockChartResponse } from 'app/shared/types';
+import { StockCharData } from 'app/shared/types';
 import { useLoadingStore } from 'stores/loading';
 import { getQuotesChartData } from 'src/service/stocks';
 import PortfolioPerformance from 'components/analytics/PortfolioPerformance.vue';
@@ -48,14 +48,18 @@ export default defineComponent({
     DashboardKpi,
   },
   setup() {
-    const benchmarkData = ref<StockChartResponse>({});
+    const benchmarkData = ref<StockCharData[]>([]);
 
     const { kpis } = usePortfolioKpis();
     const { emitLoadingTask } = useLoadingStore();
 
     const setBenchmarkData = async (tickers: string[]) => {
       await emitLoadingTask(async () => {
-        benchmarkData.value = await getQuotesChartData(tickers);
+        const chartQuotesResponse = await getQuotesChartData(tickers);
+
+        benchmarkData.value = tickers.map(
+          (ticker) => chartQuotesResponse[ticker]
+        );
       });
     };
 

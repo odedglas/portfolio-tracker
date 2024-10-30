@@ -3,6 +3,8 @@ import { AllocationPlan } from 'app/shared/types';
 import { portfoliosTransformer } from 'app/shared/transformers';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useHoldingsStore } from 'stores/holdings';
+import alertAPI from 'src/service/alert';
+import portfolioAPI from 'src/service/portfolio';
 
 export const useAllocationPlansStore = defineStore('allocationPlans', {
   state: (): { allocationPlans: AllocationPlan[] } => ({
@@ -55,6 +57,48 @@ export const useAllocationPlansStore = defineStore('allocationPlans', {
   actions: {
     setAllocationsPlans(plans: AllocationPlan[]) {
       this.allocationPlans = plans;
+    },
+    async updateAllocationPlan(plan: AllocationPlan, remove = false) {
+      const portfolioStore = usePortfolioStore();
+
+      const portfolio = portfolioStore.selectedPortfolio;
+      if (!portfolio) {
+        return;
+      }
+
+      const filteredPlans = portfolio.allocationPlans?.filter(
+        (allocationPlan) => allocationPlan.id !== plan.id
+      );
+
+      const isNew = filteredPlans?.length === portfolio.allocationPlans?.length;
+
+      portfolio.allocationPlans = [...(filteredPlans ?? [])];
+
+      if (!remove) {
+        let alertId = plan.alertId;
+
+        // Sync allocation plan with its corresponding alert.
+        if (isNew) {
+          const alert = await alertAPI.createAllocationPlanTargetPriceAlert(
+            plan,
+            portfolio
+          );
+
+          alertId = alert.id;
+        } else {
+          await alertAPI.update({ value: plan.targetPrice }, plan.alertId);
+        }
+
+        plan.alertId = alertId;
+
+        portfolio.allocationPlans.push(plan as AllocationPlan);
+      } else if (plan.alertId) {
+        await alertAPI.delete(plan.alertId);
+      }
+
+      this.setAllocationsPlans(portfolio.allocationPlans);
+
+      return portfolioAPI.update(portfolio, portfolio.id);
     },
   },
 });

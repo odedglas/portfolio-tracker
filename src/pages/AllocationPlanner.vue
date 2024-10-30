@@ -22,64 +22,11 @@
         </q-card-section>
 
         <q-card-section class="q-py-md">
-          <q-table
+          <allocations-panner-table
             v-if="allocationPlans.length"
-            :rows="allocationPlans"
-            :columns="columns"
-            hide-pagination
-            flat
-            bordered
-            row-key="id"
-            :rows-per-page-options="[100]"
-          >
-            <template v-slot:body="props">
-              <q-tr :props="props">
-                <q-td key="ticker" :props="props">
-                  <span class="flex items-center q-gap-md">
-                    <ticker-logo
-                      :ticker="props.row.ticker"
-                      :logo-image="props.row.logoImage"
-                    />
-                    <span> {{ props.row.name }}</span>
-                  </span>
-                </q-td>
-                <q-td key="shares_amount" :props="props">
-                  {{ $n(props.row.shares, 'fixedSensitive') }}
-                </q-td>
-                <q-td key="target_price" :props="props">
-                  {{ $n(props.row.targetPrice, 'decimal') }}
-                </q-td>
-                <q-td key="usage" :props="props">
-                  {{ $n(props.row.allocationUsage, 'percent') }}
-                </q-td>
-                <q-td key="total" :props="props">
-                  {{ $n(props.row.totalValue, 'decimal') }}
-                </q-td>
-                <q-td key="item_actions" :props="props">
-                  <div class="text-grey-8 q-gutter-xs">
-                    <q-btn
-                      class="gt-xs"
-                      size="12px"
-                      flat
-                      dense
-                      round
-                      icon="edit"
-                      @click.stop="() => openEntityModal(props.row)"
-                    />
-                    <q-btn
-                      size="12px"
-                      flat
-                      dense
-                      round
-                      icon="delete"
-                      @click.stop="() => deleteEntity(props.row)"
-                    >
-                    </q-btn>
-                  </div>
-                </q-td>
-              </q-tr>
-            </template>
-          </q-table>
+            @open-entity-modal="(entity) => openEntityModal(entity)"
+            @delete-entity="(entity) => deleteEntity(entity)"
+          />
           <div v-else>
             <span class="text-grey-7 text-caption">{{
               $t('portfolios.allocation_planner.empty_plans')
@@ -101,24 +48,21 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { usePortfolioStore } from 'stores/portfolios';
 import AllocationPlanDialog from 'components/allocationPlanner/AllocationPlanDialog.vue';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
-import TickerLogo from 'components/common/TickerLogo.vue';
 import { AllocationPlan } from 'app/shared/types';
-import { columns } from './columns';
 import AllocationsPannerSummary from 'components/allocationPlanner/AllocationsPannerSummary.vue';
 import { useAllocationPlansStore } from 'stores/allocationPlans';
+import AllocationsPannerTable from 'components/allocationPlanner/AllocationPlannerTable.vue';
 
 export default defineComponent({
   name: 'AllocationPlannerPage',
   components: {
+    AllocationsPannerTable,
     AllocationsPannerSummary,
-    TickerLogo,
     AllocationPlanDialog,
   },
   setup() {
-    const portfolioStore = usePortfolioStore();
     const allocationPlansStore = useAllocationPlansStore();
     const {
       showModal,
@@ -132,14 +76,13 @@ export default defineComponent({
         message: (plan) =>
           `Are you sure you want to delete allocation plan of "${plan.ticker}"?`,
         callback: async (plan) =>
-          portfolioStore.updateAllocationPlan(plan, true),
+          allocationPlansStore.updateAllocationPlan(plan, true),
       },
     });
 
     const allocationPlans = computed(() => allocationPlansStore.plans);
 
     return {
-      columns,
       allocationPlans,
       allocationPlansStore,
       showModal,

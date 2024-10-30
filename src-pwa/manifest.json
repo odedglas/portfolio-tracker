@@ -1,0 +1,31 @@
+{
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "name": "Portfolio Tracker",
+  "short_name": "Portfolio Tracker",
+  "theme_color": "#a21c48",
+  "start_url": "/dashboard",
+  "gcm_sender_id": "536377237793",
+  "icons": [
+    {
+      "src": "icons/icon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
