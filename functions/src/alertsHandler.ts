@@ -23,9 +23,13 @@ const notificationsFactory = {
   // TODO - Format notification Heading / Body.
   priceAlert: (alert: Alert, quoteValue: number): Partial<Notification> => ({
     ...notificationDefaults,
-    title: `${alert.ticker} is ${alert.condition} ${formatCurrency(alert.value)}`,
+    title: `${alert.ticker} is ${alert.condition} ${formatCurrency(
+      alert.value
+    )}`,
     type: 'priceAlert',
-    body: `The value of ${alert.ticker} is now ${formatCurrency(quoteValue)} which is under ${formatCurrency(alert.value)}`,
+    body: `The value of ${alert.ticker} is now ${formatCurrency(
+      quoteValue
+    )} which is under ${formatCurrency(alert.value)}`,
     icon: alert.logoImage,
     owner: alert.owner,
     data: {

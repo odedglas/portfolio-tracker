@@ -37,15 +37,16 @@ export const sendNotification = async (
         title,
         body,
         icon,
-        badge: 'https://portfolio-tracker-73341.firebaseapp.com/icons/logo-short-v3.svg',
+        badge:
+          'https://portfolio-tracker-73341.firebaseapp.com/icons/logo-short-v3.svg',
         vibrate: [200, 100, 200],
         data: {
           notificationPayload: JSON.stringify(notification),
         },
         fcmOptions: {
-          link: 'https://portfolio-tracker-73341.firebaseapp.com'
+          link: 'https://portfolio-tracker-73341.firebaseapp.com',
         },
-      }
+      },
     },
     data: {
       notificationPayload: JSON.stringify(notification),
