@@ -3,6 +3,7 @@
     <app-header @notifications-click="notificationsDrawerOpen = true" />
     <notifications-drawer
       :open="notificationsDrawerOpen"
+      @open-drawer="notificationsDrawerOpen = true"
       @close-drawer="notificationsDrawerOpen = false"
     />
     <q-page-container class="bg-grey-1">

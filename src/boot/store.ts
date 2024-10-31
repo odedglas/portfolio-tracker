@@ -29,9 +29,14 @@ export default boot(async () => {
 
       // Ensures user token is freshly saved every time user object is set.
       if (appUser.messagingToken !== freshToken) {
-        // TODO - Should take into considerations the device ID to allow multiple devices push.
+        const { deviceTokens = [] } = appUser;
+
+        if (!deviceTokens.includes(freshToken)) {
+          deviceTokens.push(freshToken);
+        }
+
         await userAPI.update(
-          { messagingToken: freshToken, uid: user.uid },
+          { messagingToken: freshToken, uid: user.uid, deviceTokens },
           appUser.id
         );
       }

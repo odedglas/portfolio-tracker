@@ -1,5 +1,5 @@
 <template>
-  <q-form @submit.prevent.stop="loginWithPassword" class="q-gutter-sm">
+  <q-form @submit.prevent.stop="loginWithPassword" class="column q-gap-md">
     <q-input
       v-model="email"
       type="email"

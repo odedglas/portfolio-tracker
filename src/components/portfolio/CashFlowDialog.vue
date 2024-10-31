@@ -1,76 +1,51 @@
 <template>
-  <q-dialog
-    v-model="syntheticShow"
-    backdrop-filter="blur(4px)"
-    @before-show="clearLocalCashFlow"
+  <base-dialog
+    :show="show"
+    @close="$emit('close')"
+    :on-submit="submitForm"
+    title="New Cash Flow"
+    :before-show="clearLocalCashFlow"
   >
-    <q-card style="min-width: 450px">
-      <q-card-section class="row items-center q-pa-none">
-        <q-toolbar class="bg-primary text-white">
-          <q-toolbar-title class="row items-center">
-            <q-icon name="attach_money" class="q-mr-md" />
-            New Cash Flow
-          </q-toolbar-title>
-          <q-space />
-          <q-btn flat round dense icon="close" @click="$emit('close')" />
-        </q-toolbar>
-      </q-card-section>
+    <q-select
+      v-model="localCashFlowEntry.type"
+      emit-value
+      :display-value="
+        cashTypeOptions.find((opt) => opt.value === localCashFlowEntry.type)
+          ?.label ?? ''
+      "
+      :options="cashTypeOptions"
+    />
 
-      <q-card-section>
-        <q-form ref="formRef" class="q-gutter-sm">
-          <q-select
-            v-model="localCashFlowEntry.type"
-            emit-value
-            :display-value="
-              cashTypeOptions.find(
-                (opt) => opt.value === localCashFlowEntry.type
-              )?.label ?? ''
-            "
-            :options="cashTypeOptions"
-          />
+    <q-input
+      v-model.number="localCashFlowEntry.value"
+      type="number"
+      lazy-rules
+      label="Amount"
+      :rules="[(val) => !!val || 'Please enter a valid amount']"
+    />
 
-          <q-input
-            v-model.number="localCashFlowEntry.value"
-            type="number"
-            lazy-rules
-            label="Amount"
-            :rules="[(val) => !!val || 'Please enter a valid amount']"
-          />
+    <date-input
+      :date="localCashFlowEntry.date ?? 0"
+      @date-change="(date) => (localCashFlowEntry.date = date)"
+    />
 
-          <date-input
-            :date="localCashFlowEntry.date ?? 0"
-            @date-change="(date) => (localCashFlowEntry.date = date)"
-          />
-
-          <q-input
-            v-model="localCashFlowEntry.notes"
-            dense
-            placeholder="Notes"
-            autofocus
-          />
-        </q-form>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn flat :label="$t('cancel')" @click="$emit('close')" />
-        <q-btn
-          color="primary"
-          type="submit"
-          :label="$t('save')"
-          @click="submitForm"
-        />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+    <q-input
+      v-model="localCashFlowEntry.notes"
+      dense
+      placeholder="Notes"
+      autofocus
+    />
+  </base-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, Ref } from 'vue';
+import { defineComponent, ref, Ref } from 'vue';
 import { useLoadingStore } from 'stores/loading';
 import { usePortfolioStore } from 'src/stores/portfolios';
 import { DepositEntity } from 'app/shared/types';
 import { useI18n } from 'vue-i18n';
 import DateInput from 'components/common/DateInput.vue';
+import BaseDialog from 'components/common/BaseDialog.vue';
 
 const emptyDeposit = (): DepositEntity => ({
   id: '',
@@ -82,7 +57,7 @@ const emptyDeposit = (): DepositEntity => ({
 
 export default defineComponent({
   name: 'CashFlowDialog',
-  components: { DateInput },
+  components: { BaseDialog, DateInput },
   props: {
     show: {
       type: Boolean,
@@ -90,12 +65,11 @@ export default defineComponent({
     },
   },
   emits: ['close'],
-  setup(props, { emit }) {
+  setup() {
     const $t = useI18n().t;
     const portfolioStore = usePortfolioStore();
     const { emitLoadingTask } = useLoadingStore();
 
-    const formRef: Ref<{ validate: () => void } | undefined> = ref(undefined);
     const localCashFlowEntry: Ref<Partial<DepositEntity>> = ref(emptyDeposit());
 
     const cashTypeOptions = [
@@ -103,15 +77,6 @@ export default defineComponent({
       { label: $t('withdrawal'), value: 'withdrawal' },
       { label: $t('balance'), value: 'balance' },
     ];
-
-    const syntheticShow = computed({
-      get: () => props.show,
-      set: (value: boolean) => {
-        if (!value) {
-          emit('close', undefined);
-        }
-      },
-    });
 
     const saveCashFlow = async () => {
       const existingDeposits =
@@ -126,10 +91,7 @@ export default defineComponent({
     };
 
     const submitForm = async () => {
-      if (await formRef.value?.validate()) {
-        await saveCashFlow();
-        emit('close');
-      }
+      await saveCashFlow();
     };
 
     const clearLocalCashFlow = () => {
@@ -137,8 +99,6 @@ export default defineComponent({
     };
 
     return {
-      formRef,
-      syntheticShow,
       localCashFlowEntry,
       submitForm,
       clearLocalCashFlow,

@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12 q-mt-md">
+  <div class="col-12">
     <div class="row justify-center">
       <p>{{ $t(loginMeta.switchModeText) }}</p>
       <span

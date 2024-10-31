@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import * as logger from 'firebase-functions/logger';
 import { HttpsError } from 'firebase-functions/v2/https';
-import { Message } from 'firebase-admin/messaging';
+import { MulticastMessage } from 'firebase-admin/messaging';
 import { getCollection, saveDocuments } from './getCollection';
 import { User, Notification } from '../../../shared/types';
 
@@ -27,7 +27,7 @@ export const sendNotification = async (
 
   const { body, title, icon = '' } = notification;
 
-  const message: Message = {
+  const message: MulticastMessage = {
     notification: {
       title,
       body,
@@ -51,7 +51,7 @@ export const sendNotification = async (
     data: {
       notificationPayload: JSON.stringify(notification),
     },
-    token: user.messagingToken ?? '',
+    tokens: user.deviceTokens ?? [user.messagingToken ?? ''],
   };
 
   logger.info('Sending Notification to user device ', {
@@ -60,5 +60,5 @@ export const sendNotification = async (
     messagingToken: user.messagingToken,
   });
 
-  await admin.messaging().send(message);
+  await admin.messaging().sendEachForMulticast(message);
 };

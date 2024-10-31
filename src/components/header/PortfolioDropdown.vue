@@ -5,7 +5,7 @@
     no-caps
     class="q-mx-sm"
     icon="business_center"
-    :label="portfolioStore.selectedPortfolio?.title || 'No Portfolios'"
+    :label="getPortfolioDropdownLabel()"
   >
     <q-list style="min-width: 100px" bordered>
       <q-item
@@ -70,6 +70,7 @@ import { useRouter } from 'vue-router';
 import { usePortfolioStore } from 'stores/portfolios';
 import PortfolioDialog from 'src/components/portfolio/PortfolioDialog.vue';
 import { Portfolio } from 'app/shared/types';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'PortfolioDropdown',
@@ -77,6 +78,7 @@ export default defineComponent({
     PortfolioDialog,
   },
   setup() {
+    const $q = useQuasar();
     const showPortfolioDialog = ref(false);
     const router = useRouter();
     const portfolioStore = usePortfolioStore();
@@ -90,12 +92,25 @@ export default defineComponent({
       portfolioStore.selectPortfolio(portfolio.id);
     };
 
+    const getPortfolioDropdownLabel = () => {
+      if ($q.platform.is.mobile) {
+        return '';
+      }
+
+      if (portfolioStore.selectedPortfolio) {
+        return portfolioStore.selectedPortfolio.title;
+      }
+
+      return 'No Portfolios';
+    };
+
     return {
       portfolioStore,
       showPortfolioDialog,
       gotoManagePortfolios,
       isManagePortfolios,
       selectPortfolio,
+      getPortfolioDropdownLabel,
     };
   },
 });

@@ -1,5 +1,9 @@
 <template>
-  <q-avatar text-color="grey" color="white" class="text-subtitle1 clickable"
+  <q-avatar
+    size="md"
+    text-color="grey"
+    color="white"
+    class="text-subtitle2 clickable"
     >{{ userInitials }}
     <q-menu>
       <q-list style="min-width: 200px">
@@ -8,8 +12,8 @@
             <q-avatar
               color="red-4"
               text-color="white"
-              class="text-subtitle1"
-              size="xl"
+              class="text-subtitle2"
+              size="lg"
             >
               {{ userInitials }}
             </q-avatar>

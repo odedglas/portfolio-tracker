@@ -5,6 +5,7 @@
     :width="400"
     class="notifications-drawer"
     @hide="$emit('close-drawer')"
+    @show="$emit('open-drawer')"
     side="right"
     overlay
     behavior="mobile"
@@ -68,7 +69,7 @@ export default defineComponent({
   components: {
     PriceAlertNotification,
   },
-  emits: ['close-drawer'],
+  emits: ['close-drawer', 'open-drawer'],
   props: {
     open: {
       type: Boolean,

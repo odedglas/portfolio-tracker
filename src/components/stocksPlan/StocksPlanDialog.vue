@@ -1,148 +1,116 @@
 <template>
-  <q-dialog
-    v-model="syntheticShow"
-    backdrop-filter="blur(4px)"
-    @before-show="setLocalPlan"
+  <base-dialog
+    :show="show"
+    @close="$emit('close')"
+    :on-submit="submitForm"
+    :title="
+      isNew
+        ? $t('stocks_plans.new')
+        : `${$t('stocks_plans.edit')}: ${localPlan.identifier}`
+    "
+    :before-show="setLocalPlan"
   >
-    <q-card style="min-width: 450px">
-      <q-card-section class="row items-center q-pa-none">
-        <q-toolbar class="bg-primary text-white">
-          <q-toolbar-title class="row items-center">
-            <q-icon name="grading" class="q-mr-md" />
-            {{
-              isNew
-                ? $t('stocks_plans.new')
-                : `${$t('stocks_plans.edit')}: ${localPlan.identifier}`
-            }}
-          </q-toolbar-title>
-          <q-btn flat round dense icon="close" @click="$emit('close')" />
-        </q-toolbar>
-        <span class="q-pa-md text-caption">{{
-          $t('stocks_plans.search_plan')
-        }}</span>
-      </q-card-section>
-      <q-card-section class="q-pt-none">
-        <q-form ref="formRef" class="q-gutter-sm">
-          <ticker-search
-            :ticker="localPlan.ticker || ''"
-            :disabled="!isNew"
-            :ticker-meta="{
-              display: localPlan.name,
-              logo: localPlan.logoImage,
-            }"
-            @update:tickerValue="onTickerOptionSelect"
-          />
+    <ticker-search
+      :ticker="localPlan.ticker || ''"
+      :disabled="!isNew"
+      :ticker-meta="{
+        display: localPlan.name,
+        logo: localPlan.logoImage,
+      }"
+      @update:tickerValue="onTickerOptionSelect"
+    />
 
-          <div class="row" style="gap: 12px">
-            <q-input
-              v-model="localPlan.identifier"
-              class="col"
-              type="text"
-              lazy-rules
-              label="Grant name"
-              :rules="[
-                (val) =>
-                  (val && val.length > 0) || 'Please enter a uniq grant name',
-              ]"
-            />
+    <div class="row" style="gap: 12px">
+      <q-input
+        v-model="localPlan.identifier"
+        class="col"
+        type="text"
+        lazy-rules
+        label="Grant name"
+        :rules="[
+          (val) => (val && val.length > 0) || 'Please enter a uniq grant name',
+        ]"
+      />
 
-            <q-select
-              v-model="localPlan.type"
-              class="col text-capitalize"
-              :options="[
-                { label: $t('stocks_plans.rsu'), value: 'rsu' },
-                { label: $t('stocks_plans.espp'), value: 'espp' },
-                { label: $t('stocks_plans.esop'), value: 'esop' },
-              ]"
-              :emit-value="true"
-              label="Plan type"
-            />
-          </div>
+      <q-select
+        v-model="localPlan.type"
+        class="col text-capitalize"
+        :options="[
+          { label: $t('stocks_plans.rsu'), value: 'rsu' },
+          { label: $t('stocks_plans.espp'), value: 'espp' },
+          { label: $t('stocks_plans.esop'), value: 'esop' },
+        ]"
+        :emit-value="true"
+        label="Plan type"
+      />
+    </div>
 
-          <div class="row" style="gap: 12px">
-            <q-input
-              v-model.number="localPlan.grantPrice"
-              class="col"
-              type="number"
-              lazy-rules
-              suffix="$"
-              label="Grant Price"
-              :rules="[
-                (val) => (val && val > 0) || 'Please enter a valid grant price',
-              ]"
-            />
+    <div class="row" style="gap: 12px">
+      <q-input
+        v-model.number="localPlan.grantPrice"
+        class="col"
+        type="number"
+        lazy-rules
+        suffix="$"
+        label="Grant Price"
+        :rules="[
+          (val) => (val && val > 0) || 'Please enter a valid grant price',
+        ]"
+      />
 
-            <q-input
-              class="col"
-              v-model="formattedGrantDate"
-              label="Granting Date"
-              lazy-rules
-              :rules="[
-                (val) =>
-                  (val && typeof new Date(val).getTime === 'function') ||
-                  'Please set a valid date',
-              ]"
+      <q-input
+        class="col"
+        v-model="formattedGrantDate"
+        label="Granting Date"
+        lazy-rules
+        :rules="[
+          (val) =>
+            (val && typeof new Date(val).getTime === 'function') ||
+            'Please set a valid date',
+        ]"
+      >
+        <template v-slot:append>
+          <q-icon name="event" class="cursor-pointer">
+            <q-popup-proxy
+              cover
+              transition-show="scale"
+              transition-hide="scale"
             >
-              <template v-slot:append>
-                <q-icon name="event" class="cursor-pointer">
-                  <q-popup-proxy
-                    cover
-                    transition-show="scale"
-                    transition-hide="scale"
-                  >
-                    <q-date v-model="formattedGrantDate" mask="MMM D, YYYY">
-                      <div class="row items-center justify-end">
-                        <q-btn
-                          v-close-popup
-                          label="Close"
-                          color="primary"
-                          flat
-                        />
-                      </div>
-                    </q-date>
-                  </q-popup-proxy>
-                </q-icon>
-              </template>
-            </q-input>
-          </div>
+              <q-date v-model="formattedGrantDate" mask="MMM D, YYYY">
+                <div class="row items-center justify-end">
+                  <q-btn v-close-popup label="Close" color="primary" flat />
+                </div>
+              </q-date>
+            </q-popup-proxy>
+          </q-icon>
+        </template>
+      </q-input>
+    </div>
 
-          <q-input
-            v-model.number="localPlan.amount"
-            class="col"
-            type="number"
-            lazy-rules
-            label="Stocks amount"
-          />
+    <q-input
+      v-model.number="localPlan.amount"
+      class="col"
+      type="number"
+      lazy-rules
+      label="Stocks amount"
+    />
 
-          <q-input
-            :model-value="vestingYears"
-            @update:model-value="(v) => onVestingYearsChange(Number(v))"
-            class="col"
-            type="number"
-            :disable="isESPP"
-            lazy-rules
-            label="Grant Vesting years"
-          />
+    <q-input
+      :model-value="vestingYears"
+      @update:model-value="(v) => onVestingYearsChange(Number(v))"
+      class="col"
+      type="number"
+      :disable="isESPP"
+      lazy-rules
+      label="Grant Vesting years"
+    />
 
-          <q-toggle
-            v-model="localPlan.cliff"
-            :disable="isESPP"
-            label="Plan has cliff constraint?"
-          />
-        </q-form>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn flat :label="$t('cancel')" @click="$emit('close')" />
-        <q-btn
-          color="primary"
-          type="submit"
-          :label="$t('save')"
-          @click="submitForm"
-        />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+    <q-toggle
+      v-model="localPlan.cliff"
+      :disable="isESPP"
+      label="Plan has cliff constraint?"
+    />
+  </base-dialog>
 </template>
 
 <script lang="ts">
@@ -161,6 +129,7 @@ import { StocksPlan } from 'app/shared/types';
 import { formatPlanDate } from 'src/service/date';
 import TickerSearch, { TickerOption } from 'components/common/TickerSearch.vue';
 import { useStocksPlansStore } from 'stores/stocksPlans';
+import BaseDialog from 'components/common/BaseDialog.vue';
 
 const emptyPlan = (): StocksPlan => ({
   id: '',
@@ -179,7 +148,7 @@ const emptyPlan = (): StocksPlan => ({
 
 export default defineComponent({
   name: 'StocksPlanDialog',
-  components: { TickerSearch },
+  components: { BaseDialog, TickerSearch },
   props: {
     show: {
       type: Boolean,
@@ -190,23 +159,12 @@ export default defineComponent({
     },
   },
   emits: ['close'],
-  setup(props, { emit }) {
+  setup(props) {
     const vestingYears = ref(4);
     const { emitLoadingTask } = useLoadingStore();
     const stocksPlansStore = useStocksPlansStore();
 
-    const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
-      ref(undefined);
     const localPlan = toRef(props.plan) as Ref<StocksPlan>;
-
-    const syntheticShow = computed({
-      get: () => props.show,
-      set: (value: boolean) => {
-        if (!value) {
-          emit('close', undefined);
-        }
-      },
-    });
 
     const isNew = computed(() => localPlan?.value?.id === '');
 
@@ -249,15 +207,11 @@ export default defineComponent({
       localPlan.value.id = localPlan.value.identifier;
       setVestingEndDate(vestingYears.value);
 
-      if (await formRef.value?.validate()) {
-        const plan = localPlan.value;
+      const plan = localPlan.value;
 
-        await emitLoadingTask(async () => {
-          await stocksPlansStore.updateStocksPlan(plan);
-        });
-
-        emit('close');
-      }
+      await emitLoadingTask(async () => {
+        await stocksPlansStore.updateStocksPlan(plan);
+      });
     };
 
     const onTickerOptionSelect = (tickerOption: TickerOption) => {
@@ -273,8 +227,6 @@ export default defineComponent({
     };
 
     return {
-      formRef,
-      syntheticShow,
       isNew,
       localPlan,
       setLocalPlan,

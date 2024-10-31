@@ -1,12 +1,31 @@
 <template>
   <q-header elevated>
     <q-toolbar>
-      <img class="header-logo q-mr-md" src="~assets/logo.svg" alt="app-logo" />
+      <img
+        v-if="$q.platform.is.desktop"
+        class="header-logo q-mr-md"
+        src="~assets/logo.svg"
+        alt="app-logo"
+      />
+      <img
+        v-else
+        class="header-logo q-mr-md"
+        height="24"
+        src="~assets/logo-short.svg"
+        alt="app-logo"
+      />
 
       <q-toolbar-title class="row justify-between">
         <app-navigation class="desktop-only" />
       </q-toolbar-title>
 
+      <q-btn
+        :icon="visibilityIcon"
+        flat
+        @click="featuresStore.toggleStealthMode"
+      >
+        <q-tooltip>{{ visibilityHelper }} all numeric values</q-tooltip>
+      </q-btn>
       <q-btn
         icon="notifications_none"
         class="alerts-icon"
@@ -21,13 +40,6 @@
           rounded
           >{{ notificationsStore.unreadNotifications.length }}</q-badge
         >
-      </q-btn>
-      <q-btn
-        :icon="visibilityIcon"
-        flat
-        @click="featuresStore.toggleStealthMode"
-      >
-        <q-tooltip>{{ visibilityHelper }} all numeric values</q-tooltip>
       </q-btn>
       <portfolio-dropdown />
       <user-profile />
