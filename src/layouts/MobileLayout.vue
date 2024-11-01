@@ -3,14 +3,10 @@
     <app-header />
     <notifications-drawer />
     <q-page-container class="bg-grey-1" style="overflow-x: hidden">
-      <router-view v-slot="{ Component }">
-        <transition mode="out-in" name="sub-page">
-          <keep-alive>
-            <component :is="Component" />
-          </keep-alive>
-        </transition>
-      </router-view>
+      Mobile View!
     </q-page-container>
+
+    <footer-navigation />
   </q-layout>
 </template>
 
@@ -22,7 +18,7 @@ import NotificationsDrawer from 'components/drawers/NotificationsDrawer.vue';
 import FooterNavigation from 'components/footer/FooterNavigation.vue';
 
 export default defineComponent({
-  name: 'MainLayout',
+  name: 'MobileLayout',
 
   components: {
     FooterNavigation,

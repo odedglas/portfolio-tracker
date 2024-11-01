@@ -1,3 +1,4 @@
+import { Platform } from 'quasar';
 import { RouteRecordRaw } from 'vue-router';
 
 export const ROUTE_PATHS = {
@@ -30,7 +31,13 @@ const routes: RouteRecordRaw[] = [
     meta: {
       authState: 'required',
     },
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => {
+      if (Platform.is.mobile) {
+        return import('layouts/MobileLayout.vue');
+      }
+
+      return import('layouts/MainLayout.vue');
+    },
     children: [
       { path: '', component: () => import('pages/Dashboard.vue') },
       {

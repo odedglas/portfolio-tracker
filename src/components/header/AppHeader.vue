@@ -15,22 +15,15 @@
         alt="app-logo"
       />
 
-      <q-toolbar-title class="row justify-between">
-        <app-navigation class="desktop-only" />
-      </q-toolbar-title>
+      <app-navigation class="desktop-only" />
 
-      <q-btn
-        :icon="visibilityIcon"
-        flat
-        @click="featuresStore.toggleStealthMode"
-      >
-        <q-tooltip>{{ visibilityHelper }} all numeric values</q-tooltip>
-      </q-btn>
+      <stealth-mode-button />
+
       <q-btn
         icon="notifications_none"
         class="alerts-icon"
         flat
-        @click="() => $emit('notifications-click')"
+        @click="drawersStore.toggleNotifications(true)"
       >
         <q-badge
           v-if="notificationsStore.unreadNotifications.length"
@@ -54,16 +47,19 @@ import AppNavigation from './Navigation.vue';
 import UserProfile from './UserProfile.vue';
 import { useFeaturesStore } from 'stores/features';
 import { useNotificationsStore } from 'stores/notifications';
+import { useDrawersStore } from 'stores/drawers';
+import StealthModeButton from 'components/common/StealthModeButton.vue';
 
 export default defineComponent({
   name: 'AppHeader',
   components: {
+    StealthModeButton,
     AppNavigation,
     PortfolioDropdown,
     UserProfile,
   },
-  emits: ['notifications-click'],
   setup() {
+    const drawersStore = useDrawersStore();
     const featuresStore = useFeaturesStore();
     const notificationsStore = useNotificationsStore();
 
@@ -79,6 +75,7 @@ export default defineComponent({
       visibilityHelper,
       featuresStore,
       notificationsStore,
+      drawersStore,
     };
   },
 });
