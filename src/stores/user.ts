@@ -1,13 +1,30 @@
+import { format } from 'quasar';
 import { defineStore } from 'pinia';
 import { User } from 'app/shared/types';
 import userAPI from 'src/service/user';
 import { requestMessagingPermission } from 'src/service/firebase/messaging';
 import { useNotificationsStore } from 'stores/notifications';
 
+const { capitalize } = format;
+
 export const useUserStore = defineStore('user', {
   state: (): { user: User | null } => ({
     user: null,
   }),
+  getters: {
+    displayName(state) {
+      const userDisplayNameParts = state.user?.displayName?.split(' ') || [];
+
+      return userDisplayNameParts.map(capitalize).join(' ');
+    },
+    initials: (state) => {
+      const userDisplayNameParts = state.user?.displayName?.split(' ') || [];
+
+      return userDisplayNameParts
+        .map((part) => part.split('')[0].toUpperCase())
+        .join('');
+    },
+  },
   actions: {
     async setUser(user: User | null) {
       this.user = user;
