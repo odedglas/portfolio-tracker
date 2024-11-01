@@ -6,52 +6,38 @@
 
     <user-profile-drawer />
 
-    <q-page-container class="bg-grey-1" style="overflow-x: hidden">
-      <q-tab-panels v-model="tab" animated swipeable>
-        <q-tab-panel name="home">
+    <q-page-container style="overflow-x: hidden">
+      <q-tab-panels v-model="activeTab" animated swipeable>
+        <q-tab-panel
+          v-for="tab in tabs"
+          :name="tab.name"
+          :key="tab.name"
+          class="q-pa-none bg-grey-1"
+        >
           <q-page>
-            <div class="text-h6">Mails</div>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </q-page>
-        </q-tab-panel>
-        <q-tab-panel name="portfolio">
-          <q-page>
-            <div class="text-h6">Alarms</div>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </q-page>
-        </q-tab-panel>
-        <q-tab-panel name="analytics">
-          <q-page>
-            <div class="text-h6">Alarms</div>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-          </q-page>
-        </q-tab-panel>
-        <q-tab-panel name="stocks">
-          <q-page>
-            <div class="text-h6">Movies</div>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            <div class="text-h6">{{ tab.label }}</div>
+            <component :is="tab.page" />
           </q-page>
         </q-tab-panel>
       </q-tab-panels>
 
       <q-footer>
         <q-tabs
-          v-model="tab"
+          v-model="activeTab"
           dense
           class="bg-primary text-white"
           align="justify"
           indicator-color="pink-4"
           switch-indicator
         >
-          <q-tab name="home" no-caps label="Home" icon="home" />
           <q-tab
-            name="portfolio"
+            v-for="tab in tabs"
+            :key="tab.name"
+            :name="tab.name"
             no-caps
-            label="Portfolio"
-            icon="business_center"
+            :label="tab.label"
+            :icon="tab.icon"
           />
-          <q-tab name="analytics" no-caps label="Analytics" icon="bar_chart" />
-          <q-tab name="stocks" no-caps label="Stocks" icon="inventory" />
         </q-tabs>
       </q-footer>
     </q-page-container>
@@ -64,6 +50,10 @@ import { useOrchestratorStore } from 'stores/orchestrator';
 import NotificationsDrawer from 'components/drawers/NotificationsDrawer.vue';
 import MobileAppHeader from 'components/header/MobileAppHeader.vue';
 import UserProfileDrawer from 'components/drawers/UserProfileDrawer.vue';
+import MobileDashboard from 'src/mobilePages/MobileDashboard.vue';
+import MobilePortfolio from 'src/mobilePages/MobilePortfolio.vue';
+import MobileAnalytics from 'src/mobilePages/MobileAnalytics.vue';
+import MobileStockPlans from 'src/mobilePages/MobileStockPlans.vue';
 
 export default defineComponent({
   name: 'MobileLayout',
@@ -75,15 +65,43 @@ export default defineComponent({
   },
 
   setup() {
-    const tab = ref('home');
+    const activeTab = ref('dashboard');
     const orchestratorStore = useOrchestratorStore();
+
+    const tabs = [
+      {
+        name: 'dashboard',
+        label: 'Dashboard',
+        icon: 'home',
+        page: MobileDashboard,
+      },
+      {
+        name: 'portfolio',
+        label: 'Portfolio',
+        icon: 'business_center',
+        page: MobilePortfolio,
+      },
+      {
+        name: 'analytics',
+        label: 'Analytics',
+        icon: 'bar_chart',
+        page: MobileAnalytics,
+      },
+      {
+        name: 'stocks',
+        label: 'Plans',
+        icon: 'inventory',
+        page: MobileStockPlans,
+      },
+    ];
 
     onMounted(async () => {
       await orchestratorStore.initialize();
     });
 
     return {
-      tab,
+      activeTab,
+      tabs,
     };
   },
 });

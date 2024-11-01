@@ -30,6 +30,7 @@
         />
       </q-item-section>
     </q-item>
+    <slot />
     <q-separator />
     <q-item clickable v-close-popup @click="logout">
       <q-item-section side>
@@ -44,6 +45,9 @@
 import { computed, defineComponent, PropType } from 'vue';
 import { authentication } from 'src/service/firebase/authentication';
 import { useUserStore } from 'stores/user';
+import { usePortfolioStore } from 'stores/portfolios';
+import { Portfolio } from 'app/shared/types';
+import { useDrawersStore } from 'stores/drawers';
 
 export default defineComponent({
   name: 'UserProfileList',
@@ -54,6 +58,8 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const portfolioStore = usePortfolioStore();
+    const drawersStroe = useDrawersStore();
     const userStore = useUserStore();
 
     const isDrawer = computed(() => props.appearance === 'drawer');
@@ -61,11 +67,18 @@ export default defineComponent({
 
     const logout = () => authentication.signOut();
 
+    const selectPortfolio = (portfolio: Portfolio) => {
+      portfolioStore.selectPortfolio(portfolio.id);
+      drawersStroe.toggleUserProfile();
+    };
+
     return {
+      portfolioStore,
       userStore,
       isDrawer,
       avatarSize,
       logout,
+      selectPortfolio,
     };
   },
 });
