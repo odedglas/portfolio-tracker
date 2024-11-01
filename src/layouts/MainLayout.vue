@@ -19,13 +19,11 @@ import { defineComponent, onMounted } from 'vue';
 import AppHeader from 'components/header/AppHeader.vue';
 import { useOrchestratorStore } from 'stores/orchestrator';
 import NotificationsDrawer from 'components/drawers/NotificationsDrawer.vue';
-import FooterNavigation from 'components/footer/FooterNavigation.vue';
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    FooterNavigation,
     NotificationsDrawer,
     AppHeader,
   },
