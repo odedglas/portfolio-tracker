@@ -6,7 +6,7 @@
     :title="
       isNew
         ? $t('stocks_plans.new')
-        : `${$t('stocks_plans.edit')}: ${localPlan.identifier}`
+        : `${$t('stocks_plans.edit')}: ${localPlan?.identifier}`
     "
     :before-show="setLocalPlan"
   >

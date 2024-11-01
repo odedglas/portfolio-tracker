@@ -28,7 +28,7 @@
 
       <slot name="additional-content" />
 
-      <q-card-actions align="right">
+      <q-card-actions align="right" class="card-actions">
         <q-btn flat :label="$t('cancel')" @click="$emit('close')" />
         <q-btn
           color="primary"
@@ -113,6 +113,14 @@ export default defineComponent({
   .q-dialog__inner {
     @media (max-width: $breakpoint-sm-max) {
       padding: 0;
+    }
+  }
+
+  .card-actions {
+    @media (max-width: $breakpoint-sm-max) {
+      position: absolute;
+      bottom: 0;
+      right: 0;
     }
   }
 }

@@ -2,7 +2,7 @@
   <q-drawer
     :model-value="open"
     elevated
-    :width="400"
+    :width="350"
     class="notifications-drawer"
     @hide="$emit('close-drawer')"
     @show="$emit('open-drawer')"
