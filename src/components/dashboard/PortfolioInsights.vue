@@ -1,5 +1,9 @@
 <template>
-  <q-card flat :bordered="bordered" class="portfolio-insights q-mt-lg q-pb-md">
+  <q-card
+    flat
+    :bordered="bordered"
+    class="portfolio-insights q-mt-lg q-pb-none q-pb-md-md"
+  >
     <q-card-section class="flex items-center q-pa-sm q-pa-md-lg">
       <q-icon name="auto_awesome" class="dashboard-icon q-mr-sm" size="sm" />
       <p class="text-h6 text-grey-7 q-mb-none">{{ $t('insights.title') }}</p>
@@ -9,7 +13,7 @@
         :pagination="
           hasPagination
             ? {
-                dynamicBullets: true,
+                dynamicBullets: $q.platform.is.desktop,
                 clickable: true,
               }
             : false
@@ -19,6 +23,8 @@
         :vertical="true"
         class="insights-swiper-wrapper"
         wrapper-class="q-pb-xl"
+        @touchstart="(e:Event) => e.stopImmediatePropagation()"
+        @touchend="(e:Event) => e.stopImmediatePropagation()"
         :space-between="16"
       >
         <swiper-slide

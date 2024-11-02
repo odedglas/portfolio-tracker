@@ -2,6 +2,9 @@
   <swiper
     :slides-per-view="$q.platform.is.desktop ? 9 : 3"
     :vertical="true"
+    :free-mode="true"
+    @touchstart="(e:Event) => e.stopImmediatePropagation()"
+    @touchend="(e:Event) => e.stopImmediatePropagation()"
     :space-between="16"
   >
     <swiper-slide
