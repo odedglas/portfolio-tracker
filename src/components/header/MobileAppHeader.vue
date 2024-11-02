@@ -8,14 +8,10 @@
           size="sm"
           @click="drawersStore.toggleUserProfile(true)"
         />
-        <img src="~assets/logo.svg" width="120" alt="app-logo" />
+        <img src="~assets/logo.svg" height="16" alt="app-logo" />
       </div>
 
-      <div>
-        <stealth-mode-button />
-
-        <notifications-button />
-      </div>
+      <notifications-button />
     </q-toolbar>
   </q-header>
 </template>
@@ -23,13 +19,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import NotificationsButton from 'components/common/NotificationsButton.vue';
-import StealthModeButton from 'components/common/StealthModeButton.vue';
 import { useDrawersStore } from 'stores/drawers';
 
 export default defineComponent({
   name: 'MobileAppHeader',
   components: {
-    StealthModeButton,
     NotificationsButton,
   },
   setup() {

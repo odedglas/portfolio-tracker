@@ -1,6 +1,6 @@
 <template>
-  <q-card flat bordered class="q-mt-lg">
-    <q-card-section class="flex items-center">
+  <q-card flat :bordered="bordered" class="q-mt-lg">
+    <q-card-section class="flex items-center q-pa-sm q-pa-md-md">
       <q-icon
         name="local_fire_department"
         class="dashboard-icon q-mr-sm"
@@ -8,8 +8,9 @@
       />
       <p class="text-h6 text-grey-7 q-mb-none">Portfolio heat map</p>
     </q-card-section>
-    <q-card-section class="q-py-none q-px-sm">
+    <q-card-section class="q-py-none q-px-none q-px-md-sm">
       <apexchart
+        width="375"
         height="400"
         :options="chartData.options"
         :series="chartData.series"
@@ -30,6 +31,12 @@ export default defineComponent({
   components: {
     apexchart: VueApexCharts,
   },
+  props: {
+    bordered: {
+      type: Boolean,
+      default: true,
+    },
+  },
   setup() {
     const numberFormatter = useNumberFormatter();
 
@@ -43,11 +50,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss">
-.holdings-heat-map {
-  svg {
-    transform: translate(8px, 0) !important;
-  }
-}
-</style>

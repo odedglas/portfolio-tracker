@@ -12,10 +12,9 @@
           v-for="tab in tabs"
           :name="tab.name"
           :key="tab.name"
-          class="q-pa-none bg-grey-1"
+          class="q-pa-none bg-grey-2"
         >
-          <q-page>
-            <div class="text-h6">{{ tab.label }}</div>
+          <q-page class="q-pt-md">
             <component :is="tab.page" />
           </q-page>
         </q-tab-panel>
@@ -50,10 +49,10 @@ import { useOrchestratorStore } from 'stores/orchestrator';
 import NotificationsDrawer from 'components/drawers/NotificationsDrawer.vue';
 import MobileAppHeader from 'components/header/MobileAppHeader.vue';
 import UserProfileDrawer from 'components/drawers/UserProfileDrawer.vue';
-import MobileDashboard from 'src/mobilePages/MobileDashboard.vue';
-import MobilePortfolio from 'src/mobilePages/MobilePortfolio.vue';
-import MobileAnalytics from 'src/mobilePages/MobileAnalytics.vue';
-import MobileStockPlans from 'src/mobilePages/MobileStockPlans.vue';
+import MobileDashboard from 'src/mobile/MobileDashboard.vue';
+import MobilePortfolio from 'src/mobile/MobilePortfolio.vue';
+import MobileAnalytics from 'src/mobile/MobileAnalytics.vue';
+import MobileStockPlans from 'src/mobile/MobileStockPlans.vue';
 
 export default defineComponent({
   name: 'MobileLayout',

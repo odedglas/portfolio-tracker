@@ -1,6 +1,10 @@
 <template>
   <span class="flex items-center" :class="textClass">
-    <span v-if="value !== undefined">{{ $n(value, 'decimal') }}</span>
+    <span v-if="value !== undefined">
+      <span v-if="showValueSign"> {{ valueSign }} </span>
+      {{ $n(Math.abs(value), 'decimal') }}
+    </span>
+    <q-separator v-if="showSeparator" vertical />
     <span class="flex items-center"
       ><q-icon :name="icon" size="sm" />{{ $n(percentage, 'percent') }}</span
     >
@@ -16,9 +20,13 @@ export default defineComponent({
     value: { type: Number, required: false },
     percentage: { type: Number, required: true },
     displayAsRow: { type: Boolean, default: true },
+    showValueSign: { type: Boolean, default: false },
+    showSeparator: { type: Boolean, default: false },
   },
 
   setup(props) {
+    const valueSign = computed(() => ((props?.value ?? 0) >= 0 ? '+' : '-'));
+
     const isProfitable = computed(
       () => (props.value ? props.value : props.percentage) >= 0
     );
@@ -36,6 +44,7 @@ export default defineComponent({
     return {
       icon,
       textClass,
+      valueSign,
     };
   },
 });

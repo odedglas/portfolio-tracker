@@ -1,19 +1,23 @@
 <template>
-  <q-card flat bordered class="donut-holdings-chart">
-    <q-card-section class="q-px-lg">
+  <q-card flat :bordered="bordered" class="donut-holdings-chart">
+    <q-card-section class="q-pa-sm q-pa-md-lg q-mb-md q-mb-md-none">
       <div class="flex col justify-between">
         <div class="flex items-center q-mr-sm">
           <q-icon name="scale" class="dashboard-icon q-mr-sm" size="sm" />
           <p class="text-h6 text-grey-7 q-mb-none">Holdings allocation</p>
         </div>
-        <q-toggle v-model="showInvested" label="By Invested" />
+        <q-toggle
+          v-if="$q.platform.is.desktop"
+          v-model="showInvested"
+          label="By Invested"
+        />
       </div>
     </q-card-section>
     <q-card-section class="row q-py-lg">
       <div class="col">
         <apexchart
           class="chart"
-          height="350"
+          :height="$q.platform.is.desktop ? 350 : 700"
           type="donut"
           :options="holdingsDonutData.options"
           :series="holdingsDonutData.series"
@@ -28,20 +32,29 @@ import { computed, defineComponent, ref } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { getHoldingsDonutChatOptions } from 'src/service/charts';
 import { useNumberFormatter } from 'components/composables/useNumberFormatter';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'HoldingsDonut',
   components: {
     apexchart: VueApexCharts,
   },
+  props: {
+    bordered: {
+      type: Boolean,
+      default: true,
+    },
+  },
   setup() {
+    const $q = useQuasar();
     const numberFormatter = useNumberFormatter();
     const showInvested = ref(false);
 
     const holdingsDonutData = computed(() => {
       return getHoldingsDonutChatOptions(
         showInvested.value ? 'invested' : 'currentValue',
-        numberFormatter
+        numberFormatter,
+        $q.platform.is.desktop ? 'right' : 'bottom'
       );
     });
 
@@ -59,6 +72,12 @@ export default defineComponent({
     overflow: visible;
   }
 
+  .apexcharts-legend {
+    @media (max-width: $breakpoint-sm-max) {
+      justify-content: start !important;
+    }
+  }
+
   .apexcharts-legend-marker {
     margin-right: 12px;
   }
@@ -67,6 +86,10 @@ export default defineComponent({
     display: flex;
     align-items: center;
     margin: 4px 6px !important;
+
+    @media (max-width: $breakpoint-sm-max) {
+      width: 100%;
+    }
 
     .apexcharts-legend-text {
       flex: 1;
