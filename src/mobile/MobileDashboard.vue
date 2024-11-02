@@ -18,7 +18,12 @@ import DailyMovers from 'components/dashboard/DailyMovers.vue';
 
 export default defineComponent({
   name: 'MobileDashboard',
-  components: { DailyMovers, HoldingsDonut, PortfolioHeatMap, DashboardKpiSummary },
+  components: {
+    DailyMovers,
+    HoldingsDonut,
+    PortfolioHeatMap,
+    DashboardKpiSummary,
+  },
   setup() {
     const portfolioStore = usePortfolioStore();
 

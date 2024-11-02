@@ -7,7 +7,8 @@ type HoldingDataProperty = 'currentValue' | 'invested';
 
 export const getHoldingsDonutChatOptions = (
   property: HoldingDataProperty = 'currentValue',
-  formatter: Formatter
+  formatter: Formatter,
+  legendPosition = 'left'
 ) => {
   const holdingsStore = useHoldingsStore();
 
@@ -25,6 +26,8 @@ export const getHoldingsDonutChatOptions = (
     options: {
       labels: holdings.map(({ name }) => name),
       legend: {
+        show: true,
+        position: legendPosition,
         fontSize: 14,
         fontFamily: FONT_FAMILY,
         itemMargin: {
@@ -38,9 +41,6 @@ export const getHoldingsDonutChatOptions = (
             holdingValue / totalValue,
             'percent'
           )}</span>`;
-        },
-        onItemHover: {
-          highlightDataSeries: false,
         },
       },
       colors: COLOR_PALLET,
@@ -61,12 +61,13 @@ export const getHoldingsDonutChatOptions = (
           expandOnClick: false,
           customScale: 0.95,
           dataLabels: {
-            offset: 55,
+            offset: 45,
           },
         },
       },
       tooltip: {
         y: {
+          show: true,
           formatter: (value: number) => formatter(value, 'decimal'),
         },
       },
