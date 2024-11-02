@@ -1,7 +1,7 @@
 <template>
   <q-card
     flat
-    :bordered="bordered"
+    :bordered="appearanceStore.borderedCards"
     class="daily-movers q-mt-lg q-pb-none q-pb-md-md"
   >
     <q-card-section class="flex justify-between q-pa-sm q-pa-md-lg">
@@ -38,6 +38,7 @@ import { useQuotesStore } from 'stores/quotes';
 
 import { dailyMoversBenchmarks } from './constants';
 import { getQuotes } from 'src/service/stocks';
+import { useAppearanceStore } from 'stores/appearance';
 
 const benchmarkDefaults = dailyMoversBenchmarks.map((opt) => ({
   ...opt,
@@ -48,16 +49,11 @@ const benchmarkDefaults = dailyMoversBenchmarks.map((opt) => ({
 export default defineComponent({
   name: 'DailyMovers',
   components: { DailyMoversSwiper },
-  props: {
-    bordered: {
-      type: Boolean,
-      default: true,
-    },
-  },
   setup() {
     const benchmarks = ref(benchmarkDefaults);
     const holdingsStore = useHoldingsStore();
     const quotesStore = useQuotesStore();
+    const appearanceStore = useAppearanceStore();
 
     const viewHoldings = computed(() =>
       [...holdingsStore.portfolioHoldings]
@@ -105,6 +101,7 @@ export default defineComponent({
     return {
       holdingsStore,
       quotesStore,
+      appearanceStore,
       featAndGreed,
       viewHoldings,
       benchmarks,

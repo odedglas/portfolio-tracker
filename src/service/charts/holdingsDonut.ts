@@ -42,6 +42,9 @@ export const getHoldingsDonutChatOptions = (
             'percent'
           )}</span>`;
         },
+        onItemHover: {
+          highlightDataSeries: false,
+        },
       },
       colors: COLOR_PALLET,
       dataLabels: {

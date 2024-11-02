@@ -1,5 +1,5 @@
 <template>
-  <q-card flat :bordered="bordered" class="q-mt-lg">
+  <q-card flat :bordered="appearanceStore.borderedCards" class="q-mt-lg">
     <q-card-section class="flex items-center q-pa-sm q-pa-md-md">
       <q-icon
         name="local_fire_department"
@@ -25,6 +25,7 @@ import { computed, defineComponent } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { getPortfolioHoldingsHeatMapChartOptions } from 'src/service/charts';
 import { useNumberFormatter } from 'components/composables/useNumberFormatter';
+import { useAppearanceStore } from 'stores/appearance';
 
 export default defineComponent({
   name: 'PortfolioHeatMap',
@@ -38,6 +39,7 @@ export default defineComponent({
     },
   },
   setup() {
+    const appearanceStore = useAppearanceStore();
     const numberFormatter = useNumberFormatter();
 
     const chartData = computed(() =>
@@ -45,6 +47,7 @@ export default defineComponent({
     );
 
     return {
+      appearanceStore,
       chartData,
     };
   },

@@ -1,7 +1,7 @@
 <template>
   <q-card
     flat
-    :bordered="bordered"
+    :bordered="appearanceStore.borderedCards"
     class="portfolio-insights q-mt-lg q-pb-none q-pb-md-md"
   >
     <q-card-section class="flex items-center q-pa-sm q-pa-md-lg">
@@ -92,19 +92,15 @@ import TickerLogo from 'components/common/TickerLogo.vue';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { useQuasar } from 'quasar';
+import { useAppearanceStore } from 'stores/appearance';
 
 export default defineComponent({
   name: 'PortfolioInsights',
   components: { Swiper, SwiperSlide, TickerLogo },
-  props: {
-    bordered: {
-      type: Boolean,
-      default: true,
-    },
-  },
   setup() {
     const $q = useQuasar();
     const holdingsStore = useHoldingsStore();
+    const appearanceStore = useAppearanceStore();
 
     const insights = computed(() => holdingsStore.insights);
 
@@ -119,6 +115,7 @@ export default defineComponent({
       hasPagination,
       insightsPerPage,
       swiperModules: [Pagination],
+      appearanceStore
     };
   },
 });

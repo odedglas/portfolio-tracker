@@ -1,5 +1,5 @@
 <template>
-  <q-card flat :bordered="bordered" class="donut-holdings-chart">
+  <q-card flat :bordered="appearanceStore.borderedCards" class="donut-holdings-chart">
     <q-card-section class="q-pa-sm q-pa-md-lg q-mb-md q-mb-md-none">
       <div class="flex col justify-between">
         <div class="flex items-center q-mr-sm">
@@ -33,20 +33,17 @@ import VueApexCharts from 'vue3-apexcharts';
 import { getHoldingsDonutChatOptions } from 'src/service/charts';
 import { useNumberFormatter } from 'components/composables/useNumberFormatter';
 import { useQuasar } from 'quasar';
+import { useAppearanceStore } from 'stores/appearance';
 
 export default defineComponent({
   name: 'HoldingsDonut',
   components: {
     apexchart: VueApexCharts,
   },
-  props: {
-    bordered: {
-      type: Boolean,
-      default: true,
-    },
-  },
   setup() {
     const $q = useQuasar();
+    const appearanceStore = useAppearanceStore();
+
     const numberFormatter = useNumberFormatter();
     const showInvested = ref(false);
 
@@ -59,6 +56,7 @@ export default defineComponent({
     });
 
     return {
+      appearanceStore,
       showInvested,
       holdingsDonutData,
     };
