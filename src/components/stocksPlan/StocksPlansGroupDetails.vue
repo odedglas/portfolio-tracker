@@ -1,5 +1,5 @@
 <template>
-  <q-card>
+  <q-card style="max-width: 100%">
     <q-card-section>
       <q-item>
         <q-item-section avatar>

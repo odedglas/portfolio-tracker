@@ -7,7 +7,7 @@
     <user-profile-drawer />
 
     <q-page-container style="overflow-x: hidden">
-      <q-tab-panels v-model="activeTab" animated swipeable>
+      <q-tab-panels v-model="activeTab" animated swipeable keep-alive>
         <q-tab-panel
           v-for="tab in tabs"
           :name="tab.name"

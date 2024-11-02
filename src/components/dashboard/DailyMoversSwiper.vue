@@ -2,7 +2,7 @@
   <swiper
     :slides-per-view="$q.platform.is.desktop ? 9 : 3"
     :vertical="true"
-    :free-mode="true"
+    :slides-per-group="3"
     @touchstart="(e:Event) => e.stopImmediatePropagation()"
     @touchend="(e:Event) => e.stopImmediatePropagation()"
     :space-between="16"
