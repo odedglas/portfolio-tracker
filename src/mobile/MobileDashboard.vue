@@ -3,10 +3,10 @@
     {{ portfolioStore.selectedPortfolio?.title }}
   </p>
   <dashboard-kpi-summary />
-  <daily-movers/>
-  <portfolio-insights/>
-  <portfolio-heat-map/>
-  <holdings-donut class="q-mt-lg"/>
+  <daily-movers />
+  <portfolio-insights />
+  <portfolio-heat-map />
+  <holdings-donut class="q-mt-lg" />
 </template>
 
 <script lang="ts">

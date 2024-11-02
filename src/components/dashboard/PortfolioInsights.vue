@@ -115,7 +115,7 @@ export default defineComponent({
       hasPagination,
       insightsPerPage,
       swiperModules: [Pagination],
-      appearanceStore
+      appearanceStore,
     };
   },
 });

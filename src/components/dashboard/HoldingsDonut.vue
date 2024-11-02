@@ -1,5 +1,9 @@
 <template>
-  <q-card flat :bordered="appearanceStore.borderedCards" class="donut-holdings-chart">
+  <q-card
+    flat
+    :bordered="appearanceStore.borderedCards"
+    class="donut-holdings-chart"
+  >
     <q-card-section class="q-pa-sm q-pa-md-lg q-mb-md q-mb-md-none">
       <div class="flex col justify-between">
         <div class="flex items-center q-mr-sm">
