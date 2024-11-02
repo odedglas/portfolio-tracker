@@ -3,7 +3,8 @@
     {{ portfolioStore.selectedPortfolio?.title }}
   </p>
   <dashboard-kpi-summary />
-  <daily-movers />
+  <daily-movers :bordered="false" />
+  <portfolio-insights :bordered="false" />
   <portfolio-heat-map :bordered="false" />
   <holdings-donut class="q-mt-lg" :bordered="false" />
 </template>
@@ -15,10 +16,12 @@ import DashboardKpiSummary from 'components/dashboard/DashboardKPISummary.vue';
 import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
 import HoldingsDonut from 'components/dashboard/HoldingsDonut.vue';
 import DailyMovers from 'components/dashboard/DailyMovers.vue';
+import PortfolioInsights from 'components/dashboard/PortfolioInsights.vue';
 
 export default defineComponent({
   name: 'MobileDashboard',
   components: {
+    PortfolioInsights,
     DailyMovers,
     HoldingsDonut,
     PortfolioHeatMap,

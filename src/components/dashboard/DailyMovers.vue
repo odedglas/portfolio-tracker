@@ -1,11 +1,20 @@
 <template>
-  <q-card flat bordered class="daily-movers q-mt-lg q-pb-md">
-    <q-card-section class="flex justify-between">
+  <q-card
+    flat
+    :bordered="bordered"
+    class="daily-movers q-mt-lg q-pb-none q-pb-md-md"
+  >
+    <q-card-section class="flex justify-between q-pa-sm q-pa-md-lg">
       <div class="flex items-center">
         <q-icon name="timeline" class="dashboard-icon q-mr-sm" size="sm" />
         <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
       </div>
-      <q-chip outline size="md" color="primary" :icon="featAndGreed.emoji"
+      <q-chip
+        outline
+        size="md"
+        color="primary"
+        :icon="featAndGreed.emoji"
+        class="q-mt-md q-mt-md-none"
         >Fear and Greed Index: {{ featAndGreed.text }} /
         {{ featAndGreed.value }}</q-chip
       >
@@ -39,6 +48,12 @@ const benchmarkDefaults = dailyMoversBenchmarks.map((opt) => ({
 export default defineComponent({
   name: 'DailyMovers',
   components: { DailyMoversSwiper },
+  props: {
+    bordered: {
+      type: Boolean,
+      default: true,
+    },
+  },
   setup() {
     const benchmarks = ref(benchmarkDefaults);
     const holdingsStore = useHoldingsStore();

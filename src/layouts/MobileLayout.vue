@@ -14,7 +14,7 @@
           :key="tab.name"
           class="q-pa-none bg-grey-2"
         >
-          <q-page class="q-pt-md">
+          <q-page class="q-pt-sm">
             <component :is="tab.page" />
           </q-page>
         </q-tab-panel>

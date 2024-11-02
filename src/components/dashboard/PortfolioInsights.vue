@@ -1,6 +1,6 @@
 <template>
-  <q-card flat bordered class="portfolio-insights q-mt-lg q-pb-md">
-    <q-card-section class="flex items-center">
+  <q-card flat :bordered="bordered" class="portfolio-insights q-mt-lg q-pb-md">
+    <q-card-section class="flex items-center q-pa-sm q-pa-md-lg">
       <q-icon name="auto_awesome" class="dashboard-icon q-mr-sm" size="sm" />
       <p class="text-h6 text-grey-7 q-mb-none">{{ $t('insights.title') }}</p>
     </q-card-section>
@@ -10,11 +10,12 @@
           hasPagination
             ? {
                 dynamicBullets: true,
+                clickable: true,
               }
             : false
         "
         :modules="swiperModules"
-        :slides-per-view="hasPagination ? 3 : insights.length"
+        :slides-per-view="hasPagination ? insightsPerPage : insights.length"
         :vertical="true"
         class="insights-swiper-wrapper"
         wrapper-class="q-pb-xl"
@@ -84,23 +85,33 @@ import TickerLogo from 'components/common/TickerLogo.vue';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
+import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'PortfolioInsights',
   components: { Swiper, SwiperSlide, TickerLogo },
+  props: {
+    bordered: {
+      type: Boolean,
+      default: true,
+    },
+  },
   setup() {
+    const $q = useQuasar();
     const holdingsStore = useHoldingsStore();
 
     const insights = computed(() => holdingsStore.insights);
 
-    const insightsPerPage = 3;
+    const insightsPerPage = computed(() => ($q.platform.is.desktop ? 3 : 1));
+
     const hasPagination = computed(
-      () => insights.value.length >= insightsPerPage
+      () => insights.value.length >= insightsPerPage.value
     );
 
     return {
       insights,
       hasPagination,
+      insightsPerPage,
       swiperModules: [Pagination],
     };
   },
