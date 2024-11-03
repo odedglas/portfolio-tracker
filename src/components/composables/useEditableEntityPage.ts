@@ -4,7 +4,7 @@ import { useLoadingStore } from 'stores/loading';
 import { Entity } from 'app/shared/types';
 
 interface UseEditableEntityPageProps<T> {
-  deleteModal: {
+  deleteModal?: {
     title: string;
     message: (entity: T) => string;
     callback: (entity: T) => Promise<unknown>;
@@ -13,7 +13,7 @@ interface UseEditableEntityPageProps<T> {
 
 export function useEditableEntityPage<T extends Entity>({
   deleteModal,
-}: UseEditableEntityPageProps<T>) {
+}: UseEditableEntityPageProps<T> = {}) {
   const { showAreYouSure } = useAreYouSure();
   const { emitLoadingTask } = useLoadingStore();
 
@@ -35,6 +35,10 @@ export function useEditableEntityPage<T extends Entity>({
   };
 
   const deleteEntity = (entity: T) => {
+    if (!deleteModal) {
+      return;
+    }
+
     showAreYouSure({
       title: deleteModal.title,
       message: deleteModal.message(entity),

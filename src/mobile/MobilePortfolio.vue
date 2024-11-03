@@ -4,9 +4,19 @@
       Portfolio
     </p>
     <mobile-abstract-list title="Holdings" :items="holdings" />
-    <mobile-abstract-list title="Transactions" :items="transactions" />
+    <mobile-abstract-list
+      title="Transactions"
+      :items="transactions"
+      @item-click="(item) => openEditTransactionModal(item)"
+    />
     <mobile-abstract-list title="Deposits" :items="deposits" />
   </div>
+
+  <transactions-dialog
+    :show="showTransactionsModal"
+    :transaction="editTransaction"
+    @close="hideTransactionsModal"
+  />
 </template>
 
 <script lang="ts">
@@ -14,19 +24,28 @@ import capitalize from 'lodash/capitalize';
 import { computed, defineComponent } from 'vue';
 import MobileAbstractList from 'src/mobile/MobileAbstractList.vue';
 import { usePortfolioStore } from 'stores/portfolios';
-import { Deposit } from 'app/shared/types';
+import { Deposit, Transaction } from 'app/shared/types';
 import { useViewTransactions } from 'components/composables/useViewTransactions';
 import { useViewHoldings } from 'components/composables/useViewHoldings';
 import { useI18n } from 'vue-i18n';
+import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
+import TransactionsDialog from 'components/transactions/TransactionDialog.vue';
 
 export default defineComponent({
   name: 'MobilePortfolio',
-  components: { MobileAbstractList },
+  components: { TransactionsDialog, MobileAbstractList },
   setup() {
     const $n = useI18n().n;
     const portfolioStore = usePortfolioStore();
     const { viewTransactions } = useViewTransactions();
     const { viewHoldings } = useViewHoldings();
+
+    const {
+      editEntity: editTransaction,
+      showModal: showTransactionsModal,
+      openEntityModal: openEditTransactionModal,
+      hideEntityModal: hideTransactionsModal,
+    } = useEditableEntityPage<Transaction>();
 
     const depositsIcons: Record<Deposit['type'], string> = {
       deposit: 'attach_money',
@@ -59,6 +78,7 @@ export default defineComponent({
           symbol: transaction.ticker,
           logoImage: transaction.logoImage,
         },
+        rawEntity: transaction,
       }))
     );
 
@@ -84,6 +104,10 @@ export default defineComponent({
       deposits,
       transactions,
       holdings,
+      editTransaction,
+      showTransactionsModal,
+      openEditTransactionModal,
+      hideTransactionsModal,
     };
   },
 });

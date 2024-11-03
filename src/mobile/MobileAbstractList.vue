@@ -5,7 +5,12 @@
     </q-card-section>
     <q-card-section class="q-px-none q-py-sm">
       <q-list separator>
-        <q-item v-for="item in items" :key="item.title">
+        <q-item
+          v-for="item in items"
+          :key="item.title"
+          clickable
+          @click="$emit('item-click', item.rawEntity)"
+        >
           <q-item-section side>
             <ticker-logo
               v-if="item.ticker"
@@ -66,6 +71,7 @@ import { computed, defineComponent, PropType } from 'vue';
 import { formatShortDate } from 'src/service/date';
 import ProfitIndicator from 'components/common/ProfitIndicator.vue';
 import TickerLogo from 'components/common/TickerLogo.vue';
+import { Entity } from 'app/shared/types';
 
 type ListItem = {
   title: string;
@@ -80,6 +86,7 @@ type ListItem = {
     symbol: string;
     logoImage?: string;
   };
+  rawEntity?: Entity;
 };
 
 export default defineComponent({
@@ -95,6 +102,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ['item-click'],
   setup(props) {
     const totalValue = computed(() =>
       props.items.reduce((acc, item) => acc + item.value, 0)
