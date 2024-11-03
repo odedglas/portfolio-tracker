@@ -101,12 +101,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import { useHoldingsStore } from 'src/stores/holdings';
 import { columns } from './columns';
 import ProfitIndicator from 'components/common/ProfitIndicator.vue';
+import { useViewHoldings } from 'components/composables/useViewHoldings';
 
 export default defineComponent({
   name: 'HoldingsTable',
@@ -118,28 +119,9 @@ export default defineComponent({
     const filter = ref('');
     const holdingsStore = useHoldingsStore();
 
-    const { portfolioHoldings, summary } = storeToRefs(holdingsStore);
+    const { summary } = storeToRefs(holdingsStore);
 
-    const viewHoldings = computed(() =>
-      portfolioHoldings.value.map((holding) => {
-        const totalValue = holding.currentValue;
-        const profitValue = holding.profit.value;
-        const dailyChange = holding.dailyChange;
-
-        return {
-          ...holding,
-          totalValue,
-          profit: {
-            value: profitValue,
-            percent: totalValue > 0 ? holding.profit.percent : 0,
-          },
-          daily: {
-            value: dailyChange.value,
-            percent: dailyChange.percent,
-          },
-        };
-      })
-    );
+    const { viewHoldings } = useViewHoldings();
 
     return {
       filter,

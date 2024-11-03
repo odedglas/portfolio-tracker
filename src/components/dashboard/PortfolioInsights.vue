@@ -49,7 +49,7 @@
               v-html="
                 $t(`insights.types.description.${insight.type}`, {
                   ...insight.inputs,
-                  name: insight.holding.name?.replace(', Inc.', ''),
+                  name: shortHoldingName(insight.holding.name),
                   movingAverageDays: insight.inputs.movingAverageDays,
                   deltaPercent:
                     typeof insight.inputs.deltaPercent === 'number'
@@ -88,6 +88,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Pagination } from 'swiper/modules';
 import { useHoldingsStore } from 'stores/holdings';
 import TickerLogo from 'components/common/TickerLogo.vue';
+import { shortHoldingName } from 'src/utils';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -116,6 +117,7 @@ export default defineComponent({
       insightsPerPage,
       swiperModules: [Pagination],
       appearanceStore,
+      shortHoldingName,
     };
   },
 });

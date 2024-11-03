@@ -24,17 +24,27 @@
             }}</q-item-label>
             <q-item-label
               v-if="item.caption"
-              class="text-caption text-grey-6"
+              class="text-caption text-grey-7"
               >{{ item.caption }}</q-item-label
             >
           </q-item-section>
 
-          <q-item-section side class="flex justify-between">
-            <q-item-label class="text-caption text-grey-6">{{
+          <q-item-section side class="flex justify-between q-gap-sm">
+            <q-item-label class="text-caption text-grey-7" v-if="item.date">{{
               formatShortDate(item.date)
             }}</q-item-label>
-            <q-item-label class="text-subtitle1 text-black q-pt-sm">
-              <profit-indicator :value="item.value" show-value-sign />
+            <q-item-label
+              class="text-caption text-grey-7"
+              v-if="item.dateLabel"
+              >{{ item.dateLabel }}</q-item-label
+            >
+            <q-item-label class="text-subtitle2 text-black">
+              <profit-indicator
+                :value="item.value"
+                show-value-sign
+                :percentage="item.percent"
+                :display-as-row="false"
+              />
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -62,8 +72,10 @@ type ListItem = {
   subtitle?: string;
   caption?: string;
   icon?: string;
-  date: number;
+  date?: number;
+  dateLabel?: string;
   value: number;
+  percent?: number;
   ticker?: {
     symbol: string;
     logoImage?: string;
