@@ -4,7 +4,6 @@
       <span class="text-h5" style="min-width: 130px">
         {{ $n(balance?.value ?? 0, 'decimal') }}</span
       >
-      <stealth-mode-button class="text-grey-6" />
     </q-card-section>
     <q-card-section>
       <div class="flex justify-between items-center">
@@ -53,12 +52,11 @@
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
 import { usePortfolioKpis } from 'components/composables/usePortfolioKpis';
-import StealthModeButton from 'components/common/StealthModeButton.vue';
 import ProfitIndicator from 'components/common/ProfitIndicator.vue';
 
 export default defineComponent({
   name: 'DashboardKpiSummary',
-  components: { ProfitIndicator, StealthModeButton },
+  components: { ProfitIndicator },
   setup() {
     const { kpis } = usePortfolioKpis();
 

@@ -5,3 +5,6 @@ export const formatPlanDate = (date: number) =>
 
 export const formatNotificationDate = (date: number) =>
   DateAPI.formatDate(date, 'h:m MMM D, YY');
+
+export const formatShortDate = (date: number) =>
+  DateAPI.formatDate(date, 'MMM D, YY');

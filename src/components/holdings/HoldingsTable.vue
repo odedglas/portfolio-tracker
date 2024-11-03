@@ -33,7 +33,7 @@
           {{ $n(props.row.invested, 'decimal') }}
         </q-td>
         <q-td key="total_value" :props="props">
-          {{ $n(props.row.totalValue.value, 'decimal') }}
+          {{ $n(props.row.totalValue, 'decimal') }}
         </q-td>
         <q-td key="total_profit" :props="props">
           <profit-indicator
@@ -128,10 +128,7 @@ export default defineComponent({
 
         return {
           ...holding,
-          totalValue: {
-            value: totalValue,
-            textClass: totalValue >= 0 ? 'text-green-6' : 'text-red-6',
-          },
+          totalValue,
           profit: {
             value: profitValue,
             percent: totalValue > 0 ? holding.profit.percent : 0,
