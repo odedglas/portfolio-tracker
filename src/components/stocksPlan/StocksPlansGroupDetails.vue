@@ -1,5 +1,5 @@
 <template>
-  <q-card style="max-width: 100%">
+  <q-card>
     <q-card-section>
       <q-item>
         <q-item-section avatar>
@@ -10,7 +10,7 @@
             {{ plansGroupMeta.name }}
           </q-item-label>
         </q-item-section>
-        <q-item-section side class="flex row">
+        <q-item-section side>
           <q-item-label class="text-subtitle1 text-black">
             Plans value: {{ $n(plansTotal.total, 'currency') }}
           </q-item-label>

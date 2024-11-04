@@ -12,6 +12,8 @@
       </div>
 
       <div>
+        <quick-add/>
+
         <stealth-mode-button />
 
         <notifications-button />
@@ -25,10 +27,12 @@ import { defineComponent } from 'vue';
 import NotificationsButton from 'components/common/NotificationsButton.vue';
 import StealthModeButton from 'components/common/StealthModeButton.vue';
 import { useDrawersStore } from 'stores/drawers';
+import QuickAdd from 'components/dashboard/QuickAdd.vue';
 
 export default defineComponent({
   name: 'MobileAppHeader',
   components: {
+    QuickAdd,
     StealthModeButton,
     NotificationsButton,
   },

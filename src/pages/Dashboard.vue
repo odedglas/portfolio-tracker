@@ -12,7 +12,7 @@
       <daily-movers class="dashboard-daily-movers" />
       <portfolio-insights class="dashboard-portfolio-insights" />
     </div>
-    <quick-add />
+    <sticky-quick-add/>
   </q-page>
 </template>
 
@@ -24,14 +24,14 @@ import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
 import HoldingsDonut from 'components/dashboard/HoldingsDonut.vue';
 import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
 import PortfolioInsights from 'components/dashboard/PortfolioInsights.vue';
-import QuickAdd from 'components/dashboard/QuickAdd.vue';
 import DailyMovers from 'components/dashboard/DailyMovers.vue';
+import StickyQuickAdd from 'components/dashboard/StickyQuickAdd.vue';
 
 export default defineComponent({
   name: 'DashboardPage',
   components: {
+    StickyQuickAdd,
     DailyMovers,
-    QuickAdd,
     PortfolioHeatMap,
     HoldingsDonut,
     DashboardKpi,
