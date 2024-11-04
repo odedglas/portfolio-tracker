@@ -1,8 +1,5 @@
 <template>
-  <q-fab
-    v-bind="mainFabProp"
-    vertical-actions-align="right"
-  >
+  <q-fab v-bind="mainFabProp" vertical-actions-align="right">
     <q-fab-action
       color="grey-3"
       text-color="primary"
@@ -60,7 +57,12 @@ import { QFabProps, useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'QuickAdd',
-  components: { StocksPlanDialog, CashFlowDialog, TransactionsDialog, PortfolioDialog },
+  components: {
+    StocksPlanDialog,
+    CashFlowDialog,
+    TransactionsDialog,
+    PortfolioDialog,
+  },
   setup() {
     const $q = useQuasar();
 
@@ -75,7 +77,7 @@ export default defineComponent({
       color: isMobile ? 'white' : 'primary',
       direction: isMobile ? 'down' : 'up',
       flat: isMobile,
-      square: isMobile
+      square: isMobile,
     } as QFabProps;
 
     return {
@@ -83,7 +85,7 @@ export default defineComponent({
       showPortfolioDialog,
       showTransactionDialog,
       showCashFlowDialog,
-      showStockPlanDialog
+      showStockPlanDialog,
     };
   },
 });

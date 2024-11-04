@@ -12,7 +12,7 @@
       <daily-movers class="dashboard-daily-movers" />
       <portfolio-insights class="dashboard-portfolio-insights" />
     </div>
-    <sticky-quick-add/>
+    <sticky-quick-add />
   </q-page>
 </template>
 

@@ -12,7 +12,7 @@
       </div>
 
       <div>
-        <quick-add/>
+        <quick-add />
 
         <stealth-mode-button />
 

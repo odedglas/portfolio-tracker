@@ -1,6 +1,6 @@
 <template>
   <q-page-sticky position="bottom-right" :offset="[30, 40]">
-      <quick-add />
+    <quick-add />
   </q-page-sticky>
 </template>
 
@@ -10,6 +10,6 @@ import QuickAdd from 'components/dashboard/QuickAdd.vue';
 
 export default defineComponent({
   name: 'StickyQuickAdd',
-  components: { QuickAdd }
+  components: { QuickAdd },
 });
 </script>
