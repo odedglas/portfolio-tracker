@@ -1,6 +1,10 @@
 <template>
-  <q-card flat bordered class="portfolio-performance-card">
-    <q-card-section>
+  <q-card
+    flat
+    :bordered="appearanceStore.borderedCards"
+    class="portfolio-performance-card"
+  >
+    <q-card-section class="q-pa-sm q-pa-md-md">
       <div class="flex justify-between">
         <div class="flex items-center q-mr-sm">
           <q-icon
@@ -14,7 +18,7 @@
         </div>
       </div>
       <div
-        class="flex items-center q-gutter-md q-my-xs text-grey-8 justify-between text-caption"
+        class="flex items-center q-my-xs q-my-md-md text-grey-8 justify-between text-caption q-gap-md"
       >
         <div>
           <q-btn
@@ -41,7 +45,9 @@
             >{{ $t('zoom_out') }}</q-btn
           >
         </div>
-        <div class="q-px-md flex items-center">
+        <div
+          class="graph-summary q-px-none q-px-md-md flex items-center justify-between"
+        >
           <div class="flex">
             <span
               v-for="(totalValue, index) in seriesTotalValues"
@@ -64,7 +70,7 @@
         </div>
       </div>
     </q-card-section>
-    <q-card-section class="q-pt-none">
+    <q-card-section class="q-pt-none q-px-none q-px-md-md">
       <apexchart
         ref="chartRef"
         height="500"
@@ -125,6 +131,7 @@ import NumericValue from 'components/common/NumericValue.vue';
 import { useTransactionsStore } from 'stores/transactions';
 import { Option, timeRangeOptions } from './constants';
 import { useNumberFormatter } from 'components/composables/useNumberFormatter';
+import { useAppearanceStore } from 'stores/appearance';
 
 const ModeIconMap: Record<'value' | 'percentage', string> = {
   value: 'query_stats',
@@ -164,6 +171,7 @@ export default defineComponent({
 
     const numberFormatter = useNumberFormatter();
     const portfolioStore = usePortfolioStore();
+    const appearanceStore = useAppearanceStore();
     const transactionsStore = useTransactionsStore();
 
     const periodTimeRange = computed(() => {
@@ -314,6 +322,7 @@ export default defineComponent({
       markerMenuTargetEl,
       clearMarkerMenu,
       markerMenu,
+      appearanceStore,
     };
   },
 });
@@ -350,6 +359,12 @@ export default defineComponent({
     .q-item__label + .q-item__label {
       margin-top: 0;
     }
+  }
+}
+
+.graph-summary {
+  @media (max-width: $breakpoint-sm-max) {
+    width: 100%;
   }
 }
 </style>

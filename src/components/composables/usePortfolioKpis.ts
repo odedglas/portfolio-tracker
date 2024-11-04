@@ -10,7 +10,7 @@ export const usePortfolioKpis = () => {
   const kpis = computed(() => {
     const portfolio = portfolioStore.selectedPortfolioWithHoldings;
     if (!portfolio) {
-      return;
+      return [];
     }
 
     const portfolioKpis = portfoliosTransformer.portfolioKPIS(portfolio);

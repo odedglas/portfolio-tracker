@@ -1,9 +1,11 @@
 <template>
-  <q-card flat bordered>
+  <q-card flat :bordered="appearanceStore.borderedCards">
+    <p class="text-body1 q-px-md q-pt-md q-mb-none">
+      {{ $t('charts.benchmarks') }}:
+    </p>
     <q-card-section
-      class="flex q-gutter-md items-center benchmarks-selector-wrapper"
+      class="row q-gap-md items-center benchmarks-selector-wrapper"
     >
-      <p class="text-body1 q-mb-none">{{ $t('charts.benchmarks') }}:</p>
       <div
         v-for="option in benchmarkOptions"
         :class="`q-px-md q-py-sm q-card--bordered clickable ${
@@ -21,11 +23,13 @@
 <script lang="ts">
 import { defineComponent, ref, Ref, watch } from 'vue';
 import { benchmarkOptions, Option } from 'components/analytics/constants';
+import { useAppearanceStore } from 'stores/appearance';
 
 export default defineComponent({
   name: 'BenchmarksSelector',
   emits: ['update:selectedBenchmark'],
   setup(_props, { emit }) {
+    const appearanceStore = useAppearanceStore();
     const selectedBenchmark: Ref<Option[]> = ref([benchmarkOptions[0]]);
 
     const emitSelectedBenchmark = () => {
@@ -57,6 +61,7 @@ export default defineComponent({
     watch(selectedBenchmark, emitSelectedBenchmark, { immediate: true });
 
     return {
+      appearanceStore,
       selectedBenchmark,
       benchmarkOptions,
       toggleSelectedBenchmark,
