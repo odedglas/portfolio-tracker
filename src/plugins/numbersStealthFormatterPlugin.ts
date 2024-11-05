@@ -1,5 +1,5 @@
 import { App } from 'vue';
-import { useFeaturesStore } from 'stores/features';
+import { useUserStore } from 'stores/user';
 
 export const NONE_SENSITIVE_FORMATTERS = [
   'percent',
@@ -10,7 +10,7 @@ export const NONE_SENSITIVE_FORMATTERS = [
 export const formatterStealthInterceptor =
   (originalNumberFormatter: unknown) =>
   (value: number, ...args: unknown[]) => {
-    const featuresStore = useFeaturesStore();
+    const userStore = useUserStore();
 
     const [format] = args;
 
@@ -18,7 +18,7 @@ export const formatterStealthInterceptor =
       format as string
     );
 
-    if (featuresStore.stealthMode && !isNoneSensitiveFormat) {
+    if (userStore.user?.settings.stealthModeEnabled && !isNoneSensitiveFormat) {
       const prefix =
         typeof format === 'string' && format.includes('fixed') ? '' : '$';
 

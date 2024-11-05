@@ -38,7 +38,8 @@ export type AppUser = {
   messagingToken?: string;
   deviceTokens?: string[];
   settings: {
-    notificationsEnabled: boolean;
+    notificationsEnabled?: boolean;
+    stealthModeEnabled?: boolean;
   };
 };
 

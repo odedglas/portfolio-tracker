@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { useFeaturesStore } from 'stores/features';
+import { useUserStore } from 'stores/user';
 
 export default defineComponent({
   name: 'StealthModeButton',
@@ -19,19 +19,21 @@ export default defineComponent({
     },
   },
   setup() {
-    const featuresStore = useFeaturesStore();
+    const userStore = useUserStore();
 
     const visibilityIcon = computed(() =>
-      featuresStore.stealthMode ? 'visibility' : 'visibility_off'
+      userStore.user?.settings.stealthModeEnabled
+        ? 'visibility'
+        : 'visibility_off'
     );
     const visibilityHelper = computed(() =>
-      featuresStore.stealthMode ? 'Show' : 'Hide'
+      userStore.user?.settings.stealthModeEnabled ? 'Show' : 'Hide'
     );
 
     return {
       visibilityHelper,
       visibilityIcon,
-      toggleStealthMode: featuresStore.toggleStealthMode,
+      toggleStealthMode: userStore.toggleStealthMode,
     };
   },
 });
