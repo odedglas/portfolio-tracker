@@ -8,7 +8,7 @@
           size="sm"
           @click="drawersStore.toggleUserProfile(true)"
         />
-        <img src="~assets/logo.svg" height="16" alt="app-logo" />
+        <img src="~assets/logo.svg" height="12" alt="app-logo" />
       </div>
 
       <div>
