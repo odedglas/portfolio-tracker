@@ -96,7 +96,9 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
           formatter: (dataIndex: number) => {
             const serieHolding = series[0].data[dataIndex - 1];
 
-            const holding = holdingsStore.portfolioHoldings.find(holding => holding.ticker === serieHolding?.x);
+            const holding = holdingsStore.portfolioHoldings.find(
+              (holding) => holding.ticker === serieHolding?.x
+            );
 
             return holding?.name ?? '';
           },
@@ -107,7 +109,9 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
             { dataPointIndex }: { dataPointIndex: number }
           ) => {
             const serieHolding = series[0].data[dataPointIndex];
-            const holding = holdingsStore.portfolioHoldings.find(holding => holding.ticker === serieHolding?.x);
+            const holding = holdingsStore.portfolioHoldings.find(
+              (holding) => holding.ticker === serieHolding?.x
+            );
 
             if (!holding) {
               return `${value}%`;
