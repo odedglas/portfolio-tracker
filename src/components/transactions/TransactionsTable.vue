@@ -72,7 +72,7 @@
           </div>
         </q-td>
         <q-td key="date" :props="props">
-          {{ props.row.date }}
+          {{ props.row.formattedDate }}
         </q-td>
         <q-td key="shares" :props="props">
           {{ props.row.shares }}
@@ -172,14 +172,13 @@
 
 <script lang="ts">
 import { defineComponent, ref, PropType, computed } from 'vue';
-import { date } from 'quasar';
 import { storeToRefs } from 'pinia';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import ProfitIndicator from 'components/common/ProfitIndicator.vue';
 import { useTransactionsStore } from 'src/stores/transactions';
-import { transactionsTransformer } from 'app/shared/transformers';
 import { Transaction } from 'app/shared/types';
 import { columns } from './columns';
+import { useViewTransactions } from 'components/composables/useViewTransactions';
 
 export default defineComponent({
   name: 'TransactionsTable',
@@ -198,36 +197,10 @@ export default defineComponent({
     const filter = ref('');
     const transactionsStore = useTransactionsStore();
 
-    const { transactions, summary, balanceMap, actualShares } =
+    const { transactions, summary, actualShares } =
       storeToRefs(transactionsStore);
 
-    const viewTransactions = computed(() =>
-      transactions.value.map((transaction) => {
-        const isBuyAction = transactionsTransformer.isBuy(transaction);
-        const profitValue = balanceMap.value[transaction.id] ?? 0;
-        const transactionValue =
-          transactionsTransformer.totalValue(transaction);
-
-        return {
-          ...transaction,
-          actionTextClass: isBuyAction ? 'text-green-4' : 'text-red-4',
-          totalValue: {
-            value: transactionValue,
-            textClass: isBuyAction ? 'text-red-6' : 'text-green-6',
-            sign: isBuyAction ? '-' : '+',
-          },
-          price: transaction.price,
-          date: date.formatDate(transaction.date, 'MM/DD/YY'),
-          profit: {
-            value: profitValue,
-            percent: transactionsTransformer.profitPercent(
-              profitValue,
-              transaction
-            ),
-          },
-        };
-      })
-    );
+    const { viewTransactions } = useViewTransactions();
 
     const totalProfit = computed(() =>
       viewTransactions.value.reduce((acc, transaction) => {

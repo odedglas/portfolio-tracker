@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12 q-mt-md">
+  <div class="col-12">
     <div class="row q-gutter-md justify-center">
       <div v-for="provider in authProviders" :key="provider.id">
         <q-btn

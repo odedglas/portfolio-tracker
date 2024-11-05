@@ -1,5 +1,12 @@
 <template>
-  <swiper :slides-per-view="9" :vertical="true" :space-between="16">
+  <swiper
+    :slides-per-view="$q.platform.is.desktop ? 9 : 3"
+    :vertical="true"
+    :slides-per-group="3"
+    @touchstart="(e:Event) => e.stopImmediatePropagation()"
+    @touchend="(e:Event) => e.stopImmediatePropagation()"
+    :space-between="16"
+  >
     <swiper-slide
       v-for="(mover, index) in movers"
       :key="index"

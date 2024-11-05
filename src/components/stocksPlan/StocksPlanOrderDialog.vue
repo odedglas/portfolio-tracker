@@ -1,100 +1,72 @@
 <template>
-  <q-dialog
-    v-model="syntheticShow"
-    backdrop-filter="blur(4px)"
-    @before-show="setLocalOrderPlan"
+  <base-dialog
+    :show="show"
+    @close="$emit('close')"
+    :on-submit="submitForm"
+    :title="
+      isNew
+        ? $t('stocks_plans.order.new')
+        : `${$t('stocks_plans.order.edit')}: ${localPlanOrder?.id}`
+    "
+    :before-show="setLocalOrderPlan"
   >
-    <q-card style="min-width: 450px">
-      <q-card-section class="row items-center q-pa-none">
-        <q-toolbar class="bg-primary text-white">
-          <q-toolbar-title class="row items-center">
-            <q-icon name="grading" class="q-mr-md" />
-            {{
-              isNew
-                ? $t('stocks_plans.order.new')
-                : `${$t('stocks_plans.order.edit')}: ${localPlanOrder.id}`
-            }}
-          </q-toolbar-title>
-          <q-btn flat round dense icon="close" @click="$emit('close')" />
-        </q-toolbar>
-      </q-card-section>
-      <q-card-section class="q-pt-none">
-        <q-form ref="formRef" class="q-gutter-sm">
-          <q-input
-            v-model.number="localPlanOrder.shares"
-            class="col"
-            type="number"
-            lazy-rules
-            label="Shares amount"
-            :rules="[
-              (val) =>
-                (val && val > 0 && val < (plan.availableShares ?? 0)) ||
-                `Please enter a shares amount and less than ${
-                  plan.vested ?? 0
-                }`,
-            ]"
-          />
+    <q-input
+      v-model.number="localPlanOrder.shares"
+      class="col"
+      type="number"
+      lazy-rules
+      label="Shares amount"
+      :rules="[
+        (val) =>
+          (val && val > 0 && val < (plan.availableShares ?? 0)) ||
+          `Please enter a shares amount and less than ${plan.vested ?? 0}`,
+      ]"
+    />
 
-          <q-input
-            v-model.number="localPlanOrder.price"
-            class="col"
-            type="number"
-            lazy-rules
-            suffix="$"
-            label="Sell Price"
-            :rules="[(val) => (val && val > 0) || 'Please enter a valid price']"
-          />
+    <q-input
+      v-model.number="localPlanOrder.price"
+      class="col"
+      type="number"
+      lazy-rules
+      suffix="$"
+      label="Sell Price"
+      :rules="[(val) => (val && val > 0) || 'Please enter a valid price']"
+    />
 
-          <q-input
-            class="col"
-            v-model="formattedOrderDate"
-            label="Exercise Date"
-            lazy-rules
-            :rules="[
-              (val) =>
-                (val && typeof new Date(val).getTime === 'function') ||
-                'Please set a valid date',
-            ]"
-          >
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy
-                  cover
-                  transition-show="scale"
-                  transition-hide="scale"
-                >
-                  <q-date v-model="formattedOrderDate" mask="MMM D, YYYY">
-                    <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="Close" color="primary" flat />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
-        </q-form>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn flat :label="$t('cancel')" @click="$emit('close')" />
-        <q-btn
-          color="primary"
-          type="submit"
-          :label="$t('save')"
-          @click="submitForm"
-        />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+    <q-input
+      class="col"
+      v-model="formattedOrderDate"
+      label="Exercise Date"
+      lazy-rules
+      :rules="[
+        (val) =>
+          (val && typeof new Date(val).getTime === 'function') ||
+          'Please set a valid date',
+      ]"
+    >
+      <template v-slot:append>
+        <q-icon name="event" class="cursor-pointer">
+          <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+            <q-date v-model="formattedOrderDate" mask="MMM D, YYYY">
+              <div class="row items-center justify-end">
+                <q-btn v-close-popup label="Close" color="primary" flat />
+              </div>
+            </q-date>
+          </q-popup-proxy>
+        </q-icon>
+      </template>
+    </q-input>
+  </base-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
+import { defineComponent, PropType, computed, toRef, Ref } from 'vue';
 import { useLoadingStore } from 'stores/loading';
 import { StockPlanOrder, StocksPlan } from 'app/shared/types';
 import { formatPlanDate } from 'src/service/date';
 import { useStocksPlansStore } from 'stores/stocksPlans';
 import { uid } from 'src/utils';
+import BaseDialog from 'components/common/BaseDialog.vue';
 
 const emptyOrder = (): StockPlanOrder => ({
   id: uid(),
@@ -105,6 +77,7 @@ const emptyOrder = (): StockPlanOrder => ({
 
 export default defineComponent({
   name: 'StocksPlanOrderDialog',
+  components: { BaseDialog },
   props: {
     show: {
       type: Boolean,
@@ -119,22 +92,11 @@ export default defineComponent({
     },
   },
   emits: ['close'],
-  setup(props, { emit }) {
+  setup(props) {
     const { emitLoadingTask } = useLoadingStore();
     const stocksPlansStore = useStocksPlansStore();
 
-    const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
-      ref(undefined);
     const localPlanOrder = toRef(props.planOrder) as Ref<StockPlanOrder>;
-
-    const syntheticShow = computed({
-      get: () => props.show,
-      set: (value: boolean) => {
-        if (!value) {
-          emit('close', undefined);
-        }
-      },
-    });
 
     const isNew = computed(() => localPlanOrder?.value?.id === '');
 
@@ -156,21 +118,12 @@ export default defineComponent({
     };
 
     const submitForm = async () => {
-      if (await formRef.value?.validate()) {
-        await emitLoadingTask(() =>
-          stocksPlansStore.updateStocksPlanOrder(
-            props.plan,
-            localPlanOrder.value
-          )
-        );
-
-        emit('close');
-      }
+      await emitLoadingTask(() =>
+        stocksPlansStore.updateStocksPlanOrder(props.plan, localPlanOrder.value)
+      );
     };
 
     return {
-      formRef,
-      syntheticShow,
       isNew,
       localPlanOrder,
       setLocalOrderPlan,

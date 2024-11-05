@@ -1,11 +1,20 @@
 <template>
-  <q-card flat bordered class="daily-movers q-mt-lg q-pb-md">
-    <q-card-section class="flex justify-between">
+  <q-card
+    flat
+    :bordered="appearanceStore.borderedCards"
+    class="daily-movers q-mt-lg q-pb-none q-pb-md-md"
+  >
+    <q-card-section class="flex justify-between q-pa-sm q-pa-md-lg">
       <div class="flex items-center">
         <q-icon name="timeline" class="dashboard-icon q-mr-sm" size="sm" />
         <p class="text-h6 text-grey-7 q-mb-none">Daily Movers</p>
       </div>
-      <q-chip outline size="md" color="primary" :icon="featAndGreed.emoji"
+      <q-chip
+        outline
+        size="md"
+        color="primary"
+        :icon="featAndGreed.emoji"
+        class="q-mt-md q-mt-md-none"
         >Fear and Greed Index: {{ featAndGreed.text }} /
         {{ featAndGreed.value }}</q-chip
       >
@@ -29,6 +38,7 @@ import { useQuotesStore } from 'stores/quotes';
 
 import { dailyMoversBenchmarks } from './constants';
 import { getQuotes } from 'src/service/stocks';
+import { useAppearanceStore } from 'stores/appearance';
 
 const benchmarkDefaults = dailyMoversBenchmarks.map((opt) => ({
   ...opt,
@@ -43,6 +53,7 @@ export default defineComponent({
     const benchmarks = ref(benchmarkDefaults);
     const holdingsStore = useHoldingsStore();
     const quotesStore = useQuotesStore();
+    const appearanceStore = useAppearanceStore();
 
     const viewHoldings = computed(() =>
       [...holdingsStore.portfolioHoldings]
@@ -90,6 +101,7 @@ export default defineComponent({
     return {
       holdingsStore,
       quotesStore,
+      appearanceStore,
       featAndGreed,
       viewHoldings,
       benchmarks,

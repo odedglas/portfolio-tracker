@@ -1,7 +1,7 @@
 <template>
-  <div class="login-container column q-gutter-md">
+  <div class="login-container column q-gap-md q-pa-xs-sm q-pa-md-none">
     <img class="app-logo" src="~assets/logo.svg" alt="app-logo" />
-    <q-card class="q-pa-md shadow-2 login-card" bordered>
+    <q-card class="q-pa-md shadow-2 login-card flex column q-gap-lg" bordered>
       <login-form :login-meta="loginMeta" />
       <social-media-login-bar />
       <sign-in-out-nav
@@ -48,11 +48,8 @@ export default defineComponent({
 <style lang="scss">
 .login-container {
   .app-logo {
+    max-width: 100%;
     filter: contrast(0.35);
-  }
-
-  .login-card {
-    min-width: 550px;
   }
 }
 </style>

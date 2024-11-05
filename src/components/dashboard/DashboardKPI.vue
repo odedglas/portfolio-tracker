@@ -1,5 +1,9 @@
 <template>
-  <q-card flat bordered class="dashboard-kpi-card">
+  <q-card
+    flat
+    :bordered="appearanceStore.borderedCards"
+    class="dashboard-kpi-card"
+  >
     <q-card-section>
       <div class="row items-center no-wrap">
         <span class="flex q-mr-sm icon-wrapper">
@@ -39,6 +43,7 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 import ProfitIndicator from 'components/common/ProfitIndicator.vue';
+import { useAppearanceStore } from 'stores/appearance';
 
 export default defineComponent({
   name: 'DashboardKpi',
@@ -77,10 +82,12 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const appearanceStore = useAppearanceStore();
     const valueSign = computed(() => (props.value >= 0 ? '+' : '-'));
 
     return {
       valueSign,
+      appearanceStore,
     };
   },
 });

@@ -12,62 +12,28 @@
         />
       </div>
 
-      <benchmarks-selector @update:selected-benchmark="setBenchmarkData" />
-
-      <portfolio-performance
-        :title="$t('charts.portfolio_value')"
-        :show-transactions-markers="true"
-        :benchmarkData="benchmarkData"
-      />
-
-      <portfolio-performance
-        :title="$t('charts.portfolio_performance')"
-        mode="percentage"
-        :benchmarkData="benchmarkData"
-      />
+      <analytics-graphs />
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import DashboardKpi from 'components/dashboard/DashboardKPI.vue';
 import { usePortfolioKpis } from 'components/composables/usePortfolioKpis';
-import { benchmarkOptions } from 'components/analytics/constants';
-import { StockCharData } from 'app/shared/types';
-import { useLoadingStore } from 'stores/loading';
-import { getQuotesChartData } from 'src/service/stocks';
-import PortfolioPerformance from 'components/analytics/PortfolioPerformance.vue';
-import BenchmarksSelector from 'components/analytics/BenchmarksSelector.vue';
+import AnalyticsGraphs from 'components/analytics/AnalyticsGraphs.vue';
 
 export default defineComponent({
   name: 'AnalyticsPage',
   components: {
-    PortfolioPerformance,
-    BenchmarksSelector,
+    AnalyticsGraphs,
     DashboardKpi,
   },
   setup() {
-    const benchmarkData = ref<StockCharData[]>([]);
-
     const { kpis } = usePortfolioKpis();
-    const { emitLoadingTask } = useLoadingStore();
-
-    const setBenchmarkData = async (tickers: string[]) => {
-      await emitLoadingTask(async () => {
-        const chartQuotesResponse = await getQuotesChartData(tickers);
-
-        benchmarkData.value = tickers.map(
-          (ticker) => chartQuotesResponse[ticker]
-        );
-      });
-    };
 
     return {
       kpis,
-      setBenchmarkData,
-      benchmarkData,
-      benchmarkOptions,
     };
   },
 });

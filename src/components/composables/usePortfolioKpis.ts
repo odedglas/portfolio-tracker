@@ -10,12 +10,13 @@ export const usePortfolioKpis = () => {
   const kpis = computed(() => {
     const portfolio = portfolioStore.selectedPortfolioWithHoldings;
     if (!portfolio) {
-      return;
+      return [];
     }
 
     const portfolioKpis = portfoliosTransformer.portfolioKPIS(portfolio);
     return [
       {
+        id: 'balance',
         title: $t('dashboard.kpis.value'),
         value: portfolio.currentValue ?? 0,
         icon: 'balance',
@@ -25,6 +26,7 @@ export const usePortfolioKpis = () => {
         },
       },
       {
+        id: 'profits',
         title: $t('dashboard.kpis.profit'),
         value: portfolioKpis.profit.value ?? 0,
         valuePercentage: portfolioKpis.profit.percentage,
@@ -41,6 +43,7 @@ export const usePortfolioKpis = () => {
         },
       },
       {
+        id: 'cashflow',
         title: $t('dashboard.kpis.cash_flow'),
         value: portfoliosTransformer.cashFlow(portfolio),
         icon: 'account_balance',

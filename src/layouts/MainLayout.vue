@@ -1,11 +1,8 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <app-header @notifications-click="notificationsDrawerOpen = true" />
-    <notifications-drawer
-      :open="notificationsDrawerOpen"
-      @close-drawer="notificationsDrawerOpen = false"
-    />
-    <q-page-container class="bg-grey-1">
+    <app-header />
+    <notifications-drawer />
+    <q-page-container class="bg-grey-1" style="overflow-x: hidden">
       <router-view v-slot="{ Component }">
         <transition mode="out-in" name="sub-page">
           <keep-alive>
@@ -18,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted } from 'vue';
 import AppHeader from 'components/header/AppHeader.vue';
 import { useOrchestratorStore } from 'stores/orchestrator';
 import NotificationsDrawer from 'components/drawers/NotificationsDrawer.vue';
@@ -32,16 +29,13 @@ export default defineComponent({
   },
 
   setup() {
-    const notificationsDrawerOpen = ref(false);
     const orchestratorStore = useOrchestratorStore();
 
     onMounted(async () => {
       await orchestratorStore.initialize();
     });
 
-    return {
-      notificationsDrawerOpen,
-    };
+    return {};
   },
 });
 </script>

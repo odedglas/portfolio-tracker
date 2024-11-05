@@ -1,87 +1,73 @@
 <template>
-  <q-dialog
-    v-model="syntheticShow"
-    backdrop-filter="blur(4px)"
-    @before-show="setLocalTransaction"
+  <base-dialog
+    :show="show"
+    @close="$emit('close')"
+    :on-submit="submitForm"
+    :title="isNew ? $t('transactions.create') : $t('transactions.edit')"
+    :before-show="setLocalTransaction"
   >
-    <q-card style="min-width: 450px">
-      <q-card-section class="row items-center q-pa-none">
-        <q-toolbar class="bg-primary text-white">
-          <q-toolbar-title class="row items-center">
-            <q-icon name="transform" class="q-mr-md" />
-            {{ isNew ? $t('transactions.create') : $t('transactions.edit') }}
-          </q-toolbar-title>
-          <q-btn flat round dense icon="close" @click="$emit('close')" />
-        </q-toolbar>
-      </q-card-section>
+    <ticker-search
+      :ticker="localTransaction.ticker || ''"
+      :disabled="!isNew"
+      :ticker-meta="{
+        display: localTransaction.name,
+        logo: localTransaction.logoImage,
+      }"
+      @update:tickerValue="onTickerOptionSelect"
+    />
 
-      <q-card-section>
-        <q-form ref="formRef" class="q-gutter-sm">
-          <ticker-search
-            :ticker="localTransaction.ticker || ''"
-            :disabled="!isNew"
-            :ticker-meta="{
-              display: localTransaction.name,
-              logo: localTransaction.logoImage,
-            }"
-            @update:tickerValue="onTickerOptionSelect"
-          />
+    <div class="row" style="gap: 12px">
+      <q-select
+        class="col text-capitalize"
+        v-model="localTransaction.action"
+        :disable="!isNew"
+        :emit-value="true"
+        :options="transactionActions"
+        label="Operation"
+      />
 
-          <div class="row" style="gap: 12px">
-            <q-select
-              class="col text-capitalize"
-              v-model="localTransaction.action"
-              :disable="!isNew"
-              :emit-value="true"
-              :options="transactionActions"
-              label="Operation"
-            />
+      <date-input
+        :date="localTransaction.date"
+        @date-change="(date) => (localTransaction.date = date)"
+      />
+    </div>
 
-            <date-input
-              :date="localTransaction.date"
-              @date-change="(date) => (localTransaction.date = date)"
-            />
-          </div>
+    <div class="row" style="gap: 12px">
+      <q-input
+        v-model.number="syntheticShares"
+        class="col"
+        type="text"
+        lazy-rules
+        :disable="!isNew"
+        label="Shares"
+        :rules="[
+          (val) => (val && val > 0) || 'Please enter a valid amount of shares',
+        ]"
+      />
 
-          <div class="row" style="gap: 12px">
-            <q-input
-              v-model.number="syntheticShares"
-              class="col"
-              type="text"
-              lazy-rules
-              :disable="!isNew"
-              label="Shares"
-              :rules="[
-                (val) =>
-                  (val && val > 0) || 'Please enter a valid amount of shares',
-              ]"
-            />
+      <q-input
+        v-model.number="localTransaction.price"
+        class="col"
+        type="text"
+        lazy-rules
+        suffix="$"
+        label="Price"
+        :rules="[
+          (val) => (val && val > 0) || 'Please enter a valid holdings price',
+        ]"
+      />
+    </div>
 
-            <q-input
-              v-model.number="localTransaction.price"
-              class="col"
-              type="text"
-              lazy-rules
-              suffix="$"
-              label="Price"
-              :rules="[
-                (val) =>
-                  (val && val > 0) || 'Please enter a valid holdings price',
-              ]"
-            />
-          </div>
+    <q-input
+      v-model.number="localTransaction.fees"
+      class="col"
+      type="text"
+      lazy-rules
+      suffix="$"
+      label="Fees"
+    />
 
-          <q-input
-            v-model.number="localTransaction.fees"
-            class="col"
-            type="text"
-            lazy-rules
-            suffix="$"
-            label="Fees"
-          />
-        </q-form>
-      </q-card-section>
-
+    <template v-slot:additional-content>
       <q-card-section>
         <span class="text-body-2 text-grey-6"
           >{{ $t('transactions.summary') }} -</span
@@ -90,22 +76,12 @@
           $n(totalTransaction, 'decimal')
         }}</span>
       </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn flat :label="$t('cancel')" @click="$emit('close')" />
-        <q-btn
-          color="primary"
-          type="submit"
-          :label="$t('save')"
-          @click="submitForm"
-        />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+    </template>
+  </base-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed, ref, toRef, Ref } from 'vue';
+import { defineComponent, PropType, computed, toRef, Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useTransactionsStore } from 'stores/transactions';
@@ -115,6 +91,7 @@ import { Transaction } from 'app/shared/types';
 import { TRANSACTIONS_TYPES } from 'app/shared/constants';
 import TickerSearch, { TickerOption } from '../common/TickerSearch.vue';
 import DateInput from 'components/common/DateInput.vue';
+import BaseDialog from 'components/common/BaseDialog.vue';
 
 const emptyTransaction = (): Transaction => {
   const selectedPortfolioId = usePortfolioStore().selectedPortfolio?.id;
@@ -146,28 +123,18 @@ export default defineComponent({
     },
   },
   components: {
+    BaseDialog,
     DateInput,
     TickerSearch,
   },
   emits: ['close'],
-  setup(props, { emit }) {
+  setup(props) {
     const $t = useI18n().t;
     const transactionsStore = useTransactionsStore();
     const quotesStore = useQuotesStore();
     const { emitLoadingTask } = useLoadingStore();
 
-    const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
-      ref(undefined);
     const localTransaction = toRef(props.transaction) as Ref<Transaction>;
-
-    const syntheticShow = computed({
-      get: () => props.show,
-      set: (value: boolean) => {
-        if (!value) {
-          emit('close', undefined);
-        }
-      },
-    });
 
     const syntheticShares = computed({
       get: () => localTransaction.value.shares,
@@ -193,21 +160,17 @@ export default defineComponent({
     };
 
     const submitForm = async () => {
-      if (await formRef.value?.validate()) {
-        const transaction = localTransaction.value;
+      const transaction = localTransaction.value;
 
-        await emitLoadingTask(async () => {
-          const action = isNew.value
-            ? transactionsStore.add
-            : transactionsStore.update;
+      await emitLoadingTask(async () => {
+        const action = isNew.value
+          ? transactionsStore.add
+          : transactionsStore.update;
 
-          await quotesStore.addTicker(transaction.ticker);
+        await quotesStore.addTicker(transaction.ticker);
 
-          await action(transaction);
-        });
-
-        emit('close');
-      }
+        await action(transaction);
+      });
     };
 
     const transactionActions = Object.values(TRANSACTIONS_TYPES).map(
@@ -225,8 +188,6 @@ export default defineComponent({
     });
 
     return {
-      formRef,
-      syntheticShow,
       syntheticShares,
       isNew,
       localTransaction,

@@ -1,10 +1,11 @@
 <template>
   <q-drawer
-    :model-value="open"
+    :model-value="drawersStore.notificationsOpen"
     elevated
-    :width="400"
+    :width="350"
     class="notifications-drawer"
-    @hide="$emit('close-drawer')"
+    @hide="drawersStore.toggleNotifications(false)"
+    @show="drawersStore.toggleNotifications(true)"
     side="right"
     overlay
     behavior="mobile"
@@ -14,7 +15,13 @@
         <q-icon name="alerts" class="q-mr-md" />
         Notifications
       </q-toolbar-title>
-      <q-btn flat round dense icon="close" @click="$emit('close-drawer')" />
+      <q-btn
+        flat
+        round
+        dense
+        icon="close"
+        @click="drawersStore.toggleNotifications(false)"
+      />
     </q-toolbar>
     <q-list
       class="notifications-list q-py-lg q-px-md"
@@ -62,20 +69,15 @@ import { Notification } from 'shared/types/entities';
 import { useNotificationsStore } from 'stores/notifications';
 import { formatNotificationDate } from 'src/service/date';
 import PriceAlertNotification from './PriceAlertNotification.vue';
+import { useDrawersStore } from 'stores/drawers';
 
 export default defineComponent({
   name: 'NotificationsDrawer',
   components: {
     PriceAlertNotification,
   },
-  emits: ['close-drawer'],
-  props: {
-    open: {
-      type: Boolean,
-      default: false,
-    },
-  },
   setup() {
+    const drawersStore = useDrawersStore();
     const notificationsStore = useNotificationsStore();
 
     const markAsRead = (notification: Notification) => {
@@ -94,6 +96,7 @@ export default defineComponent({
     };
 
     return {
+      drawersStore,
       notificationsStore,
       formatNotificationDate,
       markAsRead,
