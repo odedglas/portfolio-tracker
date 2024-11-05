@@ -22,7 +22,7 @@
       </q-card-section>
       <q-card-section>
         <div class="column" style="gap: 16px">
-          <q-form ref="formRef" class="q-gutter-sm">
+          <q-form ref="formRef" class="q-gap-sm">
             <q-select
               v-model="selectedEntry"
               @update:model-value="clearSimulatorResults"
@@ -163,7 +163,10 @@
               :disable="!selectedEntry"
               :rules="[
                 (val) =>
-                  (val && val > 0) || 'Please enter a valid shares amount',
+                  (val &&
+                    val > 0 &&
+                    val <= (selectedEntry?.availableShares ?? 0)) ||
+                  `Simulation shares must be greater than 0 and lower than ${selectedEntry?.availableShares}`,
               ]"
             />
 
@@ -178,8 +181,16 @@
               ]"
               label="Simulator Price"
             />
+
+            <div class="flex justify-end">
+              <q-toggle
+                v-model="simulator102Entitled"
+                :disable="!selectedEntry"
+                label="Is 102 Entitled?"
+              />
+            </div>
           </q-form>
-          <div v-if="simulatorResults">
+          <div v-if="showSimulatorResults">
             <div class="row q-px-md q-py-sm items-center text-caption">
               <span class="col" v-for="header in headers" :key="header">
                 {{ header }}</span
@@ -260,8 +271,10 @@ export default defineComponent({
   setup() {
     const showSimulator = ref(false);
     const simulatorResults: Ref<SimulatorResults | undefined> = ref(undefined);
+    const showSimulatorResults = ref(false);
     const simulatorPrice = ref(0);
     const simulatorAmount = ref(0);
+    const simulator102Entitled = ref(false);
 
     const formRef: Ref<{ validate: () => Promise<void> } | undefined> =
       ref(undefined);
@@ -279,6 +292,13 @@ export default defineComponent({
     watch(selectedEntry, (newPlan) => {
       simulatorPrice.value = newPlan?.marketPrice ?? 0;
       simulatorAmount.value = newPlan?.availableShares ?? 0;
+      simulator102Entitled.value = newPlan?.is102Entitled ?? false;
+    });
+
+    watch([simulatorPrice, simulatorAmount, simulator102Entitled], () => {
+      if (showSimulatorResults.value) {
+        simulateSell();
+      }
     });
 
     const simulateSell = async () => {
@@ -292,14 +312,14 @@ export default defineComponent({
       const inlinePrice = simulatorPrice.value;
       const priceCases = [
         {
-          case: 'bearish',
-          price: inlinePrice * 0.85,
-          logo: 'bear-market',
-        },
-        {
           case: 'target',
           price: inlinePrice,
           logo: 'target',
+        },
+        {
+          case: 'bearish',
+          price: inlinePrice * 0.85,
+          logo: 'bear-market',
         },
         {
           case: 'bullish',
@@ -312,7 +332,7 @@ export default defineComponent({
         acc[current.case as SimulatorPriceCase] = {
           ...calculateOrderGains({
             grantPrice: selectedPlan.grantPrice,
-            isAbove102Entitlement: selectedPlan.is102Entitled ?? false,
+            isAbove102Entitlement: simulator102Entitled.value,
             isTerminated: !!selectedPlan.terminationDate,
             sellPrice: current.price,
             shares: simulatorAmount.value,
@@ -324,6 +344,8 @@ export default defineComponent({
 
         return acc;
       }, {} as SimulatorResults);
+
+      showSimulatorResults.value = true;
     };
 
     const clearSimulatorResults = () => {
@@ -333,6 +355,7 @@ export default defineComponent({
     const closeSimulator = () => {
       showSimulator.value = false;
       selectedEntry.value = undefined;
+      showSimulatorResults.value = false;
       clearSimulatorResults();
     };
 
@@ -341,8 +364,10 @@ export default defineComponent({
       headers,
       selectedEntry,
       showSimulator,
+      showSimulatorResults,
       simulatorPrice,
       simulatorAmount,
+      simulator102Entitled,
       formatPlanDate,
       simulateSell,
       closeSimulator,
