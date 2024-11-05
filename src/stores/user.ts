@@ -58,5 +58,24 @@ export const useUserStore = defineStore('user', {
 
       await userAPI.update(updatePayload, this.user.id);
     },
+    async toggleStealthMode() {
+      if (!this.user) {
+        return;
+      }
+
+      this.user.settings.stealthModeEnabled =
+        !this.user?.settings.stealthModeEnabled;
+
+      await userAPI.update(
+        {
+          uid: this.user.uid,
+          settings: {
+            ...this.user.settings,
+            stealthModeEnabled: this.user.settings.stealthModeEnabled,
+          },
+        },
+        this.user.id
+      );
+    },
   },
 });

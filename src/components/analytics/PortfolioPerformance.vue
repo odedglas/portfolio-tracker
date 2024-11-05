@@ -262,10 +262,20 @@ export default defineComponent({
     };
 
     watch(
-      [showResetZoom.value, periodTimeRange],
+      [
+        showResetZoom.value,
+        periodTimeRange,
+        chartData.value.options.annotations.points,
+      ],
       () => {
         setTimeout(() => {
-          const annotations = document.querySelectorAll(
+          const chartRoot: HTMLElement = chartRef.value?.chart?.el;
+
+          if (!chartRoot) {
+            return;
+          }
+
+          const annotations = chartRoot.querySelectorAll(
             '.apexcharts-point-annotation-marker'
           );
 
@@ -274,9 +284,9 @@ export default defineComponent({
               return;
             }
 
-            const annotationDateKey = [...groupedTransactions.value.keys()][
-              index
-            ];
+            const chartAnnotation =
+              chartData.value.options.annotations.points[index];
+            const annotationDateKey = chartAnnotation.x;
 
             const showMarkerMenu = (event: Event) => {
               markerMenuTargetEl.value = event.target as Element;
