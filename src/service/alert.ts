@@ -32,7 +32,7 @@ const api = {
         logoImage: plan.logoImage,
         once: true,
         active: true,
-        condition: 'below',
+        condition: 'lt',
         expiration: dateUtils.addToDate(new Date(), { years: 1 }).getTime(),
         portfolioId: portfolio.id,
         owner: portfolio.owner,

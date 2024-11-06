@@ -114,6 +114,7 @@ export type AllocationPlan = Entity & {
   targetPrice: number;
   shares: number;
   alertId?: string;
+  alertEnabled?: boolean;
 
   // Computed
   totalValue?: number;
@@ -222,7 +223,7 @@ export type Notification = Entity &
     data: PriceAlertNotificationData;
   };
 
-type AlertCondition = 'above' | 'below';
+type AlertCondition = 'gt' | 'lt';
 type AlertValueProperty =
   | 'regularMarketPrice'
   | 'fiftyDayAverage'

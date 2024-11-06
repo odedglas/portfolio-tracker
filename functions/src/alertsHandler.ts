@@ -66,10 +66,11 @@ export const alertsHandler = async () => {
 
       const quoteValue = quote[alert.valueProperty];
       const alertConditionMatched =
-        alert.condition === 'above'
-          ? quoteValue > alert.value
-          : quoteValue < alert.value;
+        alert.condition === 'gt'
+          ? quoteValue >= alert.value
+          : quoteValue <= alert.value;
 
+      // TODO - Add check for last trigger date (Add alert frequency)
       if (alertConditionMatched) {
         logger.info('Found alert matching condition', { alert, quoteValue });
 
