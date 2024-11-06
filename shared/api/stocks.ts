@@ -29,6 +29,8 @@ const getRequest = async <Resolved>(
     ...(httpsAgent && { httpsAgent }),
   });
 
+  console.log('************** Resolved', data);
+
   return data;
 };
 

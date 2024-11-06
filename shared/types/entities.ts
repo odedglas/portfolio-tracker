@@ -240,5 +240,6 @@ export type Alert = Entity & {
   portfolioId: string;
   condition: AlertCondition;
   expiration: number;
-  lastTriggered?: number;
+  lastTriggeredDate?: number;
+  lastTriggeredPrice?: number;
 };

@@ -4,7 +4,7 @@ import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { portfolioHistoryTracker } from './portfolioHistoryTracker';
 import { migrations } from './migrations';
-import { alertsHandler } from './alertsHandler';
+import { alertsHandler } from './alerts';
 
 admin.initializeApp();
 

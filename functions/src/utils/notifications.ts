@@ -1,4 +1,3 @@
-import * as admin from 'firebase-admin';
 import * as logger from 'firebase-functions/logger';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { MulticastMessage } from 'firebase-admin/messaging';
@@ -60,5 +59,5 @@ export const sendNotification = async (
     messagingToken: user.messagingToken,
   });
 
-  await admin.messaging().sendEachForMulticast(message);
+  // await admin.messaging().sendEachForMulticast(message);
 };
