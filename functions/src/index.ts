@@ -46,6 +46,7 @@ export const portfolioScheduler = onSchedule(
 export const runNotificationsScheduler = onRequest(
   { secrets: ['RAPID_YAHOO_API_KEY'] },
   async (request, response) => {
+
     await alertsHandler();
 
     // TODO - Run insights detection

@@ -24,10 +24,15 @@ export const alertsHandler = async () => {
     (alert) => alert.active && alert.expiration > Date.now()
   );
 
+  if (!alerts.length) {
+    logger.info('No active alerts found');
+    return;
+  }
+
   logger.info(`Alerts Handler Start, processing ${alerts.length} alerts`);
 
   const tickerQuotes = await getTickersQuotes(
-    alerts.map((alert) => alert.ticker)
+    Array.from(new Set(alerts.map((alert) => alert.ticker)))
   );
 
   const updatedAlerts = alerts

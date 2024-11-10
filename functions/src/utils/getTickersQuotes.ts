@@ -16,7 +16,5 @@ export const getTickersQuotes = async (tickers: string[]) => {
     httpsAgent
   );
 
-  console.log(' Tickwers ', tickerQuotesResponse);
-
   return tickerQuotesResponse.quoteResponse.result;
 };

@@ -22,14 +22,12 @@ const getRequest = async <Resolved>(
   params: object,
   httpsAgent?: AxiosRequestConfig['httpsAgent']
 ) => {
-  const { data } = await axiosInstance.request<Resolved>({
+  const { data} = await axiosInstance.request<Resolved>({
     method: 'GET',
     url,
     params,
     ...(httpsAgent && { httpsAgent }),
   });
-
-  console.log('************** Resolved', data);
 
   return data;
 };
