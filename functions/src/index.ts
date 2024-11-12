@@ -43,13 +43,15 @@ export const portfolioScheduler = onSchedule(
   }
 );
 
-export const runNotificationsScheduler = onRequest(
-  { secrets: ['RAPID_YAHOO_API_KEY'] },
-  async (request, response) => {
+export const notificationsScheduler = onSchedule(
+  {
+    secrets: ['ALERTS_RAPID_API_KEY'],
+    timeZone: 'America/New_York',
+    schedule: 'every 15 minutes from 09:30 to 16:00',
+  },
+  async () => {
     await alertsHandler();
 
     // TODO - Run insights detection
-
-    response.send({ success: true });
   }
 );

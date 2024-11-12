@@ -1,10 +1,15 @@
 import { date as dateUtils } from 'quasar';
-import { getCollections, firestoreAPI } from 'src/service/firebase/collections';
+import {
+  getCollections,
+  firestoreAPI,
+  queries,
+} from 'src/service/firebase/collections';
 import { Alert, AllocationPlan, Portfolio } from 'app/shared/types';
 
 const alertsCollection = () => getCollections().alerts;
 
 const api = {
+  list: queries.getUserAlerts,
   get: async (alertId: string) =>
     firestoreAPI.getDocument(alertsCollection(), alertId),
   update: async (data: Partial<Alert>, alertId?: string): Promise<Alert> => {

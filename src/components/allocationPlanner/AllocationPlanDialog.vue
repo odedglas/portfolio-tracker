@@ -40,7 +40,7 @@
     />
 
     <div class="flex items-center q-mb-md q-gap-md">
-      <span class="text-subtitle2">
+      <span class="text-subtitle2 text-weight-regular">
         <q-icon name="notifications" class="text-grey-8" size="sm" />
         {{ $t('portfolios.allocation_planner.activate_alert') }}
       </span>

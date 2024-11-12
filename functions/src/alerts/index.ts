@@ -45,10 +45,16 @@ export const alertsHandler = async () => {
       }
 
       const quoteValue = quote[alert.valueProperty];
-      if (isConditionMatched(alert.condition, alert.value, quoteValue)) {
+      if (
+        isConditionMatched(alert.condition, alert.value, quoteValue) &&
+        !alert.lastTriggeredDate
+      ) {
         logger.info('Found alert matching condition', { alert, quoteValue });
 
-        alert.active = false;
+        if (alert.once) {
+          alert.active = false;
+        }
+
         alert.lastTriggeredDate = Date.now();
         alert.lastTriggeredPrice = quoteValue;
 
@@ -68,7 +74,7 @@ export const alertsHandler = async () => {
         !alert.once &&
         isConditionMatched(
           conditionOpposite(alert.condition),
-          alert.lastTriggeredPrice,
+          alert.value,
           quoteValue
         )
       ) {
@@ -76,7 +82,11 @@ export const alertsHandler = async () => {
           alert,
           quoteValue,
         });
+        alert.lastTriggeredPrice = 0;
+        alert.lastTriggeredDate = 0;
         alert.active = true;
+
+        return alert;
       }
 
       return;
