@@ -30,8 +30,12 @@
         toggle-color="primary"
         text-color="primary"
         :options="[
-          { label: 'Notifications', value: 'notifications' },
-          { label: 'Alerts', value: 'alerts' },
+          {
+            label: 'Notifications',
+            value: 'notifications',
+            icon: 'notifications_none',
+          },
+          { label: 'Alerts', value: 'alerts', icon: 'alarm' },
         ]"
       />
     </div>

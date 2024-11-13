@@ -1,7 +1,7 @@
 <template>
   <div class="flex column q-gap-xs">
     <div class="flex justify-end text-grey-8">
-      <q-btn round icon="add" size="sm" flat @click="showModal = true" />
+      <q-btn round icon="add" size="sm" flat @click="() => openEntityModal()" />
     </div>
     <q-separator />
     <q-list class="notifications-list">
@@ -15,13 +15,17 @@
             <span class="text-subtitle2 text-weight-regular">
               {{ alert.ticker }} crossing {{ $n(alert.value ?? 0, 'decimal') }}
             </span>
-            <span v-if="hoveredAlert" class="flex text-grey-8 q-gap-xs">
+            <span
+              v-if="hoveredAlert?.id === alert.id"
+              class="flex text-grey-8 q-gap-xs"
+            >
               <q-btn
                 v-if="!alert.active"
                 size="10px"
                 flat
                 dense
                 round
+                @click="() => alertsStore.toggleActive(alert.id)"
                 icon="play_circle_outline"
               />
               <q-btn
@@ -30,10 +34,25 @@
                 flat
                 dense
                 round
+                @click="() => alertsStore.toggleActive(alert.id)"
                 icon="pause_circle_outline"
               />
-              <q-btn size="10px" flat dense round icon="edit" />
-              <q-btn size="10px" flat dense round icon="delete" />
+              <q-btn
+                size="10px"
+                flat
+                dense
+                round
+                icon="edit"
+                @click="() => openEntityModal(alert)"
+              />
+              <q-btn
+                size="10px"
+                flat
+                dense
+                round
+                icon="delete"
+                @click="() => deleteEntity(alert)"
+              />
             </span>
           </div>
           <div class="flex row items-center q-gap-sm text-grey-7 text-caption">
@@ -60,7 +79,11 @@
       </div>
     </q-list>
   </div>
-  <alert-dialog :show="showModal" />
+  <alert-dialog
+    :show="showModal"
+    @close="hideEntityModal"
+    :alert="editEntity"
+  />
 </template>
 
 <script lang="ts">
@@ -79,7 +102,20 @@ export default defineComponent({
     const hoveredAlert = ref<Alert | undefined>(undefined);
     const alertsStore = useAlertsStore();
 
-    const { showModal } = useEditableEntityPage<Alert>({});
+    const {
+      showModal,
+      deleteEntity,
+      hideEntityModal,
+      editEntity,
+      openEntityModal,
+    } = useEditableEntityPage<Alert>({
+      deleteModal: {
+        title: 'Delete Alert',
+        message: (alert) =>
+          `Are you sure you want to remove this alert for "${alert.ticker}"?`,
+        callback: (alert) => alertsStore.remove(alert.id),
+      },
+    });
 
     const alertStatus = (alert: Alert) => {
       if (alert.active) {
@@ -97,6 +133,10 @@ export default defineComponent({
       alertsStore,
       hoveredAlert,
       showModal,
+      editEntity,
+      openEntityModal,
+      deleteEntity,
+      hideEntityModal,
       formatNotificationDate,
       alertStatus,
     };

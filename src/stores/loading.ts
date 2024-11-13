@@ -23,7 +23,7 @@ export const useLoadingStore = defineStore('loading', {
       this.setLoading(true);
 
       try {
-        const [taskResult] = await Promise.all([task(), wait(500)]);
+        const [taskResult] = await Promise.all([task(), wait(1000)]);
 
         return taskResult;
       } finally {
