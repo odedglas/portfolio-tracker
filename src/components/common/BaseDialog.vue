@@ -9,7 +9,7 @@
     backdrop-filter="blur(4px)"
     @before-show="beforeShow"
   >
-    <q-card style="min-width: 350px">
+    <q-card :style="{ 'min-width': computedMinWidth }">
       <q-card-section class="row items-center q-pa-none">
         <q-toolbar class="bg-primary text-white">
           <q-toolbar-title class="row items-center">
@@ -21,7 +21,7 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form ref="formRef" class="column q-gap-lg">
+        <q-form ref="formRef" class="column q-gap-md">
           <slot />
         </q-form>
       </q-card-section>
@@ -51,6 +51,10 @@ export default defineComponent({
     show: {
       type: Boolean,
       required: true,
+    },
+    minWidth: {
+      type: String,
+      default: '400px',
     },
     beforeShow: {
       type: Function as PropType<(ev: Event) => void>,
@@ -97,12 +101,17 @@ export default defineComponent({
       }
     };
 
+    const computedMinWidth = computed(() => {
+      return $q.platform.is.mobile ? '100%' : props.minWidth;
+    });
+
     return {
       syntheticShow,
       transitions,
       fullSizing,
       formRef,
       submitForm,
+      computedMinWidth,
     };
   },
 });

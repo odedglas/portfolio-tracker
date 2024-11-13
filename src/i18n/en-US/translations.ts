@@ -44,6 +44,7 @@ export const enUsMessages = {
       edit_allocation: 'Edit Allocation',
       empty_plans:
         'There are no planned allocations yet.. Start planning your allocation by creating a new one',
+      activate_alert: 'Send me an alert when price reaches target price',
     },
   },
   transactions: {

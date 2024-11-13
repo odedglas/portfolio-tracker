@@ -10,11 +10,7 @@
     overlay
     behavior="mobile"
   >
-    <q-toolbar class="bg-primary text-white">
-      <q-toolbar-title class="row items-center">
-        <q-icon name="alerts" class="q-mr-md" />
-        Notifications
-      </q-toolbar-title>
+    <q-toolbar class="bg-primary text-white justify-end">
       <q-btn
         flat
         round
@@ -23,84 +19,55 @@
         @click="drawersStore.toggleNotifications(false)"
       />
     </q-toolbar>
-    <q-list
-      class="notifications-list q-py-lg q-px-md"
-      v-if="notificationsStore.portfolioNotifications.length"
-    >
-      <q-item
-        v-for="notification in notificationsStore.portfolioNotifications"
-        :key="notification.id"
-        :class="`notification column q-my-sm q-gap-sm ${
-          notification.unread ? 'unread' : 'read'
-        }`"
-      >
-        <component
-          :is="getNotificationComponent(notification)"
-          :payload="notification.data"
-        />
-
-        <q-item-section class="row justify-between items-center flex-row">
-          <q-item-label caption class="q-ml-none"
-            >Sent at:
-            {{ formatNotificationDate(notification.createdAt) }}</q-item-label
-          >
-          <q-btn
-            flat
-            :label="`Mark as ${notification.unread ? 'read' : 'unread'}`"
-            size="sm"
-            @click="() => markAsRead(notification)"
-          />
-        </q-item-section>
-      </q-item>
-    </q-list>
-    <div
-      v-else
-      class="q-pa-lg text-grey-8 text-subtitle1 flex column items-center q-gap-lg"
-    >
-      There are no notifications yet...
-      <img src="~assets/no-alarm.png" width="64" />
+    <div class="q-mt-sm q-pa-md">
+      <q-btn-toggle
+        v-model="tabModel"
+        spread
+        class="notifications-drawer-button-toggle"
+        no-caps
+        unelevated
+        rounded
+        toggle-color="primary"
+        text-color="primary"
+        :options="[
+          {
+            label: 'Notifications',
+            value: 'notifications',
+            icon: 'notifications_none',
+          },
+          { label: 'Alerts', value: 'alerts', icon: 'alarm' },
+        ]"
+      />
+    </div>
+    <div class="q-py-sm q-px-md">
+      <notifications-tab v-if="tabModel === 'notifications'" />
+      <alerts-tab v-else-if="tabModel === 'alerts'" />
     </div>
   </q-drawer>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { Notification } from 'shared/types/entities';
+import { defineComponent, ref } from 'vue';
 import { useNotificationsStore } from 'stores/notifications';
-import { formatNotificationDate } from 'src/service/date';
-import PriceAlertNotification from './PriceAlertNotification.vue';
 import { useDrawersStore } from 'stores/drawers';
+import NotificationsTab from 'components/drawers/NotificationsTab.vue';
+import AlertsTab from 'components/drawers/AlertsTab.vue';
 
 export default defineComponent({
   name: 'NotificationsDrawer',
   components: {
-    PriceAlertNotification,
+    AlertsTab,
+    NotificationsTab,
   },
   setup() {
+    const tabModel = ref('notifications');
     const drawersStore = useDrawersStore();
     const notificationsStore = useNotificationsStore();
 
-    const markAsRead = (notification: Notification) => {
-      const { id, unread } = notification;
-
-      notificationsStore.markAsRead(id, !unread);
-    };
-
-    const getNotificationComponent = (notification: Notification) => {
-      switch (notification.type) {
-        case 'priceAlert':
-          return PriceAlertNotification;
-        default:
-          return null;
-      }
-    };
-
     return {
+      tabModel,
       drawersStore,
       notificationsStore,
-      formatNotificationDate,
-      markAsRead,
-      getNotificationComponent,
     };
   },
 });
@@ -127,6 +94,10 @@ export default defineComponent({
     .q-item__section--main + .q-item__section--main {
       margin-left: 0;
     }
+  }
+
+  .notifications-drawer-button-toggle {
+    border: 1px solid $primary;
   }
 }
 </style>

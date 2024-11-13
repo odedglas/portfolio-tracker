@@ -27,15 +27,15 @@ import { usePortfolioStore } from 'stores/portfolios';
 import { Deposit, Transaction } from 'app/shared/types';
 import { useViewTransactions } from 'components/composables/useViewTransactions';
 import { useViewHoldings } from 'components/composables/useViewHoldings';
-import { useI18n } from 'vue-i18n';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
 import TransactionsDialog from 'components/transactions/TransactionDialog.vue';
+import { useNumberFormatter } from 'components/composables/useNumberFormatter';
 
 export default defineComponent({
   name: 'MobilePortfolio',
   components: { TransactionsDialog, MobileAbstractList },
   setup() {
-    const $n = useI18n().n;
+    const $n = useNumberFormatter();
     const portfolioStore = usePortfolioStore();
     const { viewTransactions } = useViewTransactions();
     const { viewHoldings } = useViewHoldings();

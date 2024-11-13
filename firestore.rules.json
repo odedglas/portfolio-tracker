@@ -18,8 +18,8 @@ service cloud.firestore {
       allow write: if request.auth.uid != null
     }
     match /alerts/{alert} {
-       allow read, update: if request.auth.uid != null && get(/databases/$(database)/documents/portfolios/$(resource.data.portfolioId)).data.owner == request.auth.uid
-       allow write: if request.auth.uid != null
+      allow read, update: if request.auth.uid != null && resource.data.owner == request.auth.uid;
+      allow write: if request.auth.uid != null
     }
     match /transactions/{transaction} {
       allow read, update: if request.auth.uid != null && get(/databases/$(database)/documents/portfolios/$(resource.data.portfolioId)).data.owner == request.auth.uid

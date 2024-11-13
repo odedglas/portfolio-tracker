@@ -18,7 +18,7 @@
       label="Shares amount"
       :rules="[
         (val) =>
-          (val && val > 0 && val < (plan.availableShares ?? 0)) ||
+          (val && val > 0 && val <= (plan.availableShares ?? 0)) ||
           `Please enter a shares amount and less than ${plan.vested ?? 0}`,
       ]"
     />

@@ -107,6 +107,13 @@ export const queries = {
 
     return firestoreAPI.getAll(notificationsQuery);
   },
+  getUserAlerts: async (ownerId: string) => {
+    const alertsCollection = getCollections().alerts;
+
+    const alertsQuery = query(alertsCollection, where('owner', '==', ownerId));
+
+    return firestoreAPI.getAll(alertsQuery);
+  },
 };
 
 /**

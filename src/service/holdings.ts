@@ -43,6 +43,7 @@ const api = {
     holding: Holding,
     transactions: Transaction[]
   ) => {
+    debugger;
     const holdingTransactions = transactions.filter(
       (t) => t.ticker === holding.ticker
     );
@@ -66,8 +67,11 @@ const api = {
       : 0;
 
     // Calculate invested by transactions funds (original shares), Fees included
-    holding.invested = buyTransactions.reduce(
-      (acc, t) => acc + transactionsTransformer.totalValue(t),
+    holding.invested = holdingTransactions.reduce(
+      (acc, t) =>
+        acc +
+        transactionsTransformer.totalValue(t) *
+          (transactionsTransformer.isBuy(t) ? 1 : -1),
       0
     );
 

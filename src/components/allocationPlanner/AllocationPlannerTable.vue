@@ -66,7 +66,7 @@ import TickerLogo from 'components/common/TickerLogo.vue';
 import { columns } from './columns';
 
 export default defineComponent({
-  name: 'AllocationsPannerTable',
+  name: 'AllocationsPlannerTable',
   components: { TickerLogo },
   emits: ['open-entity-modal', 'delete-entity'],
   setup() {

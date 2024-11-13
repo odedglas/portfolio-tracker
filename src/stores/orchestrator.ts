@@ -5,6 +5,7 @@ import { useHoldingsStore } from 'stores/holdings';
 import { useQuotesStore } from 'stores/quotes';
 import { queries } from 'src/service/firebase/collections';
 import { useNotificationsStore } from 'stores/notifications';
+import { useAlertsStore } from 'stores/alerts';
 
 export const useOrchestratorStore = defineStore('orchestrator', {
   state: () => ({}),
@@ -15,6 +16,7 @@ export const useOrchestratorStore = defineStore('orchestrator', {
       const holdingsStore = useHoldingsStore();
       const portfoliosStore = usePortfolioStore();
       const notificationsStore = useNotificationsStore();
+      const alertsStore = useAlertsStore();
 
       await loadingStore.emitLoadingTask(async () => {
         const portfolios = await portfoliosStore.list();
@@ -27,12 +29,18 @@ export const useOrchestratorStore = defineStore('orchestrator', {
           new Set(holdings.map((holding) => holding.ticker))
         );
 
-        await quotesStore.getTickersQuotes(holdingsTickers);
-        await quotesStore.setFearAndGreed();
+        await Promise.all([
+          quotesStore.getTickersQuotes(holdingsTickers),
+          quotesStore.setFearAndGreed(),
+        ]);
 
         holdingsStore.setPortfoliosHoldings(holdings);
 
-        await notificationsStore.listNotifications();
+        // None awaitable promises.
+        await Promise.all([
+          notificationsStore.listNotifications(),
+          alertsStore.listAlerts(),
+        ]);
       });
     },
   },

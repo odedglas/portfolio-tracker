@@ -4,7 +4,7 @@ import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { portfolioHistoryTracker } from './portfolioHistoryTracker';
 import { migrations } from './migrations';
-import { alertsHandler } from './alertsHandler';
+import { alertsHandler } from './alerts';
 
 admin.initializeApp();
 
@@ -43,13 +43,22 @@ export const portfolioScheduler = onSchedule(
   }
 );
 
-export const runNotificationsScheduler = onRequest(
-  { secrets: ['RAPID_YAHOO_API_KEY'] },
-  async (request, response) => {
+const isWeekend = (date: Date = new Date()) => date.getDay() % 6 === 0;
+
+export const notificationsScheduler = onSchedule(
+  {
+    secrets: ['ALERTS_RAPID_API_KEY'],
+    timeZone: 'America/New_York',
+    schedule: 'every 20 minutes from 09:30 to 16:00',
+  },
+  async () => {
+    if (isWeekend()) {
+      // Skips weekends none trading days.
+      return;
+    }
+
     await alertsHandler();
 
     // TODO - Run insights detection
-
-    response.send({ success: true });
   }
 );
