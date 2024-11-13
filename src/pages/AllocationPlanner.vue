@@ -22,7 +22,7 @@
         </q-card-section>
 
         <q-card-section class="q-py-md">
-          <allocations-panner-table
+          <allocations-planner-table
             v-if="allocationPlans.length"
             @open-entity-modal="(entity) => openEntityModal(entity)"
             @delete-entity="(entity) => deleteEntity(entity)"
@@ -53,12 +53,12 @@ import { useEditableEntityPage } from 'components/composables/useEditableEntityP
 import { AllocationPlan } from 'app/shared/types';
 import AllocationsPannerSummary from 'components/allocationPlanner/AllocationsPannerSummary.vue';
 import { useAllocationPlansStore } from 'stores/allocationPlans';
-import AllocationsPannerTable from 'components/allocationPlanner/AllocationPlannerTable.vue';
+import AllocationsPlannerTable from 'components/allocationPlanner/AllocationPlannerTable.vue';
 
 export default defineComponent({
   name: 'AllocationPlannerPage',
   components: {
-    AllocationsPannerTable,
+    AllocationsPlannerTable,
     AllocationsPannerSummary,
     AllocationPlanDialog,
   },

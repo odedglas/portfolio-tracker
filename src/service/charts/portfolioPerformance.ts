@@ -166,8 +166,8 @@ const buildTransactionsAnnotations = (
   const [sellAnnotationColor] = COLOR_PALLET;
 
   const isWithinRange = (date: number) =>
-    date > periodTimeRange[0] &&
-    date < periodTimeRange[periodTimeRange.length - 1];
+    date >= periodTimeRange[0] &&
+    date <= periodTimeRange[periodTimeRange.length - 1];
 
   return {
     yaxis: [

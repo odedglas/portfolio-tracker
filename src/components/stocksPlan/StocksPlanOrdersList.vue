@@ -21,22 +21,22 @@
           $n(order.shares, 'fixedSensitive')
         }}</span>
         <span class="col flex items-center">{{
-          $n(order.price, 'currency')
+          $n(order.price, 'decimal')
         }}</span>
         <span class="col flex items-center text-bold">{{
-          $n(order.baseValue ?? 0, 'currency')
+          $n(order.baseValue ?? 0, 'decimal')
         }}</span>
         <span class="col flex items-center text-bold">{{
-          $n(order.totalValue ?? 0, 'currency')
+          $n(order.totalValue ?? 0, 'decimal')
         }}</span>
         <span class="col flex items-center text-bold">{{
-          $n(order.taxComponent ?? 0, 'currency')
+          $n(order.taxComponent ?? 0, 'decimal')
         }}</span>
         <span class="col flex items-center text-bold">{{
-          $n(order.capitalGain ?? 0, 'currency')
+          $n(order.capitalGain ?? 0, 'decimal')
         }}</span>
         <span class="col flex items-center text-bold">{{
-          $n(order.netGain ?? 0, 'currency')
+          $n(order.netGain ?? 0, 'decimal')
         }}</span>
         <div class="col-1 text-grey-7 flex justify-end">
           <q-btn

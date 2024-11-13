@@ -39,6 +39,14 @@
       :rules="[(val) => validateTotalValue(localPlan.shares, val)]"
     />
 
+    <div class="flex items-center q-mb-md q-gap-md">
+      <span class="text-subtitle2 text-weight-regular">
+        <q-icon name="notifications" class="text-grey-8" size="sm" />
+        {{ $t('portfolios.allocation_planner.activate_alert') }}
+      </span>
+      <q-toggle v-model="localPlan.alertEnabled" size="sm" />
+    </div>
+    <q-separator />
     <div class="flex column q-gap-sm">
       <span class="text-caption text-grey-7"
         >Total Value:
@@ -68,6 +76,7 @@ const emptyPlan = (): AllocationPlan => ({
   name: '',
   ticker: '',
   logoImage: '',
+  alertEnabled: true,
 });
 
 export default defineComponent({
