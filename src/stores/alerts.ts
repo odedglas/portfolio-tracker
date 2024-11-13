@@ -12,7 +12,6 @@ export const useAlertsStore = defineStore('alerts', {
     portfolioAlerts(state) {
       const portfolioStore = usePortfolioStore();
 
-      console.log(state.alerts);
       return state.alerts.filter(
         (alert) => alert.portfolioId === portfolioStore.selectedPortfolio?.id
       );

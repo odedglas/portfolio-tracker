@@ -1,23 +1,40 @@
 <template>
   <div class="flex column q-gap-xs">
-    <div class="flex justify-end text-grey-6">
-      <q-btn round icon="add" size="sm" flat />
+    <div class="flex justify-end text-grey-8">
+      <q-btn round icon="add" size="sm" flat @click="showModal = true" />
     </div>
     <q-separator />
     <q-list class="notifications-list">
       <div v-for="alert in alertsStore.portfolioAlerts" :key="alert.id">
         <q-item
-          class="flex column q-gap-xs"
+          class="flex column q-gap-sm"
           @mouseenter="hoveredAlert = alert"
           @mouseleave="hoveredAlert = undefined"
         >
-          <div class="flex justify-between">
-            <span
-              class="text-subtitle2 text-weight-regular flex items-center q-gap-sm"
-            >
+          <div class="flex justify-between" style="min-height: 24px">
+            <span class="text-subtitle2 text-weight-regular">
               {{ alert.ticker }} crossing {{ $n(alert.value ?? 0, 'decimal') }}
             </span>
-            <span v-if="hoveredAlert"> Actions </span>
+            <span v-if="hoveredAlert" class="flex text-grey-8 q-gap-xs">
+              <q-btn
+                v-if="!alert.active"
+                size="10px"
+                flat
+                dense
+                round
+                icon="play_circle_outline"
+              />
+              <q-btn
+                v-if="alert.active"
+                size="10px"
+                flat
+                dense
+                round
+                icon="pause_circle_outline"
+              />
+              <q-btn size="10px" flat dense round icon="edit" />
+              <q-btn size="10px" flat dense round icon="delete" />
+            </span>
           </div>
           <div class="flex row items-center q-gap-sm text-grey-7 text-caption">
             <div class="flex q-gap-xs">
@@ -29,8 +46,8 @@
               {{ alert.ticker }}
             </div>
             <q-separator vertical />
-            <span :class="`flex ${alertStatusClass(alert)}`">
-              <span>{{ alert.active ? 'Active' : 'Stopped' }}</span>
+            <span :class="`flex ${alertStatus(alert).className}`">
+              <span>{{ alertStatus(alert).text }}</span>
               <span v-if="alert.lastTriggeredDate">&nbsp; - Triggered </span>
             </span>
             <q-separator v-if="alert.lastTriggeredDate" vertical />
@@ -43,6 +60,7 @@
       </div>
     </q-list>
   </div>
+  <alert-dialog :show="showModal" />
 </template>
 
 <script lang="ts">
@@ -51,31 +69,36 @@ import { useAlertsStore } from 'stores/alerts';
 import { formatNotificationDate } from 'src/service/date';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import { Alert } from 'app/shared/types';
+import AlertDialog from 'components/drawers/AlertDialog.vue';
+import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
 
 export default defineComponent({
   name: 'AlertsTab',
-  components: { TickerLogo },
+  components: { AlertDialog, TickerLogo },
   setup() {
     const hoveredAlert = ref<Alert | undefined>(undefined);
     const alertsStore = useAlertsStore();
 
-    const alertStatusClass = (alert: Alert) => {
+    const { showModal } = useEditableEntityPage<Alert>({});
+
+    const alertStatus = (alert: Alert) => {
       if (alert.active) {
-        return 'text-success';
+        return { className: 'text-green-7', text: 'Active' };
       }
 
       if (alert.lastTriggeredDate) {
-        return 'text-yellow-10';
+        return { className: 'text-yellow-10', text: 'Stopped' };
       }
 
-      return 'text-grey-7';
+      return { className: 'text-grey-7', text: 'Manually Stopped' };
     };
 
     return {
       alertsStore,
       hoveredAlert,
+      showModal,
       formatNotificationDate,
-      alertStatusClass,
+      alertStatus,
     };
   },
 });
