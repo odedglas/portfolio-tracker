@@ -43,7 +43,6 @@ const api = {
     holding: Holding,
     transactions: Transaction[]
   ) => {
-    debugger;
     const holdingTransactions = transactions.filter(
       (t) => t.ticker === holding.ticker
     );
