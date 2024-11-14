@@ -2,7 +2,7 @@
   <q-drawer
     :model-value="drawersStore.notificationsOpen"
     elevated
-    :width="350"
+    :width="390"
     class="notifications-drawer"
     @hide="drawersStore.toggleNotifications(false)"
     @show="drawersStore.toggleNotifications(true)"
