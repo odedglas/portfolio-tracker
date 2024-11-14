@@ -99,7 +99,6 @@
             :display-as-row="false"
           />
           <span v-else>
-            -- 1
             <span>{{ $t('transactions.all_profit_is_realized') }}</span>
           </span>
         </q-td>

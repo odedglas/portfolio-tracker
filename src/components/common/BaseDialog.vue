@@ -9,7 +9,7 @@
     backdrop-filter="blur(4px)"
     @before-show="beforeShow"
   >
-    <q-card :style="{ 'min-width': minWidth }">
+    <q-card :style="{ 'min-width': computedMinWidth }">
       <q-card-section class="row items-center q-pa-none">
         <q-toolbar class="bg-primary text-white">
           <q-toolbar-title class="row items-center">
@@ -101,12 +101,17 @@ export default defineComponent({
       }
     };
 
+    const computedMinWidth = computed(() => {
+      return $q.platform.is.mobile ? '100%' : props.minWidth;
+    });
+
     return {
       syntheticShow,
       transitions,
       fullSizing,
       formRef,
       submitForm,
+      computedMinWidth,
     };
   },
 });

@@ -73,6 +73,7 @@ export const useHoldingsStore = defineStore('holdings', {
         async (context) => {
           const selectedPortfolioId = usePortfolioStore().selectedPortfolioId;
           const { name, args } = context;
+
           if (name === 'list') {
             return;
           }

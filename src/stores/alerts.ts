@@ -48,7 +48,6 @@ export const useAlertsStore = defineStore('alerts', {
         ? { lastTriggeredPrice: 0, lastTriggeredDate: 0 }
         : {};
 
-      console.log('Updating ', lastValues);
       await loadingStore.emitLoadingTask(() =>
         alertsAPI.update({ active: newAlertState, ...lastValues }, alertId)
       );

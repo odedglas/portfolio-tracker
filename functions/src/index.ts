@@ -43,13 +43,20 @@ export const portfolioScheduler = onSchedule(
   }
 );
 
+const isWeekend = (date: Date = new Date()) => date.getDay() % 6 === 0;
+
 export const notificationsScheduler = onSchedule(
   {
     secrets: ['ALERTS_RAPID_API_KEY'],
     timeZone: 'America/New_York',
-    schedule: 'every 15 minutes from 09:30 to 16:00',
+    schedule: 'every 20 minutes from 09:30 to 16:00',
   },
   async () => {
+    if (isWeekend()) {
+      // Skips weekends none trading days.
+      return;
+    }
+
     await alertsHandler();
 
     // TODO - Run insights detection
