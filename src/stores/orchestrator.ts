@@ -36,8 +36,7 @@ export const useOrchestratorStore = defineStore('orchestrator', {
 
         holdingsStore.setPortfoliosHoldings(holdings);
 
-        // None awaitable promises.
-        await Promise.all([
+        Promise.all([
           notificationsStore.listNotifications(),
           alertsStore.listAlerts(),
         ]);

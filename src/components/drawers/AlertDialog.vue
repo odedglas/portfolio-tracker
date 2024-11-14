@@ -55,7 +55,7 @@
       <q-toggle v-model="localAlert.once" label="Trigger once" />
       <q-separator vertical />
 
-      <q-toggle v-model="localAlert.active" label="Active" />
+      <q-toggle v-model="localAlert.active" label="Active" class="q-pr-md" />
     </div>
     <q-separator />
   </base-dialog>
