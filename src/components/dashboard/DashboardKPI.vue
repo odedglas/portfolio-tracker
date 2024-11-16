@@ -109,7 +109,7 @@ export default defineComponent({
   },
   setup(props) {
     const tooltipRef: Ref<Element | null> = ref(null);
-    const showKPITooltip = ref(true);
+    const showKPITooltip = ref(false);
     const appearanceStore = useAppearanceStore();
     const valueSign = computed(() => (props.value >= 0 ? '+' : '-'));
 

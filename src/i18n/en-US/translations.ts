@@ -112,12 +112,12 @@ export const enUsMessages = {
       },
       description: {
         nearMovingAverages:
-          "<i>{name}</i> is <b>{deltaPercent} {direction}</b> it's <b>{movingAverageDays}</b> day's moving average.",
+          "{name} is {deltaPercent} {direction} it's {movingAverageDays} day's moving average.",
         highShortInterest:
-          '<i>{name}</i> short interest is <b>{shortRatio}</b> which is <b>{deltaPercent}</b> above expected.',
-        near52WeekLow: '<i>{name}</i> is near its 52 week low.',
+          '{name} short interest is {shortRatio} which is {deltaPercent} above expected.',
+        near52WeekLow: '{name} is near its 52 week low.',
         below52WeekHigh:
-          "<i>{name}</i> is <b>{deltaPercent} {direction}</b> its 52-week-high and is <b>above</b> it's moving averages.",
+          "{name} is {deltaPercent} {direction} its 52-week-high and is above it's moving averages.",
       },
     },
     tags: {

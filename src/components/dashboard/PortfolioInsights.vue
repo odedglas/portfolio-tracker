@@ -45,21 +45,26 @@
                 $t(`insights.types.title.${insight.type}`)
               }}</span>
             </div>
-            <p
+            <i18n-t
               class="q-mb-sm"
-              v-html="
-                $t(`insights.types.description.${insight.type}`, {
-                  ...insight.inputs,
-                  name: shortHoldingName(insight.holding.name),
-                  movingAverageDays: insight.inputs.movingAverageDays,
-                  deltaPercent:
-                    typeof insight.inputs.deltaPercent === 'number'
-                      ? $n(insight.inputs.deltaPercent, 'percent')
-                      : 0,
-                  direction: insight.inputs.isAbove ? 'above' : 'below',
-                })
-              "
-            />
+              keypath="insights.types.description.nearMovingAverages"
+              tag="p"
+            >
+              <template v-slot:name>
+                <i>{{ insight.holding.name }}</i>
+              </template>
+              <template v-slot:deltaPercent>
+                <b>{{
+                  $n(Number(insight.inputs.deltaPercent ?? 0), 'percent')
+                }}</b>
+              </template>
+              <template v-slot:movingAverageDays>
+                <b>{{ insight.inputs.movingAverageDays }}</b>
+              </template>
+              <template v-slot:direction>
+                <b>{{ insight.inputs.isAbove ? 'above' : 'below' }}</b>
+              </template>
+            </i18n-t>
             <div class="flex chips-container">
               <q-chip
                 v-for="(tag, tagIndex) in insight?.tags"
