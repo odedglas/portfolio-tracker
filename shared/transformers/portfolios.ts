@@ -16,9 +16,10 @@ export const portfoliosTransformer = {
   },
   cashFlow(portfolio: Portfolio) {
     return (
-      portfoliosTransformer.depositsValue(portfolio) -
-      portfolio.invested +
-      portfoliosTransformer.depositManualBalance(portfolio)
+      portfoliosTransformer.depositsValue(portfolio) +
+      portfoliosTransformer.depositManualBalance(portfolio) +
+      (portfolio.realized ?? 0) -
+      portfolio.invested
     );
   },
   portfolioKPIS(portfolio: Portfolio) {

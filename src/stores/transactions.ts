@@ -9,6 +9,26 @@ interface TransactionsStoreState {
   loading: boolean;
 }
 
+const updateTransaction = async (
+  transaction: Transaction,
+  transactions: Transaction[]
+) => {
+  const updateIndex = transactions.findIndex(
+    (current) => current.id === transaction.id
+  );
+
+  const existing = transactions[updateIndex];
+  if (existing && !transformer.isBuy(existing)) {
+    transaction.realizedProfit =
+      (existing.realizedProfit ?? 0) +
+      (transaction.price - existing.price) * transaction.actualShares;
+  }
+
+  await transactionsAPI.update(transaction, transaction.id);
+
+  transactions[updateIndex] = transaction;
+};
+
 export const useTransactionsStore = defineStore('transactions', {
   state: (): TransactionsStoreState => ({
     transactions: [],
@@ -99,7 +119,10 @@ export const useTransactionsStore = defineStore('transactions', {
           this.transactions
         );
 
-        affectedTransaction.forEach(this.update);
+        console.log('Affected transactions are : ', affectedTransaction);
+        affectedTransaction.forEach((affected) =>
+          updateTransaction(affected, this.transactions)
+        );
       }
 
       transaction = await transactionsAPI.update(transaction);
@@ -109,20 +132,7 @@ export const useTransactionsStore = defineStore('transactions', {
       );
     },
     async update(transaction: Transaction) {
-      const updateIndex = this.transactions.findIndex(
-        (current) => current.id === transaction.id
-      );
-
-      const existing = this.transactions[updateIndex];
-      if (existing && !transformer.isBuy(existing)) {
-        transaction.realizedProfit =
-          (existing.realizedProfit ?? 0) +
-          (transaction.price - existing.price) * transaction.actualShares;
-      }
-
-      await transactionsAPI.update(transaction, transaction.id);
-
-      this.transactions[updateIndex] = transaction;
+      await updateTransaction(transaction, this.transactions);
     },
   },
 });

@@ -1,6 +1,7 @@
 <template>
   <q-card
     flat
+    v-if="insights.length > 0"
     :bordered="appearanceStore.borderedCards"
     class="portfolio-insights q-mt-lg q-pb-none q-pb-md-md"
   >

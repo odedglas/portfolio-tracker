@@ -94,6 +94,7 @@ export const useHoldingsStore = defineStore('holdings', {
           }
 
           if (holding.shares <= 0) {
+            // TODO - Removing holding is fine, as long as we can manual balance record / update portfolio.
             return await this.remove(holding.id);
           }
 

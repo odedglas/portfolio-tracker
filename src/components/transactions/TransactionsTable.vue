@@ -99,7 +99,6 @@
             :display-as-row="false"
           />
           <span v-else>
-            -- 1
             <span>{{ $t('transactions.all_profit_is_realized') }}</span>
           </span>
         </q-td>
@@ -201,6 +200,8 @@ export default defineComponent({
       storeToRefs(transactionsStore);
 
     const { viewTransactions } = useViewTransactions();
+
+    console.log(viewTransactions);
 
     const totalProfit = computed(() =>
       viewTransactions.value.reduce((acc, transaction) => {
