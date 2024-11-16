@@ -15,6 +15,9 @@ export const enUsMessages = {
   deposit: 'Deposit',
   balance: 'Balance',
   withdrawal: 'Withdrawal',
+  fees: 'Fees',
+  realized: 'Realized gains',
+  capital: 'Capital gains',
   portfolios: {
     title: "Manage portfolio's",
     create: 'New Portfolio',
