@@ -1,5 +1,10 @@
-import { INSIGHT_TYPE } from 'app/shared/constants';
-import { Holding, Quote, PortfolioInsight } from 'app/shared/types';
+import { INSIGHT_TYPE } from '../constants';
+import {
+  Holding,
+  Quote,
+  PortfolioInsight,
+  ViewPortfolioInsight,
+} from '../types';
 
 type CalculateInsightOptions = {
   holding: Holding;
@@ -9,7 +14,7 @@ type CalculateInsightOptions = {
 type InsightCalculator = {
   getInsight: (
     options: CalculateInsightOptions
-  ) => Omit<PortfolioInsight, 'holding'> | undefined;
+  ) => Omit<PortfolioInsight, 'holdingId'> | undefined;
 };
 
 const fiftyTwoWeekHighInsightCalculator = {
@@ -90,7 +95,7 @@ const MOVING_AVERAGE_THRESHOLD = 0.025;
 const movingAveragesInsightCalculator = {
   getInsight: (
     options: CalculateInsightOptions
-  ): Omit<PortfolioInsight, 'holding'> | undefined => {
+  ): Omit<PortfolioInsight, 'holdingId'> | undefined => {
     const { quote } = options;
 
     const { regularMarketPrice, fiftyDayAverage, twoHundredDayAverage } = quote;
@@ -169,8 +174,8 @@ export const calculateInsights = (
 
       return {
         ...insight,
-        holding,
+        holdingId: holding.id,
         tags: [...defaultTags, ...(insight.tags ?? [])],
       };
     })
-    .filter(Boolean) as PortfolioInsight[];
+    .filter(Boolean) as ViewPortfolioInsight[];

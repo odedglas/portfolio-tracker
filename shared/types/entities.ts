@@ -196,6 +196,10 @@ export type PortfolioInsight = {
     value: number;
     format?: string;
   }[];
+  holdingId: string;
+};
+
+export type ViewPortfolioInsight = PortfolioInsight & {
   holding: Holding;
 };
 

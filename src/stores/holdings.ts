@@ -1,6 +1,7 @@
 import { groupBy, mapValues } from 'lodash';
 import { defineStore } from 'pinia';
 import { holdingsTransformer } from 'app/shared/transformers';
+import { calculateInsights } from 'app/shared/insights';
 import holdingsAPI from 'src/service/holdings';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useTransactionsStore } from 'stores/transactions';
@@ -9,9 +10,8 @@ import {
   Holding,
   Transaction,
   HoldingsSummary,
-  PortfolioInsight,
+  ViewPortfolioInsight,
 } from 'app/shared/types';
-import { calculateInsights } from 'src/service/insights';
 
 interface HoldingsStoreState {
   holdings: Holding[];
@@ -54,12 +54,15 @@ export const useHoldingsStore = defineStore('holdings', {
     summary(): HoldingsSummary {
       return holdingsTransformer.summary(this.portfolioHoldings);
     },
-    insights(): PortfolioInsight[] {
+    insights(): ViewPortfolioInsight[] {
       return this.portfolioHoldings
         .map((holding) => {
           const quote = useQuotesStore().tickerQuotes[holding.ticker];
 
-          return calculateInsights(holding, quote);
+          return calculateInsights(holding, quote).map((insight) => ({
+            ...insight,
+            holding,
+          }));
         })
         .flat();
     },

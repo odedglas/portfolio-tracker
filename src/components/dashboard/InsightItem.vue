@@ -49,13 +49,13 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import TickerLogo from 'components/common/TickerLogo.vue';
-import { PortfolioInsight } from 'app/shared/types';
+import { ViewPortfolioInsight } from 'app/shared/types';
 
 export default defineComponent({
   name: 'InsightItem',
   props: {
     insight: {
-      type: Object as PropType<PortfolioInsight>,
+      type: Object as PropType<ViewPortfolioInsight>,
       required: true,
     },
   },
