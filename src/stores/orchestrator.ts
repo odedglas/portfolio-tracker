@@ -32,15 +32,11 @@ export const useOrchestratorStore = defineStore('orchestrator', {
         await Promise.all([
           quotesStore.getTickersQuotes(holdingsTickers),
           quotesStore.setFearAndGreed(),
-        ]);
-
-        holdingsStore.setPortfoliosHoldings(holdings);
-
-        // None awaitable promises.
-        Promise.all([
           notificationsStore.listNotifications(),
           alertsStore.listAlerts(),
         ]);
+
+        holdingsStore.setPortfoliosHoldings(holdings);
       });
     },
   },

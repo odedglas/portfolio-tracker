@@ -36,7 +36,6 @@ import { computed, defineComponent, ref } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { getHoldingsDonutChatOptions } from 'src/service/charts';
 import { useNumberFormatter } from 'components/composables/useNumberFormatter';
-import { useQuasar } from 'quasar';
 import { useAppearanceStore } from 'stores/appearance';
 
 export default defineComponent({
@@ -45,7 +44,6 @@ export default defineComponent({
     apexchart: VueApexCharts,
   },
   setup() {
-    const $q = useQuasar();
     const appearanceStore = useAppearanceStore();
 
     const numberFormatter = useNumberFormatter();
@@ -54,8 +52,7 @@ export default defineComponent({
     const holdingsDonutData = computed(() => {
       return getHoldingsDonutChatOptions(
         showInvested.value ? 'invested' : 'currentValue',
-        numberFormatter,
-        $q.platform.is.desktop ? 'right' : 'bottom'
+        numberFormatter
       );
     });
 

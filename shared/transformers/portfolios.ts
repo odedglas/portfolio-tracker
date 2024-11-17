@@ -22,6 +22,12 @@ export const portfoliosTransformer = {
       portfolio.invested
     );
   },
+  realizedGains: (portfolio: Portfolio) => {
+    const realized = portfolio.realized ?? 0;
+    const manualBalance = portfoliosTransformer.depositManualBalance(portfolio);
+
+    return realized + manualBalance;
+  },
   portfolioKPIS(portfolio: Portfolio) {
     const depositsValue = portfoliosTransformer.depositsValue(portfolio);
     const cashFlow = portfoliosTransformer.cashFlow(portfolio);

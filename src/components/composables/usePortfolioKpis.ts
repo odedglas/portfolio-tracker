@@ -35,7 +35,7 @@ export const usePortfolioKpis = () => {
         showValueSign: true,
         tooltip: {
           capital: portfolio.capitalGains ?? 0,
-          realized: portfolio.realized ?? 0,
+          realized: portfoliosTransformer.realizedGains(portfolio),
           fees: (portfolio.fees ?? 0) * -1,
         },
         icon: 'trending_up',

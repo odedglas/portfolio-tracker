@@ -33,55 +33,7 @@
           :key="insightKey"
           class="insight-content"
         >
-          <div class="inner q-pa-md flex column q-gap-md">
-            <div class="flex items-center q-gap-sm">
-              <ticker-logo
-                :ticker="insight.holding.ticker"
-                :logo-image="insight.holding.logoImage"
-                :size="36"
-                class="q-mr-xs"
-              />
-              <span class="text-h6 text-capitalize">{{
-                $t(`insights.types.title.${insight.type}`)
-              }}</span>
-            </div>
-            <i18n-t
-              class="q-mb-sm"
-              keypath="insights.types.description.nearMovingAverages"
-              tag="p"
-            >
-              <template v-slot:name>
-                <i>{{ insight.holding.name }}</i>
-              </template>
-              <template v-slot:deltaPercent>
-                <b>{{
-                  $n(Number(insight.inputs.deltaPercent ?? 0), 'percent')
-                }}</b>
-              </template>
-              <template v-slot:movingAverageDays>
-                <b>{{ insight.inputs.movingAverageDays }}</b>
-              </template>
-              <template v-slot:direction>
-                <b>{{ insight.inputs.isAbove ? 'above' : 'below' }}</b>
-              </template>
-            </i18n-t>
-            <div class="flex chips-container">
-              <q-chip
-                v-for="(tag, tagIndex) in insight?.tags"
-                size="sm"
-                outline
-                color="primary"
-                :key="tagIndex"
-              >
-                {{ $t(`insights.tags.${tag.name}`) }}:&nbsp;
-                <b>
-                  {{
-                    $n(Number(tag.value), tag.format ?? 'noneSensitiveDecimal')
-                  }}
-                </b>
-              </q-chip>
-            </div>
-          </div>
+          <insight-item :insight="insight" />
         </swiper-slide>
       </swiper>
     </q-card-section>
@@ -93,17 +45,17 @@ import { computed, defineComponent } from 'vue';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Pagination } from 'swiper/modules';
 import { useHoldingsStore } from 'stores/holdings';
-import TickerLogo from 'components/common/TickerLogo.vue';
 import { shortHoldingName } from 'src/utils';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { useQuasar } from 'quasar';
 import { useAppearanceStore } from 'stores/appearance';
+import InsightItem from 'components/dashboard/InsightItem.vue';
 
 export default defineComponent({
   name: 'PortfolioInsights',
-  components: { Swiper, SwiperSlide, TickerLogo },
+  components: { InsightItem, Swiper, SwiperSlide },
   setup() {
     const $q = useQuasar();
     const holdingsStore = useHoldingsStore();
