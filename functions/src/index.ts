@@ -3,15 +3,22 @@ import { onRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { portfolioHistoryTracker } from './portfolioHistoryTracker';
+import { insightsGenerator } from './insightsGenerator';
 import { migrations } from './migrations';
 import { alertsHandler } from './alerts';
+import { getPortfoliosContext } from './utils/getPortfoliosContext';
 
 admin.initializeApp();
 
 export const manualPortfolioTracker = onRequest(
   { secrets: ['RAPID_YAHOO_API_KEY'] },
   async (_request, response) => {
-    await portfolioHistoryTracker(true);
+    const schedulerContext = {
+      ...(await getPortfoliosContext()),
+      dryRun: true,
+    };
+
+    await insightsGenerator(schedulerContext);
 
     response.send({ success: true });
   }
@@ -34,11 +41,30 @@ export const portfolioScheduler = onSchedule(
     secrets: ['RAPID_YAHOO_API_KEY'],
   },
   async (event) => {
-    logger.info('Portfolio tracker scheduler starting', {
+    logger.info('Portfolio Daily scheduler starting', {
       timestamp: Date.now(),
       event,
     });
-    await portfolioHistoryTracker();
+
+    const schedulerContext = {
+      ...(await getPortfoliosContext()),
+      dryRun: false,
+    };
+
+    // Daily profits
+    try {
+      await portfolioHistoryTracker(schedulerContext);
+    } catch (error: unknown) {
+      logger.error('Portfolio Daily scheduler failed', error);
+    }
+
+    // Insights
+    try {
+      await insightsGenerator(schedulerContext);
+    } catch (error: unknown) {
+      logger.error('Insights generator failed', error);
+    }
+
     return;
   }
 );
@@ -49,9 +75,5 @@ export const notificationsScheduler = onSchedule(
     timeZone: 'America/New_York',
     schedule: 'every 15 minutes from 09:30 to 16:00',
   },
-  async () => {
-    await alertsHandler();
-
-    // TODO - Run insights detection
-  }
+  alertsHandler
 );

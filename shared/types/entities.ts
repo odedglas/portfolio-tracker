@@ -188,7 +188,8 @@ export type HoldingWithProfits = Holding & {
 
 type InsightType = (typeof INSIGHT_TYPE)[keyof typeof INSIGHT_TYPE];
 
-export type PortfolioInsight = {
+export type PortfolioInsight = Entity & {
+  identifier?: string;
   type: InsightType;
   inputs: Record<string, string | number | boolean>;
   tags?: {
@@ -197,6 +198,9 @@ export type PortfolioInsight = {
     format?: string;
   }[];
   holdingId: string;
+  portfolioId: string;
+  createdAt?: number;
+  expiredAt?: number;
 };
 
 export type ViewPortfolioInsight = PortfolioInsight & {

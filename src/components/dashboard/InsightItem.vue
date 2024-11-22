@@ -13,7 +13,7 @@
     </div>
     <i18n-t
       class="q-mb-sm"
-      keypath="insights.types.description.nearMovingAverages"
+      :keypath="`insights.types.description.${insight.type}`"
       tag="p"
     >
       <template v-slot:name>

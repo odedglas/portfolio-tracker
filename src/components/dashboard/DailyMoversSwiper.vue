@@ -24,7 +24,7 @@
             :size="20"
           />
           <span class="text-caption text-bold text-grey-9">{{
-            showLogo ? mover.ticker : mover.label
+            mover.label ?? mover.ticker
           }}</span>
         </span>
         <span class="text-caption text-grey-9 q-mt-xs">

@@ -14,7 +14,7 @@ type CalculateInsightOptions = {
 type InsightCalculator = {
   getInsight: (
     options: CalculateInsightOptions
-  ) => Omit<PortfolioInsight, 'holdingId'> | undefined;
+  ) => Omit<PortfolioInsight, 'portfolioId' | 'id' | 'holdingId'> | undefined;
 };
 
 const fiftyTwoWeekHighInsightCalculator = {
@@ -72,8 +72,8 @@ const fiftyTwoWeekLowInsightCalculator = {
     const delta = regularMarketPrice - fiftyTwoWeekLow;
     const deltaPercent = delta / fiftyTwoWeekLow;
 
-    if (deltaPercent > 0.02) {
-      // Price is more than 2% above 52 week low
+    if (deltaPercent > 0.05) {
+      // Price is more than 5% above 52 week low
       return undefined;
     }
 
@@ -95,7 +95,7 @@ const MOVING_AVERAGE_THRESHOLD = 0.025;
 const movingAveragesInsightCalculator = {
   getInsight: (
     options: CalculateInsightOptions
-  ): Omit<PortfolioInsight, 'holdingId'> | undefined => {
+  ): Omit<PortfolioInsight, 'portfolioId' | 'id' | 'holdingId'> | undefined => {
     const { quote } = options;
 
     const { regularMarketPrice, fiftyDayAverage, twoHundredDayAverage } = quote;
@@ -156,6 +156,9 @@ const insightsCalculators: InsightCalculator[] = [
   movingAveragesInsightCalculator,
 ];
 
+export const getInsightKey = (insight: PortfolioInsight) =>
+  [insight.portfolioId, insight.holdingId, insight.type].join('_');
+
 export const calculateInsights = (
   holding: Holding,
   quote: Quote
@@ -175,6 +178,8 @@ export const calculateInsights = (
       return {
         ...insight,
         holdingId: holding.id,
+        portfolioId: holding.portfolioId,
+        createdAt: Date.now(),
         tags: [...defaultTags, ...(insight.tags ?? [])],
       };
     })

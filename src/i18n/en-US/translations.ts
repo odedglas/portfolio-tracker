@@ -108,7 +108,7 @@ export const enUsMessages = {
         nearMovingAverages: 'Near moving averages',
         highShortInterest: 'High short interest',
         near52WeekLow: 'Near 52 week low',
-        below52WeekHigh: 'Below 52 week high',
+        below52WeekHigh: 'Below 52 weeks high',
       },
       description: {
         nearMovingAverages:

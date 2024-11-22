@@ -25,7 +25,7 @@
     </q-card-section>
     <q-card-section class="q-py-sm">
       <p class="text-caption text-grey-8 q-mb-sm">Benchmarks:</p>
-      <daily-movers-swiper :movers="benchmarks" :show-logo="false" />
+      <daily-movers-swiper :movers="benchmarks" />
     </q-card-section>
   </q-card>
 </template>
