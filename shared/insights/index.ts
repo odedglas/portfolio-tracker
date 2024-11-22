@@ -1,10 +1,5 @@
 import { INSIGHT_TYPE } from '../constants';
-import {
-  Holding,
-  Quote,
-  PortfolioInsight,
-  ViewPortfolioInsight,
-} from '../types';
+import { Holding, Quote, PortfolioInsight } from '../types';
 
 type CalculateInsightOptions = {
   holding: Holding;
@@ -156,8 +151,10 @@ const insightsCalculators: InsightCalculator[] = [
   movingAveragesInsightCalculator,
 ];
 
-export const getInsightKey = (insight: PortfolioInsight) =>
-  [insight.portfolioId, insight.holdingId, insight.type].join('_');
+type InsightKey = { holdingId: string; portfolioId: string; type: string };
+
+export const getInsightKey = (options: InsightKey) =>
+  [options.portfolioId, options.holdingId, options.type].join('_');
 
 export const calculateInsights = (
   holding: Holding,
@@ -179,8 +176,13 @@ export const calculateInsights = (
         ...insight,
         holdingId: holding.id,
         portfolioId: holding.portfolioId,
+        identifier: getInsightKey({
+          holdingId: holding.id,
+          portfolioId: holding.portfolioId,
+          type: insight.type,
+        }),
         createdAt: Date.now(),
         tags: [...defaultTags, ...(insight.tags ?? [])],
       };
     })
-    .filter(Boolean) as ViewPortfolioInsight[];
+    .filter(Boolean) as PortfolioInsight[];

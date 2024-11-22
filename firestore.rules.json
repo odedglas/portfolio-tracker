@@ -29,6 +29,10 @@ service cloud.firestore {
       allow read, update: if request.auth.uid != null && get(/databases/$(database)/documents/portfolios/$(resource.data.portfolioId)).data.owner == request.auth.uid
       allow write: if request.auth.uid != null
     }
+    match /insights/{insight} {
+      allow read, update: if request.auth.uid != null && get(/databases/$(database)/documents/portfolios/$(resource.data.portfolioId)).data.owner == request.auth.uid
+      allow write: if request.auth.uid != null
+    }
     match /portfolioHistory/{history} {
       allow read, update: if request.auth.uid != null && get(/databases/$(database)/documents/portfolios/$(resource.data.portfolioId)).data.owner == request.auth.uid
       allow write: if request.auth.uid != null

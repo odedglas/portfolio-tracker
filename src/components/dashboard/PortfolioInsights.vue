@@ -42,26 +42,26 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { useQuasar } from 'quasar';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Pagination } from 'swiper/modules';
-import { useHoldingsStore } from 'stores/holdings';
+import { useAppearanceStore } from 'stores/appearance';
+import { useInsightsStore } from 'stores/insights';
 import { shortHoldingName } from 'src/utils';
+import InsightItem from 'components/dashboard/InsightItem.vue';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { useQuasar } from 'quasar';
-import { useAppearanceStore } from 'stores/appearance';
-import InsightItem from 'components/dashboard/InsightItem.vue';
 
 export default defineComponent({
   name: 'PortfolioInsights',
   components: { InsightItem, Swiper, SwiperSlide },
   setup() {
     const $q = useQuasar();
-    const holdingsStore = useHoldingsStore();
+    const insightsStore = useInsightsStore();
     const appearanceStore = useAppearanceStore();
 
-    const insights = computed(() => holdingsStore.insights);
+    const insights = computed(() => insightsStore.viewInsights);
 
     const insightsPerPage = computed(() => ($q.platform.is.desktop ? 3 : 1));
 

@@ -15,7 +15,6 @@ export const usePortfolioKpis = () => {
 
     const portfolioKpis = portfoliosTransformer.portfolioKPIS(portfolio);
 
-    console.log(portfolio, portfolioKpis);
     return [
       {
         id: 'balance',

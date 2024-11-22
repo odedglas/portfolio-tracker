@@ -119,7 +119,6 @@ export const useTransactionsStore = defineStore('transactions', {
           this.transactions
         );
 
-        console.log('Affected transactions are : ', affectedTransaction);
         affectedTransaction.forEach((affected) =>
           updateTransaction(affected, this.transactions)
         );

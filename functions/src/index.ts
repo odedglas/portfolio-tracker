@@ -12,10 +12,10 @@ admin.initializeApp();
 
 export const manualPortfolioTracker = onRequest(
   { secrets: ['RAPID_YAHOO_API_KEY'] },
-  async (_request, response) => {
+  async (request, response) => {
     const schedulerContext = {
       ...(await getPortfoliosContext()),
-      dryRun: true,
+      dryRun: request.query.dryRun ? request.query.dryRun === 'true' : true,
     };
 
     await insightsGenerator(schedulerContext);
@@ -60,6 +60,7 @@ export const portfolioScheduler = onSchedule(
 
     // Insights
     try {
+      // TODO - Add isTrading conditioned.
       await insightsGenerator(schedulerContext);
     } catch (error: unknown) {
       logger.error('Insights generator failed', error);

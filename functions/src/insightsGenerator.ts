@@ -45,12 +45,12 @@ export const insightsGenerator = async (
     dryRun,
   });
 
-  const persistedInsights = (
-    await getCollection<PortfolioInsight>('insights')
-  ).map((insight) => ({
-    ...insight,
-    holding: portfolioHoldings[insight.holdingId],
-  }));
+  const persistedInsights = (await getCollection<PortfolioInsight>('insights'))
+    .filter((insight) => !insight.expiredAt)
+    .map((insight) => ({
+      ...insight,
+      holding: portfolioHoldings[insight.holdingId],
+    }));
 
   const dailyInsights = Object.values(portfolioHoldings)
     .map((holdings) =>

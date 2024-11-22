@@ -1,15 +1,23 @@
 <template>
   <div class="inner q-pa-md flex column q-gap-md">
-    <div class="flex items-center q-gap-sm">
-      <ticker-logo
-        :ticker="insight.holding.ticker"
-        :logo-image="insight.holding.logoImage"
-        :size="36"
-        class="q-mr-xs"
+    <div class="flex justify-between items-center">
+      <span class="flex items-center q-gap-sm">
+        <ticker-logo
+          :ticker="insight.holding.ticker"
+          :logo-image="insight.holding.logoImage"
+          :size="36"
+          class="q-mr-xs"
+        />
+        <span class="text-h6 text-capitalize">{{
+          $t(`insights.types.title.${insight.type}`)
+        }}</span>
+      </span>
+      <q-badge
+        class="text-caption text-grey-8"
+        :label="getInsightDateBadge(insight)"
+        outline
+        color="orange"
       />
-      <span class="text-h6 text-capitalize">{{
-        $t(`insights.types.title.${insight.type}`)
-      }}</span>
     </div>
     <i18n-t
       class="q-mb-sm"
@@ -50,6 +58,7 @@
 import { defineComponent, PropType } from 'vue';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import { ViewPortfolioInsight } from 'app/shared/types';
+import { daysFromNow, isToday } from 'src/service/date';
 
 export default defineComponent({
   name: 'InsightItem',
@@ -60,5 +69,22 @@ export default defineComponent({
     },
   },
   components: { TickerLogo },
+  setup() {
+    const getInsightDateBadge = (insight: ViewPortfolioInsight) => {
+      const { createdAt = Date.now(), expiredAt } = insight;
+
+      if (expiredAt) {
+        return isToday(expiredAt) ? 'Expired Today' : 'Expired';
+      }
+
+      if (isToday(createdAt)) {
+        return 'New';
+      }
+
+      return `${daysFromNow(createdAt)} days ago`;
+    };
+
+    return { getInsightDateBadge };
+  },
 });
 </script>

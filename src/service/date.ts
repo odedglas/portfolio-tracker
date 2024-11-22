@@ -8,3 +8,9 @@ export const formatNotificationDate = (date: number) =>
 
 export const formatShortDate = (date: number) =>
   DateAPI.formatDate(date, 'MMM D, YY');
+
+export const isToday = (date: number) =>
+  DateAPI.getDateDiff(Date.now(), date, 'days') === 0;
+
+export const daysFromNow = (date: number) =>
+  DateAPI.getDateDiff(Date.now(), date, 'days');
