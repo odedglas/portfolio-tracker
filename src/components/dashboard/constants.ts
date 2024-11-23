@@ -20,7 +20,7 @@ export const dailyMoversBenchmarks = [
     logoImage: 'https://s3-symbol-logo.tradingview.com/indices/dow-30.svg',
   },
   {
-    label: 'USD',
+    label: 'USD/ILS',
     ticker: 'ILS=X',
     logoImage: 'https://s3-symbol-logo.tradingview.com/country/IL.svg',
   },

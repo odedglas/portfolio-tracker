@@ -34,8 +34,10 @@ export const useInsightsStore = defineStore('insights', {
 
             return {
               ...insight,
-              expiredAt: storedInsight?.expiredAt,
-              createdAt: storedInsight?.createdAt,
+              ...(storedInsight && {
+                expiredAt: storedInsight.expiredAt,
+                createdAt: storedInsight.createdAt,
+              }),
               holding,
             };
           });

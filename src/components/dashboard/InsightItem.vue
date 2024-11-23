@@ -12,31 +12,16 @@
           $t(`insights.types.title.${insight.type}`)
         }}</span>
       </span>
-      <q-badge
+      <q-chip
         class="text-caption text-grey-8"
         :label="getInsightDateBadge(insight)"
+        dense
         outline
+        square
         color="orange"
       />
     </div>
-    <i18n-t
-      class="q-mb-sm"
-      :keypath="`insights.types.description.${insight.type}`"
-      tag="p"
-    >
-      <template v-slot:name>
-        <i>{{ insight.holding.name }}</i>
-      </template>
-      <template v-slot:deltaPercent>
-        <b>{{ $n(Number(insight.inputs.deltaPercent ?? 0), 'percent') }}</b>
-      </template>
-      <template v-slot:movingAverageDays>
-        <b>{{ insight.inputs.movingAverageDays }}</b>
-      </template>
-      <template v-slot:direction>
-        <b>{{ insight.inputs.isAbove ? 'above' : 'below' }}</b>
-      </template>
-    </i18n-t>
+    <insight-item-text :insight="insight" />
     <div class="flex chips-container">
       <q-chip
         v-for="(tag, tagIndex) in insight?.tags"
@@ -59,6 +44,9 @@ import { defineComponent, PropType } from 'vue';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import { ViewPortfolioInsight } from 'app/shared/types';
 import { daysFromNow, isToday } from 'src/service/date';
+import { shortHoldingName } from 'src/utils';
+import { useI18n } from 'vue-i18n';
+import InsightItemText from 'components/dashboard/InsightItemText.vue';
 
 export default defineComponent({
   name: 'InsightItem',
@@ -68,7 +56,7 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { TickerLogo },
+  components: { InsightItemText, TickerLogo },
   setup() {
     const getInsightDateBadge = (insight: ViewPortfolioInsight) => {
       const { createdAt = Date.now(), expiredAt } = insight;
@@ -84,7 +72,7 @@ export default defineComponent({
       return `${daysFromNow(createdAt)} days ago`;
     };
 
-    return { getInsightDateBadge };
+    return { getInsightDateBadge, shortHoldingName };
   },
 });
 </script>

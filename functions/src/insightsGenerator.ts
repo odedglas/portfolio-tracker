@@ -89,6 +89,8 @@ export const insightsGenerator = async (
     await updateDocuments('insights', updated);
   }
 
+  // TODO - Add recurringInsights handling - Should save history tags / etc.
+
   logger.info('Insights Generator Done', {
     totalTime: Date.now() - now,
     dryRun,
