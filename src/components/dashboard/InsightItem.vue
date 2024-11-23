@@ -45,7 +45,6 @@ import TickerLogo from 'components/common/TickerLogo.vue';
 import { ViewPortfolioInsight } from 'app/shared/types';
 import { daysFromNow, isToday } from 'src/service/date';
 import { shortHoldingName } from 'src/utils';
-import { useI18n } from 'vue-i18n';
 import InsightItemText from 'components/dashboard/InsightItemText.vue';
 
 export default defineComponent({

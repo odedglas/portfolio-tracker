@@ -7,6 +7,7 @@ import { insightsGenerator } from './insightsGenerator';
 import { migrations } from './migrations';
 import { alertsHandler } from './alerts';
 import { getPortfoliosContext } from './utils/getPortfoliosContext';
+import { isTradingDay } from './utils/isTradingDay';
 
 admin.initializeApp();
 
@@ -60,7 +61,11 @@ export const portfolioScheduler = onSchedule(
 
     // Insights
     try {
-      // TODO - Add isTrading conditioned.
+      if (!isTradingDay()) {
+        logger.info('Skipping insights generation, not a trading day');
+        return;
+      }
+
       await insightsGenerator(schedulerContext);
     } catch (error: unknown) {
       logger.error('Insights generator failed', error);

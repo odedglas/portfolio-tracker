@@ -23,9 +23,19 @@ const classifyInsights = (
     (insight) => !dailyInsightsKeys.includes(getInsightKey(insight))
   );
 
-  const recurringInsights = persistedInsights.filter((insight) =>
-    dailyInsightsKeys.includes(getInsightKey(insight))
-  );
+  const recurringInsights = dailyInsights
+    .filter((insight) => persistedInsightsKeys.includes(getInsightKey(insight)))
+    .map((insight) => {
+      const persisted = persistedInsights.find(
+        (persisted) => getInsightKey(persisted) === getInsightKey(insight)
+      );
+
+      return {
+        ...persisted,
+        // Attach only daily inputs to be saved as history
+        inputs: insight.inputs,
+      };
+    }) as PortfolioInsight[];
 
   return {
     newInsights,
@@ -66,12 +76,8 @@ export const insightsGenerator = async (
     .flat()
     .flat();
 
-  logger.info('Daily generated insights', { dailyInsights: dailyInsights });
-
-  const { newInsights, deactivatedInsights } = classifyInsights(
-    persistedInsights,
-    dailyInsights
-  );
+  const { newInsights, deactivatedInsights, recurringInsights } =
+    classifyInsights(persistedInsights, dailyInsights);
 
   // Persisting new insights
   logger.info('Persisting new insights', { newInsights });
@@ -79,17 +85,35 @@ export const insightsGenerator = async (
     await saveDocuments('insights', newInsights);
   }
 
-  logger.info('Deactivating insights', { deactivatedInsights });
+  logger.info('Deactivating insights', {
+    deactivatedInsights: deactivatedInsights.map((insight) => insight.id),
+  });
   if (!dryRun) {
     const updated = deactivatedInsights.map((insight) => ({
-      ...insight,
+      id: insight.id,
       expiredAt: Date.now(),
     }));
 
     await updateDocuments('insights', updated);
   }
 
-  // TODO - Add recurringInsights handling - Should save history tags / etc.
+  logger.info('Updating Recurring insights inputs', {
+    recurringInsights: recurringInsights.map((insight) => insight.id),
+  });
+  if (!dryRun) {
+    const updated = recurringInsights.map((insight) => ({
+      id: insight.id,
+      historyInputs: [
+        ...(insight.historyInputs ?? []),
+        {
+          date: Date.now(),
+          inputs: insight.inputs,
+        },
+      ],
+    }));
+
+    await updateDocuments('insights', updated);
+  }
 
   logger.info('Insights Generator Done', {
     totalTime: Date.now() - now,

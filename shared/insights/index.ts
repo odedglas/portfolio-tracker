@@ -109,7 +109,7 @@ const movingAveragesInsightCalculator = {
           twoHundredDayAverage,
           deltaPercent: twoHundredDayDeltaPercent,
           isAbove: twoHundredDayDelta > 0,
-          movingAverageDays: null as unknown as number,
+          movingAverageDays: 200,
         },
         tags: [
           { name: 'twoHundredDayAverage', value: twoHundredDayAverage },
@@ -132,7 +132,7 @@ const movingAveragesInsightCalculator = {
           isAbove: fiftyDayDelta > 0,
           fiftyDayAverage,
           deltaPercent: fiftyDayDeltaPercent,
-          movingAverageDays: null as unknown as number,
+          movingAverageDays: 50,
         },
         tags: [
           { name: 'fiftyDayAverage', value: fiftyDayAverage },
