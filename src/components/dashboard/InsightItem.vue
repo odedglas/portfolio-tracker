@@ -68,7 +68,8 @@ export default defineComponent({
         return 'New';
       }
 
-      return `${daysFromNow(createdAt)} days ago`;
+      const daysPlural = daysFromNow(createdAt) > 1 ? 's' : '';
+      return `${daysFromNow(createdAt)} day${daysPlural} ago`;
     };
 
     return { getInsightDateBadge, shortHoldingName };
