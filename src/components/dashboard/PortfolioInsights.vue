@@ -61,7 +61,22 @@ export default defineComponent({
     const insightsStore = useInsightsStore();
     const appearanceStore = useAppearanceStore();
 
-    const insights = computed(() => insightsStore.viewInsights);
+    const inactiveInsights = computed(() =>
+      [...insightsStore.inactiveInsights].sort((a, b) =>
+        (a.expiredAt ?? 0) - (b.expiredAt ?? 0) ? -1 : 1
+      )
+    );
+
+    const activeInsights = computed(() =>
+      [...insightsStore.dailyInsights].sort((a, b) =>
+        (a.createdAt ?? 0) - (b.createdAt ?? 0) ? -1 : 1
+      )
+    );
+
+    const insights = computed(() => [
+      ...activeInsights.value,
+      ...inactiveInsights.value,
+    ]);
 
     const insightsPerPage = computed(() => ($q.platform.is.desktop ? 3 : 1));
 

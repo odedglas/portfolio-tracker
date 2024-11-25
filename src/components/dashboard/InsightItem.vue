@@ -22,6 +22,12 @@
       />
     </div>
     <insight-item-text :insight="insight" />
+    <apexchart
+      width="100%"
+      height="35"
+      :options="chartOptions"
+      :series="series"
+    ></apexchart>
     <div class="flex chips-container">
       <q-chip
         v-for="(tag, tagIndex) in insight?.tags"
@@ -41,6 +47,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+import VueApexCharts from 'vue3-apexcharts';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import { ViewPortfolioInsight } from 'app/shared/types';
 import { daysFromNow, isToday } from 'src/service/date';
@@ -55,24 +62,70 @@ export default defineComponent({
       required: true,
     },
   },
-  components: { InsightItemText, TickerLogo },
+  components: {
+    InsightItemText,
+    TickerLogo,
+    apexchart: VueApexCharts,
+  },
   setup() {
+    const daysAgo = (date: number) => {
+      const daysPlural = daysFromNow(date) > 1 ? 's' : '';
+
+      return `${daysFromNow(date)} day${daysPlural} ago`;
+    };
+
     const getInsightDateBadge = (insight: ViewPortfolioInsight) => {
       const { createdAt = Date.now(), expiredAt } = insight;
 
       if (expiredAt) {
-        return isToday(expiredAt) ? 'Expired Today' : 'Expired';
+        return isToday(expiredAt)
+          ? 'Expired Today'
+          : `Expired ${daysAgo(expiredAt)}`;
       }
 
       if (isToday(createdAt)) {
         return 'New';
       }
 
-      const daysPlural = daysFromNow(createdAt) > 1 ? 's' : '';
-      return `${daysFromNow(createdAt)} day${daysPlural} ago`;
+      return daysAgo(createdAt);
     };
 
-    return { getInsightDateBadge, shortHoldingName };
+    return {
+      getInsightDateBadge,
+      shortHoldingName,
+      series: [
+        {
+          data: [12, 14, 2, 47, 42, 15, 47, 75, 65, 19, 14],
+        },
+      ],
+      chartOptions: {
+        chart: {
+          type: 'line',
+          width: '100%',
+          height: 35,
+          sparkline: {
+            enabled: true,
+          },
+        },
+        colors: ['#a21c48'],
+        stroke: {
+          width: 2,
+        },
+        tooltip: {
+          x: {
+            show: false,
+          },
+          y: {
+            title: {
+              formatter: (s: string) => s,
+            },
+          },
+          marker: {
+            show: false,
+          },
+        },
+      },
+    };
   },
 });
 </script>

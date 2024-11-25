@@ -50,9 +50,11 @@
         <q-item
           v-for="[name, value] in Object.entries(tooltip)"
           :key="name"
-          style="min-height: 32px"
+          style="min-height: 16px"
         >
-          <q-item-section>{{ $t(name) }}</q-item-section>
+          <q-item-section class="text-weight-medium"
+            >{{ $t(name) }}:</q-item-section
+          >
           <q-item-section side>
             <profit-indicator :value="value" show-value-sign />
           </q-item-section>

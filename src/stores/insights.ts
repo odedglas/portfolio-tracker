@@ -16,7 +16,7 @@ export const useInsightsStore = defineStore('insights', {
     loading: false,
   }),
   getters: {
-    viewInsights(state): ViewPortfolioInsight[] {
+    dailyInsights(state): ViewPortfolioInsight[] {
       const holdings = useHoldingsStore().portfolioHoldings;
 
       if (!holdings.length) {
@@ -43,6 +43,26 @@ export const useInsightsStore = defineStore('insights', {
           });
         })
         .flat();
+    },
+    inactiveInsights(state): ViewPortfolioInsight[] {
+      const holdings = useHoldingsStore().portfolioHoldings;
+      if (!holdings.length) {
+        return [];
+      }
+
+      return state.storedInsights
+        .filter((insight) => !!insight.expiredAt)
+        .map((insight) => {
+          const holding = holdings.find(
+            (holding) => holding.id === insight.holdingId
+          );
+
+          return {
+            ...insight,
+            holding,
+          };
+        })
+        .filter(Boolean) as ViewPortfolioInsight[];
     },
   },
   actions: {
