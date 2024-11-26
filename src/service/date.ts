@@ -14,3 +14,9 @@ export const isToday = (date: number) =>
 
 export const daysFromNow = (date: number) =>
   DateAPI.getDateDiff(Date.now(), date, 'days');
+
+export const daysAgo = (date: number) => {
+  const daysPlural = daysFromNow(date) > 1 ? 's' : '';
+
+  return `${daysFromNow(date)} day${daysPlural} ago`;
+};

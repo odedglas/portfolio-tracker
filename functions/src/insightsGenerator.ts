@@ -82,7 +82,13 @@ export const insightsGenerator = async (
   // Persisting new insights
   logger.info('Persisting new insights', { newInsights });
   if (!dryRun) {
-    await saveDocuments('insights', newInsights);
+    await saveDocuments(
+      'insights',
+      newInsights.map((insight) => ({
+        ...insight,
+        historyInputs: [{ date: Date.now(), inputs: insight.inputs }],
+      }))
+    );
   }
 
   logger.info('Deactivating insights', {
