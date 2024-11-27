@@ -59,14 +59,8 @@ export const portfolioScheduler = onSchedule(
       logger.error('Portfolio Daily scheduler failed', error);
     }
 
-    // Insights
     try {
-      if (!isTradingDay()) {
-        logger.info('Skipping insights generation, not a trading day');
-        return;
-      }
-
-      await insightsGenerator(schedulerContext);
+      // TODO - Add volume insight generate
     } catch (error: unknown) {
       logger.error('Insights generator failed', error);
     }
@@ -81,5 +75,27 @@ export const notificationsScheduler = onSchedule(
     timeZone: 'America/New_York',
     schedule: 'every 30 minutes from 09:30 to 16:00',
   },
-  alertsHandler
+  async () => {
+    if (!isTradingDay()) {
+      logger.info('Skipping insights generation, not a trading day');
+      return;
+    }
+
+    try {
+      await alertsHandler();
+    } catch (error: unknown) {
+      logger.error('Alerts handler failed', error);
+    }
+
+    try {
+      const schedulerContext = {
+        ...(await getPortfoliosContext()),
+        dryRun: false,
+      };
+
+      await insightsGenerator(schedulerContext);
+    } catch (error: unknown) {
+      logger.error('Insights generator failed', error);
+    }
+  }
 );
