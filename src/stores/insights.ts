@@ -3,7 +3,8 @@ import { PortfolioInsight, ViewPortfolioInsight } from 'app/shared/types';
 import insightsAPI from 'src/service/insights';
 import { useHoldingsStore } from 'stores/holdings';
 import { useQuotesStore } from 'stores/quotes';
-import { calculateInsights } from 'app/shared/insights';
+import { calculateInsights, calculateInsightTags } from 'app/shared/insights';
+import { usePortfolioStore } from 'stores/portfolios';
 
 type InsightsState = {
   storedInsights: PortfolioInsight[];
@@ -45,21 +46,42 @@ export const useInsightsStore = defineStore('insights', {
         .flat();
     },
     inactiveInsights(state): ViewPortfolioInsight[] {
+      const selectedPortfolioId = usePortfolioStore().selectedPortfolio?.id;
       const holdings = useHoldingsStore().portfolioHoldings;
       if (!holdings.length) {
         return [];
       }
 
+      const dailyInsightsIdentifiers = this.dailyInsights.map(
+        (insight) => insight.identifier
+      );
+
       return state.storedInsights
-        .filter((insight) => !!insight.expiredAt)
+        .filter(
+          (insight) => !dailyInsightsIdentifiers.includes(insight.identifier)
+        )
+        .filter((insight) => insight.portfolioId === selectedPortfolioId)
         .map((insight) => {
           const holding = holdings.find(
             (holding) => holding.id === insight.holdingId
           );
 
+          if (!holding) {
+            console.warn(
+              'Insights generator - Cannot match to holding id',
+              insight.id
+            );
+            return;
+          }
+
+          const quote = useQuotesStore().tickerQuotes[holding.ticker];
+          const tags = calculateInsightTags(insight, quote);
+
           return {
             ...insight,
             holding,
+            // Override tags with latest value calculations
+            tags,
           };
         })
         .filter(Boolean) as ViewPortfolioInsight[];

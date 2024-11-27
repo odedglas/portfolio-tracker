@@ -6,13 +6,31 @@ type CalculateInsightOptions = {
   quote: Quote;
 };
 
-type InsightCalculator = {
-  getInsight: (
-    options: CalculateInsightOptions
-  ) => Omit<PortfolioInsight, 'portfolioId' | 'id' | 'holdingId'> | undefined;
+type CalculateTagsOptions = {
+  quote: Quote;
 };
 
+type InsightTag = { name: string; value: number; format?: string };
+type InsightCalculator = {
+  type: (typeof INSIGHT_TYPE)[keyof typeof INSIGHT_TYPE];
+
+  getInsight: (
+    options: CalculateInsightOptions
+  ) =>
+    | Omit<PortfolioInsight, 'portfolioId' | 'id' | 'holdingId' | 'type'>
+    | undefined;
+
+  getTags: (options: CalculateTagsOptions) => InsightTag[];
+};
+
+const baseTags = (options: CalculateTagsOptions, tags: InsightTag[]) => [
+  { name: 'marketPrice', value: options.quote.regularMarketPrice },
+  ...tags,
+];
+
 const fiftyTwoWeekHighInsightCalculator = {
+  type: INSIGHT_TYPE.BELOW_52_WEEK_HIGH,
+
   getInsight: (options: CalculateInsightOptions) => {
     const { quote } = options;
     const {
@@ -43,7 +61,6 @@ const fiftyTwoWeekHighInsightCalculator = {
     }
 
     return {
-      type: INSIGHT_TYPE.BELOW_52_WEEK_HIGH,
       inputs: {
         fiftyTwoWeekHigh,
         fiftyTwoWeekHighDelta,
@@ -51,15 +68,21 @@ const fiftyTwoWeekHighInsightCalculator = {
         regularMarketPrice,
         twoHundredDayAverage,
       },
-      tags: [
-        { name: 'fiftyTwoWeekHigh', value: fiftyTwoWeekHigh },
-        { name: 'twoHundredDayAverage', value: twoHundredDayAverage },
-      ],
     };
+  },
+
+  getTags: ({ quote }: CalculateTagsOptions) => {
+    const { fiftyTwoWeekHigh, twoHundredDayAverage } = quote;
+    return baseTags({ quote }, [
+      { name: 'fiftyTwoWeekHigh', value: fiftyTwoWeekHigh },
+      { name: 'twoHundredDayAverage', value: twoHundredDayAverage },
+    ]);
   },
 };
 
 const fiftyTwoWeekLowInsightCalculator = {
+  type: INSIGHT_TYPE.NEAR_52_WEEK_LOW,
+
   getInsight: (options: CalculateInsightOptions) => {
     const { quote } = options;
     const { fiftyTwoWeekLow, regularMarketPrice } = quote;
@@ -73,24 +96,33 @@ const fiftyTwoWeekLowInsightCalculator = {
     }
 
     return {
-      type: INSIGHT_TYPE.NEAR_52_WEEK_LOW,
       inputs: {
         fiftyTwoWeekLow,
         delta,
         deltaPercent,
         regularMarketPrice,
       },
-      tags: [{ name: 'fiftyTwoWeekLow', value: fiftyTwoWeekLow }],
     };
+  },
+
+  getTags: ({ quote }: CalculateTagsOptions) => {
+    const { fiftyTwoWeekLow } = quote;
+    return baseTags({ quote }, [
+      { name: 'fiftyTwoWeekLow', value: fiftyTwoWeekLow },
+    ]);
   },
 };
 
 const MOVING_AVERAGE_THRESHOLD = 0.025;
 
 const movingAveragesInsightCalculator = {
+  type: INSIGHT_TYPE.NEAR_MOVING_AVERAGES,
+
   getInsight: (
     options: CalculateInsightOptions
-  ): Omit<PortfolioInsight, 'portfolioId' | 'id' | 'holdingId'> | undefined => {
+  ):
+    | Omit<PortfolioInsight, 'portfolioId' | 'id' | 'holdingId' | 'type'>
+    | undefined => {
     const { quote } = options;
 
     const { regularMarketPrice, fiftyDayAverage, twoHundredDayAverage } = quote;
@@ -103,7 +135,6 @@ const movingAveragesInsightCalculator = {
       twoHundredDayDeltaPercent >= -MOVING_AVERAGE_THRESHOLD
     ) {
       return {
-        type: INSIGHT_TYPE.NEAR_MOVING_AVERAGES,
         inputs: {
           regularMarketPrice,
           twoHundredDayAverage,
@@ -111,10 +142,6 @@ const movingAveragesInsightCalculator = {
           isAbove: twoHundredDayDelta > 0,
           movingAverageDays: 200,
         },
-        tags: [
-          { name: 'twoHundredDayAverage', value: twoHundredDayAverage },
-          { name: 'fiftyDayAverage', value: fiftyDayAverage },
-        ],
       };
     }
 
@@ -126,7 +153,6 @@ const movingAveragesInsightCalculator = {
       fiftyDayDeltaPercent >= -MOVING_AVERAGE_THRESHOLD
     ) {
       return {
-        type: INSIGHT_TYPE.NEAR_MOVING_AVERAGES,
         inputs: {
           regularMarketPrice,
           isAbove: fiftyDayDelta > 0,
@@ -134,14 +160,18 @@ const movingAveragesInsightCalculator = {
           deltaPercent: fiftyDayDeltaPercent,
           movingAverageDays: 50,
         },
-        tags: [
-          { name: 'fiftyDayAverage', value: fiftyDayAverage },
-          { name: 'twoHundredDayAverage', value: twoHundredDayAverage },
-        ],
       };
     }
 
     return undefined;
+  },
+
+  getTags: ({ quote }: CalculateTagsOptions) => {
+    const { twoHundredDayAverage, fiftyDayAverage } = quote;
+    return baseTags({ quote }, [
+      { name: 'twoHundredDayAverage', value: twoHundredDayAverage },
+      { name: 'fiftyDayAverage', value: fiftyDayAverage },
+    ]);
   },
 };
 
@@ -168,21 +198,26 @@ export const calculateInsights = (
         return undefined;
       }
 
-      const defaultTags: PortfolioInsight['tags'] = [
-        { name: 'marketPrice', value: quote.regularMarketPrice },
-      ];
-
       return {
         ...insight,
+        type: calculator.type,
         holdingId: holding.id,
         portfolioId: holding.portfolioId,
         identifier: getInsightKey({
           holdingId: holding.id,
           portfolioId: holding.portfolioId,
-          type: insight.type,
+          type: calculator.type,
         }),
         createdAt: Date.now(),
-        tags: [...defaultTags, ...(insight.tags ?? [])],
+        tags: calculator.getTags({ quote }) ?? [],
       };
     })
     .filter(Boolean) as PortfolioInsight[];
+
+export const calculateInsightTags = (
+  insight: PortfolioInsight,
+  quote: Quote
+): InsightTag[] =>
+  insightsCalculators
+    .find((calculator) => calculator.type === insight.type)
+    ?.getTags({ quote }) ?? [];

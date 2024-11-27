@@ -220,6 +220,7 @@ export type PortfolioInsight = Entity & {
 
 export type ViewPortfolioInsight = PortfolioInsight & {
   holding: Holding;
+  inactive?: boolean;
 };
 
 export type NotificationType =
