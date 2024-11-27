@@ -16,7 +16,9 @@
               {{ alert.ticker }} crossing {{ $n(alert.value ?? 0, 'decimal') }}
             </span>
             <span
-              v-if="hoveredAlert?.id === alert.id"
+              v-if="
+                $q.platform.is.desktop ? hoveredAlert?.id === alert.id : true
+              "
               class="flex text-grey-8 q-gap-xs"
             >
               <q-btn

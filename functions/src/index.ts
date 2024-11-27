@@ -79,7 +79,7 @@ export const notificationsScheduler = onSchedule(
   {
     secrets: ['ALERTS_RAPID_API_KEY'],
     timeZone: 'America/New_York',
-    schedule: 'every 15 minutes from 09:30 to 16:00',
+    schedule: 'every 30 minutes from 09:30 to 16:00',
   },
   alertsHandler
 );

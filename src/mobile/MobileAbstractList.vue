@@ -53,7 +53,7 @@
             </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item class="flex justify-between">
+        <q-item class="flex justify-between" v-if="displayTotal">
           <q-item-section>
             <q-item-label class="text-grey-7">Total</q-item-label>
           </q-item-section>
@@ -100,6 +100,10 @@ export default defineComponent({
     items: {
       type: Array as PropType<ListItem[]>,
       required: true,
+    },
+    displayTotal: {
+      type: Boolean,
+      default: true,
     },
   },
   emits: ['item-click'],
