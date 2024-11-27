@@ -69,7 +69,7 @@ const api = {
     holding.invested = holdingTransactions.reduce(
       (acc, t) =>
         acc +
-        transactionsTransformer.totalValue(t) *
+        transactionsTransformer.fundsValue(t) *
           (transactionsTransformer.isBuy(t) ? 1 : -1),
       0
     );

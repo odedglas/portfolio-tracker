@@ -14,6 +14,7 @@ export const usePortfolioKpis = () => {
     }
 
     const portfolioKpis = portfoliosTransformer.portfolioKPIS(portfolio);
+
     return [
       {
         id: 'balance',
@@ -31,6 +32,11 @@ export const usePortfolioKpis = () => {
         value: portfolioKpis.profit.value ?? 0,
         valuePercentage: portfolioKpis.profit.percentage,
         showValueSign: true,
+        tooltip: {
+          capital: portfolio.capitalGains ?? 0,
+          realized: portfoliosTransformer.realizedGains(portfolio),
+          fees: (portfolio.fees ?? 0) * -1,
+        },
         icon: 'trending_up',
         subtitle: {
           text: 'daily',

@@ -1,5 +1,5 @@
 import * as logger from 'firebase-functions/logger';
-import { Alert } from '../../../shared/types';
+import { Alert, User } from '../../../shared/types';
 import { getCollection, updateDocuments } from '../utils/getCollection';
 import { getTickersQuotes } from '../utils/getTickersQuotes';
 import { sendNotification } from '../utils/notifications';
@@ -18,11 +18,15 @@ const conditionOpposite = (condition: string) => {
 };
 
 export const alertsHandler = async () => {
+  const usersCollection = await getCollection<User>('users');
   const alertsCollection = await getCollection<Alert>('alerts');
 
-  const alerts = alertsCollection.filter(
-    (alert) => alert.active && alert.expiration > Date.now()
-  );
+  const alerts = alertsCollection
+    .filter((alert) => alert.active && alert.expiration > Date.now())
+    .filter((alert) => {
+      const user = usersCollection.find((user) => user.id === alert.owner);
+      return user?.settings.notificationsEnabled ?? false;
+    });
 
   if (!alerts.length) {
     logger.info('No active alerts found');

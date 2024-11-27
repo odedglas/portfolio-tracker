@@ -188,15 +188,39 @@ export type HoldingWithProfits = Holding & {
 
 type InsightType = (typeof INSIGHT_TYPE)[keyof typeof INSIGHT_TYPE];
 
-export type PortfolioInsight = {
+type InsightInputs = {
+  fiftyTwoWeekHigh: number;
+  fiftyTwoWeekHighDelta: number;
+  fiftyTwoWeekLow: number;
+  delta: number;
+  deltaPercent: number;
+  regularMarketPrice: number;
+  twoHundredDayAverage: number;
+  isAbove: boolean;
+  fiftyDayAverage: number;
+  movingAverageDays: 50 | 200;
+  shortRatio: number;
+};
+
+export type PortfolioInsight = Entity & {
+  identifier?: string;
   type: InsightType;
-  inputs: Record<string, string | number | boolean>;
+  inputs: Partial<InsightInputs>;
   tags?: {
     name: string;
     value: number;
     format?: string;
   }[];
+  holdingId: string;
+  portfolioId: string;
+  createdAt?: number;
+  expiredAt?: number;
+  historyInputs?: { date: number; inputs: Partial<InsightInputs> }[];
+};
+
+export type ViewPortfolioInsight = PortfolioInsight & {
   holding: Holding;
+  inactive?: boolean;
 };
 
 export type NotificationType =

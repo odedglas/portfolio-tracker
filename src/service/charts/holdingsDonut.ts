@@ -1,3 +1,4 @@
+import { Platform } from 'quasar';
 import { useHoldingsStore } from 'stores/holdings';
 import { HoldingWithProfits } from 'app/shared/types';
 import { Formatter } from './base';
@@ -8,7 +9,7 @@ type HoldingDataProperty = 'currentValue' | 'invested';
 export const getHoldingsDonutChatOptions = (
   property: HoldingDataProperty = 'currentValue',
   formatter: Formatter,
-  legendPosition = 'left'
+  legendPosition = Platform.is.desktop ? 'right' : 'bottom'
 ) => {
   const holdingsStore = useHoldingsStore();
 
@@ -64,7 +65,7 @@ export const getHoldingsDonutChatOptions = (
           expandOnClick: false,
           customScale: 0.95,
           dataLabels: {
-            offset: 45,
+            offset: Platform.is.desktop ? 55 : 45,
           },
         },
       },

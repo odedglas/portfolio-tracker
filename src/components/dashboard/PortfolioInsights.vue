@@ -1,6 +1,7 @@
 <template>
   <q-card
     flat
+    v-if="insights.length > 0"
     :bordered="appearanceStore.borderedCards"
     class="portfolio-insights q-mt-lg q-pb-none q-pb-md-md"
   >
@@ -32,50 +33,7 @@
           :key="insightKey"
           class="insight-content"
         >
-          <div class="inner q-pa-md flex column q-gap-md">
-            <div class="flex items-center q-gap-sm">
-              <ticker-logo
-                :ticker="insight.holding.ticker"
-                :logo-image="insight.holding.logoImage"
-                :size="36"
-                class="q-mr-xs"
-              />
-              <span class="text-h6 text-capitalize">{{
-                $t(`insights.types.title.${insight.type}`)
-              }}</span>
-            </div>
-            <p
-              class="q-mb-sm"
-              v-html="
-                $t(`insights.types.description.${insight.type}`, {
-                  ...insight.inputs,
-                  name: shortHoldingName(insight.holding.name),
-                  movingAverageDays: insight.inputs.movingAverageDays,
-                  deltaPercent:
-                    typeof insight.inputs.deltaPercent === 'number'
-                      ? $n(insight.inputs.deltaPercent, 'percent')
-                      : 0,
-                  direction: insight.inputs.isAbove ? 'above' : 'below',
-                })
-              "
-            />
-            <div class="flex chips-container">
-              <q-chip
-                v-for="(tag, tagIndex) in insight?.tags"
-                size="sm"
-                outline
-                color="primary"
-                :key="tagIndex"
-              >
-                {{ $t(`insights.tags.${tag.name}`) }}:&nbsp;
-                <b>
-                  {{
-                    $n(Number(tag.value), tag.format ?? 'noneSensitiveDecimal')
-                  }}
-                </b>
-              </q-chip>
-            </div>
-          </div>
+          <insight-item :insight="insight" />
         </swiper-slide>
       </swiper>
     </q-card-section>
@@ -84,26 +42,36 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { useQuasar } from 'quasar';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Pagination } from 'swiper/modules';
-import { useHoldingsStore } from 'stores/holdings';
-import TickerLogo from 'components/common/TickerLogo.vue';
+import { useAppearanceStore } from 'stores/appearance';
+import { useInsightsStore } from 'stores/insights';
 import { shortHoldingName } from 'src/utils';
+import InsightItem from 'components/dashboard/InsightItem.vue';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { useQuasar } from 'quasar';
-import { useAppearanceStore } from 'stores/appearance';
 
 export default defineComponent({
   name: 'PortfolioInsights',
-  components: { Swiper, SwiperSlide, TickerLogo },
+  components: { InsightItem, Swiper, SwiperSlide },
   setup() {
     const $q = useQuasar();
-    const holdingsStore = useHoldingsStore();
+    const insightsStore = useInsightsStore();
     const appearanceStore = useAppearanceStore();
 
-    const insights = computed(() => holdingsStore.insights);
+    const inactiveInsights = computed(() =>
+      [...insightsStore.inactiveInsights].map((insight) => ({
+        ...insight,
+        inactive: true,
+      }))
+    );
+
+    const insights = computed(() => [
+      ...insightsStore.dailyInsights,
+      ...inactiveInsights.value,
+    ]);
 
     const insightsPerPage = computed(() => ($q.platform.is.desktop ? 3 : 1));
 

@@ -54,7 +54,7 @@ export const holdingsTransformer = {
         acc.currentValue += holding.currentValue;
         acc.invested += holding.invested;
         acc.realized += holding.realizedProfits ?? 0;
-        acc.captialGains +=
+        acc.capitalGains +=
           holding.profit.value - (holding.realizedProfits ?? 0);
         acc.dailyChange += holding.dailyChange.value;
         acc.fees += holding?.fees ?? 0;
@@ -67,7 +67,7 @@ export const holdingsTransformer = {
         currentValue: 0,
         invested: 0,
         realized: 0,
-        captialGains: 0,
+        capitalGains: 0,
         dailyChange: 0,
         fees: 0,
       }

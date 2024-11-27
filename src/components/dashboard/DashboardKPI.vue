@@ -3,6 +3,7 @@
     flat
     :bordered="appearanceStore.borderedCards"
     class="dashboard-kpi-card"
+    @mouseleave="delayTooltipHide"
   >
     <q-card-section>
       <div class="row items-center no-wrap">
@@ -12,9 +13,11 @@
         <div class="text-subtitle2 text-grey-9">{{ title }}</div>
       </div>
       <div class="flex items-center q-my-sm text-h4">
-        <span v-if="showValueSign">{{ valueSign }}</span>
-        <span>
-          {{ $n(Math.abs(value), 'decimal') }}
+        <span ref="tooltipRef" @mouseenter="showKPITooltip = true">
+          <span v-if="showValueSign">{{ valueSign }}</span>
+          <span>
+            {{ $n(Math.abs(value), 'decimal') }}
+          </span>
         </span>
         <profit-indicator
           v-if="valuePercentage"
@@ -36,12 +39,33 @@
           {{ subtitle.text }}
         </span>
       </div>
+      <q-menu
+        anchor="bottom left"
+        class="text-caption"
+        v-if="tooltipRef && !!tooltip"
+        @mouseenter.capture="() => {}"
+        :target="tooltipRef"
+        v-model="showKPITooltip"
+      >
+        <q-item
+          v-for="[name, value] in Object.entries(tooltip)"
+          :key="name"
+          style="min-height: 16px"
+        >
+          <q-item-section class="text-weight-medium"
+            >{{ $t(name) }}:</q-item-section
+          >
+          <q-item-section side>
+            <profit-indicator :value="value" show-value-sign />
+          </q-item-section>
+        </q-item>
+      </q-menu>
     </q-card-section>
   </q-card>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType, Ref, ref } from 'vue';
 import ProfitIndicator from 'components/common/ProfitIndicator.vue';
 import { useAppearanceStore } from 'stores/appearance';
 
@@ -71,6 +95,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    tooltip: {
+      type: Object as PropType<Record<string, number | undefined>>,
+      required: false,
+    },
     subtitle: {
       type: Object as PropType<{
         text: string;
@@ -82,12 +110,23 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const tooltipRef: Ref<Element | null> = ref(null);
+    const showKPITooltip = ref(false);
     const appearanceStore = useAppearanceStore();
     const valueSign = computed(() => (props.value >= 0 ? '+' : '-'));
+
+    const delayTooltipHide = () => {
+      setTimeout(() => {
+        showKPITooltip.value = false;
+      }, 200);
+    };
 
     return {
       valueSign,
       appearanceStore,
+      tooltipRef,
+      showKPITooltip,
+      delayTooltipHide,
     };
   },
 });

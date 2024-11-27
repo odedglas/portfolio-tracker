@@ -33,6 +33,7 @@ export const getCollections = () => ({
   user: createCollection('users'),
   notifications: createCollection('notifications'),
   alerts: createCollection('alerts'),
+  insights: createCollection('insights'),
 });
 
 /**
@@ -86,6 +87,20 @@ export const queries = {
     );
 
     return firestoreAPI.getAll(holdingsQuery);
+  },
+  listPortfolioInsights: async (portfoliosIds: string[]) => {
+    if (!portfoliosIds.length) {
+      return [];
+    }
+
+    const insightsCollection = getCollections().insights;
+
+    const insightsQuery = query(
+      insightsCollection,
+      where('portfolioId', 'in', portfoliosIds)
+    );
+
+    return firestoreAPI.getAll(insightsQuery);
   },
   getPortfolioHistory: async (portfolioId: string) => {
     const historyCollection = getCollections().portfolioHistory;

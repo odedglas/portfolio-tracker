@@ -201,6 +201,8 @@ export default defineComponent({
 
     const { viewTransactions } = useViewTransactions();
 
+    console.log(viewTransactions);
+
     const totalProfit = computed(() =>
       viewTransactions.value.reduce((acc, transaction) => {
         const profitValue = transaction.profit.value ?? 0;
