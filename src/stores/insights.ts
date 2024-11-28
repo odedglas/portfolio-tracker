@@ -91,5 +91,12 @@ export const useInsightsStore = defineStore('insights', {
     async listInsights(portfolioIds: string[]) {
       this.storedInsights = await insightsAPI.list(portfolioIds);
     },
+    async removeInsight(id: string) {
+      await insightsAPI.remove(id);
+
+      this.storedInsights = this.storedInsights.filter(
+        (insight) => insight.id !== id
+      );
+    },
   },
 });

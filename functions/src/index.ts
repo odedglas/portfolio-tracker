@@ -81,18 +81,18 @@ export const notificationsScheduler = onSchedule(
       return;
     }
 
+    const schedulerContext = {
+      ...(await getPortfoliosContext()),
+      dryRun: false,
+    };
+
     try {
-      await alertsHandler();
+      await alertsHandler(schedulerContext.tickerQuotes);
     } catch (error: unknown) {
       logger.error('Alerts handler failed', error);
     }
 
     try {
-      const schedulerContext = {
-        ...(await getPortfoliosContext()),
-        dryRun: false,
-      };
-
       await insightsGenerator(schedulerContext);
     } catch (error: unknown) {
       logger.error('Insights generator failed', error);

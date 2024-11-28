@@ -94,6 +94,7 @@ export default defineComponent({
 <style lang="scss">
 .insight-content {
   .inner {
+    position: relative;
     border: 1px solid $grey-5;
   }
 
