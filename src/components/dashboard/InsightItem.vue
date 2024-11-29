@@ -10,7 +10,7 @@
       @click="removeInsight"
     >
       <q-icon name="close" color="grey-9" size="xs">
-        <q-tooltip>Delete insight</q-tooltip>
+        <q-tooltip>Hide insight</q-tooltip>
       </q-icon>
     </div>
     <div class="flex q-gap-md q-px-md">
@@ -37,11 +37,20 @@
       </div>
       <insight-item-text :insight="insight" />
     </div>
-    <i class="text-subtitle2 text-grey-8 q-px-md">
-      <q-icon name="schedule" class="q-mr-xs" />
-      Created at {{ formatNotificationDate(insight.createdAt ?? 0) }} | Price:
-      {{ $n(insight.inputs.regularMarketPrice ?? 0, 'noneSensitiveDecimal') }}
-    </i>
+    <div class="flex justify-between">
+      <i class="text-subtitle2 text-grey-8 q-px-md flex items-center">
+        <q-icon name="schedule" class="q-mr-xs" />
+        Created at {{ formatNotificationDate(insight.createdAt ?? 0) }} | Price:
+        {{ $n(insight.inputs.regularMarketPrice ?? 0, 'noneSensitiveDecimal') }}
+      </i>
+      <span class="q-px-md cursor-pointer">
+        <q-icon name="timeline" size="sm" color="grey-7">
+          <q-menu class="q-pa-lg" anchor="top left" self="bottom middle">
+            Gello
+          </q-menu>
+        </q-icon>
+      </span>
+    </div>
     <q-separator />
     <div class="flex chips-container q-px-md q-pb-xs">
       <q-chip

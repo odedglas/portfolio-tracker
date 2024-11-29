@@ -19,6 +19,7 @@ export const manualPortfolioTracker = onRequest(
       dryRun: request.query.dryRun ? request.query.dryRun === 'true' : true,
     };
 
+    await portfolioHistoryTracker(schedulerContext);
     await insightsGenerator(schedulerContext);
 
     response.send({ success: true });
@@ -71,7 +72,7 @@ export const portfolioScheduler = onSchedule(
 
 export const notificationsScheduler = onSchedule(
   {
-    secrets: ['ALERTS_RAPID_API_KEY'],
+    secrets: ['RAPID_YAHOO_API_KEY', 'ALERTS_RAPID_API_KEY'],
     timeZone: 'America/New_York',
     schedule: 'every 30 minutes from 09:30 to 16:00',
   },
@@ -80,6 +81,9 @@ export const notificationsScheduler = onSchedule(
       logger.info('Skipping insights generation, not a trading day');
       return;
     }
+
+    // Overrides API key into dedicated notifications scheduler API one.
+    process.env.RAPID_YAHOO_API_KEY = process.env.ALERTS_RAPID_API_KEY;
 
     const schedulerContext = {
       ...(await getPortfoliosContext()),
