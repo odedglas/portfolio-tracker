@@ -34,8 +34,6 @@ const getRequest = async <Resolved>(
     ...(httpsAgent && { httpsAgent }),
   });
 
-  console.log('***************** Request was done with : ', buildHeaders());
-
   return data;
 };
 

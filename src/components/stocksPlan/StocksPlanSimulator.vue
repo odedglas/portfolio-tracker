@@ -262,6 +262,11 @@ type SimulatorResults = Record<
 export default defineComponent({
   name: 'StocksPlanSimulator',
   components: { DynamicImage, TickerLogo },
+  methods: {
+    test() {
+      console.log('tested');
+    },
+  },
   props: {
     plans: {
       type: Array as PropType<StocksPlan[]>,

@@ -43,11 +43,18 @@
         Created at {{ formatNotificationDate(insight.createdAt ?? 0) }} | Price:
         {{ $n(insight.inputs.regularMarketPrice ?? 0, 'noneSensitiveDecimal') }}
       </i>
-      <span class="q-px-md cursor-pointer">
-        <q-icon name="timeline" size="sm" color="grey-7">
-          <q-menu class="q-pa-lg" anchor="top left" self="bottom middle">
-            Gello
-          </q-menu>
+      <span class="q-px-md cursor-pointer" v-if="showInsightHistoryGraph">
+        <q-icon
+          name="timeline"
+          size="sm"
+          color="grey-7"
+          @click="insightMenuOpen = !insightMenuOpen"
+        >
+          <insight-menu
+            :show="insightMenuOpen"
+            :insight="insight"
+            @close="insightMenuOpen = false"
+          />
         </q-icon>
       </span>
     </div>
@@ -69,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 import TickerLogo from 'components/common/TickerLogo.vue';
 import { ViewPortfolioInsight } from 'app/shared/types';
 import { daysAgo, formatNotificationDate, isToday } from 'src/service/date';
@@ -77,6 +84,9 @@ import { shortHoldingName } from 'src/utils';
 import InsightItemText from 'components/dashboard/InsightItemText.vue';
 import { useInsightsStore } from 'stores/insights';
 import { useAreYouSure } from 'components/composables/useAreYouSureDialog';
+import InsightMenu from 'components/dashboard/InsightMenu.vue';
+
+const MIN_GRAPH_INPUTS = 0;
 
 export default defineComponent({
   name: 'InsightItem',
@@ -87,14 +97,20 @@ export default defineComponent({
     },
   },
   components: {
+    InsightMenu,
     InsightItemText,
     TickerLogo,
   },
   setup(props) {
     const closeMenuOpen = ref(false);
+    const insightMenuOpen = ref(false);
 
     const insightsStore = useInsightsStore();
     const { showAreYouSure } = useAreYouSure();
+
+    const showInsightHistoryGraph = computed(
+      () => (props.insight?.historyInputs?.length ?? 0) >= MIN_GRAPH_INPUTS
+    );
 
     const getInsightDateBadge = (insight: ViewPortfolioInsight) => {
       const { createdAt = Date.now(), expiredAt, inactive } = insight;
@@ -124,6 +140,8 @@ export default defineComponent({
 
     return {
       closeMenuOpen,
+      insightMenuOpen,
+      showInsightHistoryGraph,
       getInsightDateBadge,
       shortHoldingName,
       formatNotificationDate,

@@ -5,10 +5,11 @@
     </q-card-section>
 
     <q-card-section class="q-pt-none">
-      <stocks-plans-list
+      `<stocks-plans-list
         :plans="plans"
         @delete-plan="(plan) => $emit('delete-plan', plan)"
         @edit-plan="(plan) => $emit('edit-plan', plan)"
+        @simulate-plan="(plan) => $emit('simulate-plan', plan)"
       />
     </q-card-section>
   </q-card>
@@ -23,7 +24,7 @@ import StocksPlansGroupHeader from 'components/stocksPlan/StocksPlansGroupHeader
 export default defineComponent({
   name: 'StocksPlansGroupDetails',
   components: { StocksPlansGroupHeader, StocksPlansList },
-  emits: ['delete-plan', 'edit-plan'],
+  emits: ['delete-plan', 'edit-plan', 'simulate-plan'],
   props: {
     plans: {
       type: Object as PropType<StocksPlan[]>,
