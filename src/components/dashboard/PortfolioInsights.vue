@@ -66,10 +66,11 @@ export default defineComponent({
       }))
     );
 
-    const insights = computed(() => [
-      ...insightsStore.dailyInsights,
-      ...inactiveInsights.value,
-    ]);
+    const insights = computed(() => {
+      console.log([...insightsStore.dailyInsights, ...inactiveInsights.value]);
+
+      return [...insightsStore.dailyInsights, ...inactiveInsights.value];
+    });
 
     const insightsPerPage = computed(() => ($q.platform.is.desktop ? 3 : 1));
 

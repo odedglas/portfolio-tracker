@@ -9,7 +9,7 @@
       :class="`floating-close-menu ${closeMenuOpen ? 'open' : 'closed'}`"
       @click="removeInsight"
     >
-      <q-icon name="close" color="grey-9" size="xs">
+      <q-icon name="close" color="red-5" size="xs">
         <q-tooltip>Hide insight</q-tooltip>
       </q-icon>
     </div>
@@ -155,18 +155,18 @@ export default defineComponent({
 .floating-close-menu {
   position: absolute;
   transition: all 0.2s;
-  right: 8px;
+  right: 4px;
   cursor: pointer;
   z-index: 9999;
 
   &.closed {
-    bottom: 0;
+    top: -20px;
     opacity: 0;
     pointer-events: none;
   }
 
   &.open {
-    bottom: 20px;
+    top: 5px;
     opacity: 1;
     pointer-events: all;
   }

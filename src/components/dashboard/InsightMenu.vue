@@ -47,8 +47,9 @@ export default defineComponent({
 
     const triggerPrice = 135.26;
 
+    // TODO - Migrate this truly to insight inputs once data is gathered.
     const dates = buildDateRangeFromToday(11);
-    const values = [100, 149, 138.32, 136, 133, 105, 131, 133, 135, 132, 187];
+    const values = [100, 179, 168.32, 156, 133, 105, 131, 133, 157, 144, 187];
 
     const chartData = insightSparklineChartData({
       insight: {

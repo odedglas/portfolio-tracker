@@ -24,8 +24,8 @@ export const insightSparklineChartData = (options: InsightSparklineOptions) => {
     ],
     chart: {
       type: 'line',
-      width: 200,
-      height: 36,
+      width: 260,
+      height: 66,
       sparkline: {
         enabled: true,
       },
@@ -41,15 +41,22 @@ export const insightSparklineChartData = (options: InsightSparklineOptions) => {
           borderColor: '#c2c2c2',
           fillColor: '#c2c2c2',
           yAxisIndex: 0,
+          opacity: 0.3,
           label: {
-            borderColor: 'white',
-            text: 'Trigger Price',
+            borderColor: 'transparent',
+            offsetY: 30,
+            text: `Triggered: ${formatter(triggerPrice, 'decimal')}`,
+            style: {
+              background: 'transparent',
+            },
           },
         },
       ],
     },
+    colors: ['#a21c48'],
     stroke: {
       width: 2,
+      colors: ['#a21c48'],
     },
     tooltip: {
       fixed: {

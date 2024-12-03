@@ -38,6 +38,7 @@ export const useInsightsStore = defineStore('insights', {
               ...(storedInsight && {
                 expiredAt: storedInsight.expiredAt,
                 createdAt: storedInsight.createdAt,
+                historyInputs: storedInsight.historyInputs,
               }),
               holding,
             };
