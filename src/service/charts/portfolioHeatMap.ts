@@ -1,3 +1,4 @@
+import { Platform } from 'quasar';
 import { useHoldingsStore } from 'stores/holdings';
 import { Formatter } from './base';
 import { FONT_FAMILY } from './constants';
@@ -29,7 +30,7 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
       },
       chart: {
         type: 'treemap',
-        width: 375,
+        width: Platform.is.desktop ? 445 : 375,
         height: 400,
         toolbar: {
           show: false,
@@ -73,18 +74,28 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
               },
               {
                 from: 0,
-                to: 3,
+                to: 7,
                 color: 'rgba(46, 169, 161, 0.55)',
               },
               {
-                from: 3,
-                to: 6,
+                from: 7,
+                to: 15,
                 color: 'rgb(27, 197, 189)',
               },
               {
-                from: 6,
-                to: 100,
+                from: 15,
+                to: 60,
                 color: 'rgb(46, 169, 161)',
+              },
+              {
+                from: 60,
+                to: 100,
+                color: 'rgb(36,136,129)',
+              },
+              {
+                from: 100,
+                to: 1000,
+                color: 'rgb(60,108,107)',
               },
             ],
           },

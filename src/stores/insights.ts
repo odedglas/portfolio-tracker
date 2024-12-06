@@ -1,3 +1,4 @@
+import groupBy from 'lodash/groupBy';
 import { defineStore } from 'pinia';
 import { PortfolioInsight, ViewPortfolioInsight } from 'app/shared/types';
 import insightsAPI from 'src/service/insights';
@@ -38,6 +39,7 @@ export const useInsightsStore = defineStore('insights', {
               ...(storedInsight && {
                 expiredAt: storedInsight.expiredAt,
                 createdAt: storedInsight.createdAt,
+                historyInputs: storedInsight.historyInputs,
               }),
               holding,
             };
@@ -54,6 +56,12 @@ export const useInsightsStore = defineStore('insights', {
 
       const dailyInsightsIdentifiers = this.dailyInsights.map(
         (insight) => insight.identifier
+      );
+
+      console.log(
+        'All stores insights',
+        groupBy(state.storedInsights, 'portfolioId'),
+        this.dailyInsights
       );
 
       return state.storedInsights
@@ -80,7 +88,7 @@ export const useInsightsStore = defineStore('insights', {
           return {
             ...insight,
             holding,
-            // Override tags with latest value calculations
+            // Override tags with latest quote calculations
             tags,
           };
         })
@@ -90,6 +98,13 @@ export const useInsightsStore = defineStore('insights', {
   actions: {
     async listInsights(portfolioIds: string[]) {
       this.storedInsights = await insightsAPI.list(portfolioIds);
+    },
+    async removeInsight(id: string) {
+      await insightsAPI.remove(id);
+
+      this.storedInsights = this.storedInsights.filter(
+        (insight) => insight.id !== id
+      );
     },
   },
 });

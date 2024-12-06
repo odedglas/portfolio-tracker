@@ -24,8 +24,6 @@
         :vertical="true"
         class="insights-swiper-wrapper"
         wrapper-class="q-pb-xl"
-        @touchstart="(e:Event) => e.stopImmediatePropagation()"
-        @touchend="(e:Event) => e.stopImmediatePropagation()"
         :space-between="16"
       >
         <swiper-slide
@@ -94,6 +92,7 @@ export default defineComponent({
 <style lang="scss">
 .insight-content {
   .inner {
+    position: relative;
     border: 1px solid $grey-5;
   }
 

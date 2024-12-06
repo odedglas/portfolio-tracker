@@ -8,6 +8,16 @@ import {
 } from './utils/getCollection';
 import { PortfolioInsight } from '../../shared/types';
 
+const ONE_DAY_MS = 1000 * 60 * 60 * 24;
+
+const isInsightExpired = ({ expiredAt }: PortfolioInsight) => {
+  if (!expiredAt) {
+    return false;
+  }
+
+  return Date.now() - expiredAt > ONE_DAY_MS; // Rather insight was expired more than 24 hours ago.
+};
+
 const classifyInsights = (
   persistedInsights: PortfolioInsight[],
   dailyInsights: PortfolioInsight[]
@@ -47,7 +57,7 @@ const classifyInsights = (
 export const insightsGenerator = async (
   context: PortfoliosSchedulerContext
 ) => {
-  const { portfolioHoldings, tickerQuotesMap, dryRun } = context;
+  const { holdings, portfolioHoldings, tickerQuotesMap, dryRun } = context;
 
   const now = Date.now();
   logger.info('Insights Generator Start', {
@@ -56,7 +66,7 @@ export const insightsGenerator = async (
   });
 
   const persistedInsights = (await getCollection<PortfolioInsight>('insights'))
-    .filter((insight) => !insight.expiredAt)
+    .filter(isInsightExpired)
     .map((insight) => ({
       ...insight,
       holding: portfolioHoldings[insight.holdingId],
@@ -95,10 +105,36 @@ export const insightsGenerator = async (
     deactivatedInsights: deactivatedInsights.map((insight) => insight.id),
   });
   if (!dryRun) {
-    const updated = deactivatedInsights.map((insight) => ({
-      id: insight.id,
-      expiredAt: Date.now(),
-    }));
+    const updated = deactivatedInsights.map((insight) => {
+      const holding = holdings.find(
+        (holding) => holding.id === insight.holdingId
+      );
+
+      if (!holding) {
+        logger.error('Holding not found', { holdingId: insight.holdingId });
+        throw new Error('Holding not found');
+      }
+
+      const {
+        regularMarketPrice = 0,
+        fiftyDayAverage = 0,
+        twoHundredDayAverage = 0,
+      } = tickerQuotesMap[holding.ticker] ?? {};
+
+      return {
+        id: insight.id,
+        expiredAt: insight.expiredAt ?? Date.now(),
+        historyInputs: [
+          ...(insight?.historyInputs ?? []),
+          {
+            date: Date.now(),
+            inputs: [
+              { regularMarketPrice, fiftyDayAverage, twoHundredDayAverage },
+            ],
+          },
+        ],
+      };
+    });
 
     await updateDocuments('insights', updated);
   }

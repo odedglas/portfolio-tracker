@@ -10,8 +10,8 @@
     </q-card-section>
     <q-card-section class="q-py-none q-px-none q-px-md-sm">
       <apexchart
-        width="375"
-        height="400"
+        :width="chartData.options.chart.width"
+        :height="chartData.options.chart.height"
         :options="chartData.options"
         :series="chartData.series"
         class="holdings-heat-map"

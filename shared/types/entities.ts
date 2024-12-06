@@ -186,7 +186,7 @@ export type HoldingWithProfits = Holding & {
   };
 };
 
-type InsightType = (typeof INSIGHT_TYPE)[keyof typeof INSIGHT_TYPE];
+export type InsightType = (typeof INSIGHT_TYPE)[keyof typeof INSIGHT_TYPE];
 
 type InsightInputs = {
   fiftyTwoWeekHigh: number;

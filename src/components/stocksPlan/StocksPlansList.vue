@@ -70,6 +70,16 @@
                 flat
                 dense
                 round
+                :disable="props.row.availableShares === 0"
+                icon="calculate"
+                @click.stop="() => $emit('simulate-plan', props.row)"
+              />
+              <q-btn
+                class="gt-xs"
+                size="12px"
+                flat
+                dense
+                round
                 icon="edit"
                 @click.stop="() => $emit('edit-plan', props.row)"
               />
@@ -105,7 +115,7 @@ import StocksPlanExtendedDetails from 'components/stocksPlan/StocksPlanExtendedD
 export default defineComponent({
   name: 'StocksPlansList',
   components: { StocksPlanExtendedDetails },
-  emits: ['delete-plan', 'edit-plan'],
+  emits: ['delete-plan', 'edit-plan', 'simulate-plan'],
   props: {
     plans: {
       type: Object as PropType<StocksPlan[]>,

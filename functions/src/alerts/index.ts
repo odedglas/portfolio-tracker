@@ -1,7 +1,6 @@
 import * as logger from 'firebase-functions/logger';
-import { Alert, User } from '../../../shared/types';
+import { Alert, Quote, User } from '../../../shared/types';
 import { getCollection, updateDocuments } from '../utils/getCollection';
-import { getTickersQuotes } from '../utils/getTickersQuotes';
 import { sendNotification } from '../utils/notifications';
 import notificationsFactory from './factory';
 
@@ -17,7 +16,7 @@ const conditionOpposite = (condition: string) => {
   return condition === 'gt' ? 'lt' : 'gt';
 };
 
-export const alertsHandler = async () => {
+export const alertsHandler = async (tickerQuotes: Quote[]) => {
   const usersCollection = await getCollection<User>('users');
   const alertsCollection = await getCollection<Alert>('alerts');
 
@@ -34,10 +33,6 @@ export const alertsHandler = async () => {
   }
 
   logger.info(`Alerts Handler Start, processing ${alerts.length} alerts`);
-
-  const tickerQuotes = await getTickersQuotes(
-    Array.from(new Set(alerts.map((alert) => alert.ticker)))
-  );
 
   const updatedAlerts = alerts
     .map((alert) => {

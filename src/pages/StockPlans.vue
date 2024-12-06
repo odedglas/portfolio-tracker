@@ -23,6 +23,7 @@
           v-for="(plans, index) in stocksPlansGroups"
           @delete-plan="deleteEntity"
           @edit-plan="openEntityModal"
+          @simulate-plan="simulateStocksPlan"
           :key="index"
           :plans="plans"
         />
@@ -40,12 +41,15 @@
       :plan="editEntity"
     />
 
-    <stocks-plan-simulator :plans="stocksPlansStore.stocksPlans" />
+    <stocks-plan-simulator
+      ref="simulatorRef"
+      :plans="stocksPlansStore.stocksPlans"
+    />
   </q-page>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import groupBy from 'lodash/groupBy';
 import StocksPlansGroupDetails from 'components/stocksPlan/StocksPlansGroupDetails.vue';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
@@ -62,6 +66,9 @@ export default defineComponent({
     StocksPlansGroupDetails,
   },
   setup() {
+    const simulatorRef = ref<InstanceType<typeof StocksPlanSimulator> | null>(
+      null
+    );
     const stocksPlansStore = useStocksPlansStore();
 
     const {
@@ -79,6 +86,15 @@ export default defineComponent({
       },
     });
 
+    const simulateStocksPlan = (plan: StocksPlan) => {
+      if (!simulatorRef.value) {
+        return;
+      }
+
+      simulatorRef.value.selectedEntry = plan;
+      simulatorRef.value.showSimulator = true;
+    };
+
     const stocksPlansGroups = computed(() =>
       groupBy(stocksPlansStore.stocksPlans, 'ticker')
     );
@@ -91,6 +107,8 @@ export default defineComponent({
       deleteEntity,
       hideEntityModal,
       stocksPlansGroups,
+      simulateStocksPlan,
+      simulatorRef,
     };
   },
 });

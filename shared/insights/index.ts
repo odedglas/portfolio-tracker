@@ -1,5 +1,10 @@
 import { INSIGHT_TYPE } from '../constants';
-import { Holding, Quote, PortfolioInsight } from '../types';
+import {
+  Holding,
+  Quote,
+  PortfolioInsight,
+  ViewPortfolioInsight,
+} from '../types';
 
 type CalculateInsightOptions = {
   holding: Holding;
@@ -214,10 +219,12 @@ export const calculateInsights = (
     })
     .filter(Boolean) as PortfolioInsight[];
 
-export const calculateInsightTags = (
-  insight: PortfolioInsight,
-  quote: Quote
-): InsightTag[] =>
+export const calculateInsight = (insight: ViewPortfolioInsight, quote: Quote) =>
+  insightsCalculators
+    .find((calculator) => calculator.type === insight.type)
+    ?.getInsight({ quote, holding: insight.holding });
+
+export const calculateInsightTags = (insight: PortfolioInsight, quote: Quote) =>
   insightsCalculators
     .find((calculator) => calculator.type === insight.type)
     ?.getTags({ quote }) ?? [];
