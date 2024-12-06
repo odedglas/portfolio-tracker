@@ -3,8 +3,9 @@ import {
   Holding,
   Quote,
   PortfolioInsight,
-  ViewPortfolioInsight,
 } from '../types';
+
+const MOVING_AVERAGE_THRESHOLD = 0.025;
 
 type CalculateInsightOptions = {
   holding: Holding;
@@ -25,6 +26,8 @@ type InsightCalculator = {
     | Omit<PortfolioInsight, 'portfolioId' | 'id' | 'holdingId' | 'type'>
     | undefined;
 
+  getInputs: (options: CalculateInsightOptions) => PortfolioInsight['inputs'];
+
   getTags: (options: CalculateTagsOptions) => InsightTag[];
 };
 
@@ -33,10 +36,10 @@ const baseTags = (options: CalculateTagsOptions, tags: InsightTag[]) => [
   ...tags,
 ];
 
-const fiftyTwoWeekHighInsightCalculator = {
+const fiftyTwoWeekHighInsightCalculator: InsightCalculator = {
   type: INSIGHT_TYPE.BELOW_52_WEEK_HIGH,
 
-  getInsight: (options: CalculateInsightOptions) => {
+  getInsight: (options) => {
     const { quote } = options;
     const {
       fiftyTwoWeekHigh,
@@ -58,25 +61,38 @@ const fiftyTwoWeekHighInsightCalculator = {
       return undefined;
     }
 
-    const fiftyTwoWeekHighDelta = fiftyTwoWeekHigh - regularMarketPrice;
-    const deltaPercent = fiftyTwoWeekHighDelta / fiftyTwoWeekHigh;
+    const inputs = fiftyTwoWeekHighInsightCalculator.getInputs(options);
+    const { deltaPercent = 0} = inputs;
 
     if (deltaPercent < 0.15 || deltaPercent >= 0.35) {
       return undefined;
     }
 
     return {
-      inputs: {
-        fiftyTwoWeekHigh,
-        fiftyTwoWeekHighDelta,
-        deltaPercent,
-        regularMarketPrice,
-        twoHundredDayAverage,
-      },
+      inputs
     };
   },
 
-  getTags: ({ quote }: CalculateTagsOptions) => {
+  getInputs({ quote }) {
+    const {
+      fiftyTwoWeekHigh,
+      regularMarketPrice,
+      twoHundredDayAverage,
+    } = quote;
+
+    const fiftyTwoWeekHighDelta = fiftyTwoWeekHigh - regularMarketPrice;
+    const deltaPercent = fiftyTwoWeekHighDelta / fiftyTwoWeekHigh;
+
+    return {
+      fiftyTwoWeekHigh,
+      fiftyTwoWeekHighDelta,
+      deltaPercent,
+      regularMarketPrice,
+      twoHundredDayAverage,
+    };
+  },
+
+  getTags: ({ quote }) => {
     const { fiftyTwoWeekHigh, twoHundredDayAverage } = quote;
     return baseTags({ quote }, [
       { name: 'fiftyTwoWeekHigh', value: fiftyTwoWeekHigh },
@@ -85,15 +101,12 @@ const fiftyTwoWeekHighInsightCalculator = {
   },
 };
 
-const fiftyTwoWeekLowInsightCalculator = {
+const fiftyTwoWeekLowInsightCalculator: InsightCalculator = {
   type: INSIGHT_TYPE.NEAR_52_WEEK_LOW,
 
-  getInsight: (options: CalculateInsightOptions) => {
-    const { quote } = options;
-    const { fiftyTwoWeekLow, regularMarketPrice } = quote;
-
-    const delta = regularMarketPrice - fiftyTwoWeekLow;
-    const deltaPercent = delta / fiftyTwoWeekLow;
+  getInsight: (options) => {
+    const inputs = fiftyTwoWeekLowInsightCalculator.getInputs(options);
+    const { deltaPercent = 0 } = inputs;
 
     if (deltaPercent > 0.05) {
       // Price is more than 5% above 52 week low
@@ -101,16 +114,25 @@ const fiftyTwoWeekLowInsightCalculator = {
     }
 
     return {
-      inputs: {
-        fiftyTwoWeekLow,
-        delta,
-        deltaPercent,
-        regularMarketPrice,
-      },
+      inputs
     };
   },
 
-  getTags: ({ quote }: CalculateTagsOptions) => {
+  getInputs({ quote }) {
+    const { fiftyTwoWeekLow, regularMarketPrice } = quote;
+
+    const delta = regularMarketPrice - fiftyTwoWeekLow;
+    const deltaPercent = delta / fiftyTwoWeekLow;
+
+    return {
+      fiftyTwoWeekLow,
+      delta,
+      deltaPercent,
+      regularMarketPrice,
+    };
+  },
+
+  getTags: ({ quote }) => {
     const { fiftyTwoWeekLow } = quote;
     return baseTags({ quote }, [
       { name: 'fiftyTwoWeekLow', value: fiftyTwoWeekLow },
@@ -118,60 +140,43 @@ const fiftyTwoWeekLowInsightCalculator = {
   },
 };
 
-const MOVING_AVERAGE_THRESHOLD = 0.025;
-
-const movingAveragesInsightCalculator = {
-  type: INSIGHT_TYPE.NEAR_MOVING_AVERAGES,
+const moving200AveragesInsightCalculator: InsightCalculator = {
+  type: INSIGHT_TYPE.NEAR_MOVING_200_AVERAGES,
 
   getInsight: (
-    options: CalculateInsightOptions
-  ):
-    | Omit<PortfolioInsight, 'portfolioId' | 'id' | 'holdingId' | 'type'>
-    | undefined => {
-    const { quote } = options;
+    options
+  )=> {
+    const inputs = moving200AveragesInsightCalculator.getInputs(options);
 
-    const { regularMarketPrice, fiftyDayAverage, twoHundredDayAverage } = quote;
-
-    const twoHundredDayDelta = regularMarketPrice - twoHundredDayAverage;
-    const twoHundredDayDeltaPercent = twoHundredDayDelta / twoHundredDayAverage;
+    const { deltaPercent = 0 } = inputs;
 
     if (
-      twoHundredDayDeltaPercent <= MOVING_AVERAGE_THRESHOLD &&
-      twoHundredDayDeltaPercent >= -MOVING_AVERAGE_THRESHOLD
+      deltaPercent <= MOVING_AVERAGE_THRESHOLD &&
+      deltaPercent >= -MOVING_AVERAGE_THRESHOLD
     ) {
-      return {
-        inputs: {
-          regularMarketPrice,
-          twoHundredDayAverage,
-          deltaPercent: twoHundredDayDeltaPercent,
-          isAbove: twoHundredDayDelta > 0,
-          movingAverageDays: 200,
-        },
-      };
-    }
-
-    const fiftyDayDelta = regularMarketPrice - fiftyDayAverage;
-    const fiftyDayDeltaPercent = fiftyDayDelta / fiftyDayAverage;
-
-    if (
-      fiftyDayDeltaPercent <= MOVING_AVERAGE_THRESHOLD &&
-      fiftyDayDeltaPercent >= -MOVING_AVERAGE_THRESHOLD
-    ) {
-      return {
-        inputs: {
-          regularMarketPrice,
-          isAbove: fiftyDayDelta > 0,
-          fiftyDayAverage,
-          deltaPercent: fiftyDayDeltaPercent,
-          movingAverageDays: 50,
-        },
-      };
+      return { inputs };
     }
 
     return undefined;
   },
 
-  getTags: ({ quote }: CalculateTagsOptions) => {
+  getInputs: ({ quote }) => {
+    const { regularMarketPrice, twoHundredDayAverage, fiftyDayAverage } = quote;
+
+    const twoHundredDayDelta = regularMarketPrice - twoHundredDayAverage;
+    const twoHundredDayDeltaPercent = twoHundredDayDelta / twoHundredDayAverage;
+
+    return {
+      regularMarketPrice,
+      twoHundredDayAverage,
+      fiftyDayAverage,
+      deltaPercent: twoHundredDayDeltaPercent,
+      isAbove: twoHundredDayDelta > 0,
+      movingAverageDays: 200,
+    }
+  },
+
+  getTags: ({ quote }) => {
     const { twoHundredDayAverage, fiftyDayAverage } = quote;
     return baseTags({ quote }, [
       { name: 'twoHundredDayAverage', value: twoHundredDayAverage },
@@ -180,10 +185,50 @@ const movingAveragesInsightCalculator = {
   },
 };
 
+const moving50AveragesInsightCalculator: InsightCalculator = {
+  type: INSIGHT_TYPE.NEAR_MOVING_50_AVERAGES,
+
+  getInsight: (
+    options
+  )=> {
+    const inputs = moving200AveragesInsightCalculator.getInputs(options);
+
+    const { deltaPercent = 0 } = inputs;
+
+    if (
+      deltaPercent <= MOVING_AVERAGE_THRESHOLD &&
+      deltaPercent >= -MOVING_AVERAGE_THRESHOLD
+    ) {
+      return { inputs };
+    }
+
+    return undefined;
+  },
+
+  getInputs: ({ quote }) => {
+    const { regularMarketPrice, twoHundredDayAverage, fiftyDayAverage } = quote;
+
+    const fiftyDayDelta = regularMarketPrice - fiftyDayAverage;
+    const fiftyDayDeltaPercent = fiftyDayDelta / fiftyDayAverage;
+
+    return {
+      regularMarketPrice,
+      fiftyDayAverage,
+      twoHundredDayAverage,
+      deltaPercent: fiftyDayDeltaPercent,
+      isAbove: fiftyDayDeltaPercent > 0,
+      movingAverageDays: 50,
+    }
+  },
+
+  getTags: moving200AveragesInsightCalculator.getTags
+};
+
 const insightsCalculators: InsightCalculator[] = [
   fiftyTwoWeekHighInsightCalculator,
   fiftyTwoWeekLowInsightCalculator,
-  movingAveragesInsightCalculator,
+  moving200AveragesInsightCalculator,
+  moving50AveragesInsightCalculator,
 ];
 
 type InsightKey = { holdingId: string; portfolioId: string; type: string };
@@ -218,11 +263,6 @@ export const calculateInsights = (
       };
     })
     .filter(Boolean) as PortfolioInsight[];
-
-export const calculateInsight = (insight: ViewPortfolioInsight, quote: Quote) =>
-  insightsCalculators
-    .find((calculator) => calculator.type === insight.type)
-    ?.getInsight({ quote, holding: insight.holding });
 
 export const calculateInsightTags = (insight: PortfolioInsight, quote: Quote) =>
   insightsCalculators

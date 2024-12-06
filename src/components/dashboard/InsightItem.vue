@@ -28,12 +28,15 @@
         </div>
         <q-chip
           class="text-caption text-grey-8"
-          :label="getInsightDateBadge(insight)"
+          :label="getInsightDateBadge(insight).text"
           dense
           outline
           square
-          color="orange"
-        />
+          color="orange">
+          <q-tooltip v-if="getInsightDateBadge(insight).tooltip">
+            {{ getInsightDateBadge(insight).tooltip }}
+          </q-tooltip>
+        </q-chip>
       </div>
       <insight-item-text :insight="insight" />
     </div>
@@ -116,18 +119,29 @@ export default defineComponent({
       const { createdAt = Date.now(), expiredAt, inactive } = insight;
 
       if (expiredAt) {
-        return `Expired ${daysAgo(expiredAt)}`;
+        return {
+          text: `Expired ${daysAgo(expiredAt)}`,
+          tooltip: `Expired at ${formatNotificationDate(expiredAt)}`,
+        };
       }
 
       if (inactive) {
-        return 'Expired Today';
+        return {
+          text: 'Expired Today',
+          tooltip: `This insight is not active since ${formatNotificationDate(expiredAt ?? 0)}`,
+        };
       }
 
       if (isToday(createdAt)) {
-        return 'New';
+        return {
+          text: 'New',
+          tooltip: 'Insight created today'
+        };
       }
 
-      return daysAgo(createdAt);
+      return {
+        text: daysAgo(createdAt),
+      };
     };
 
     const removeInsight = () => {
