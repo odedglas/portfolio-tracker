@@ -257,3 +257,12 @@ export const calculateInsightTags = (insight: PortfolioInsight, quote: Quote) =>
   insightsCalculators
     .find((calculator) => calculator.type === insight.type)
     ?.getTags({ quote }) ?? [];
+
+export const calculateInsightInputs = (
+  insight: PortfolioInsight,
+  holding: Holding,
+  quote: Quote
+) =>
+  insightsCalculators
+    .find((calculator) => calculator.type === insight.type)
+    ?.getInputs({ quote, holding });

@@ -1,6 +1,10 @@
 import * as logger from 'firebase-functions/logger';
 import { PortfoliosSchedulerContext } from './types';
-import { calculateInsights, getInsightKey } from '../../shared/insights';
+import {
+  calculateInsightInputs,
+  calculateInsights,
+  getInsightKey,
+} from '../../shared/insights';
 import {
   getCollection,
   saveDocuments,
@@ -115,11 +119,11 @@ export const insightsGenerator = async (
         throw new Error('Holding not found');
       }
 
-      const {
-        regularMarketPrice = 0,
-        fiftyDayAverage = 0,
-        twoHundredDayAverage = 0,
-      } = tickerQuotesMap[holding.ticker] ?? {};
+      const currentInputs = calculateInsightInputs(
+        insight,
+        holding,
+        tickerQuotesMap[holding.ticker]
+      );
 
       return {
         id: insight.id,
@@ -128,9 +132,7 @@ export const insightsGenerator = async (
           ...(insight?.historyInputs ?? []),
           {
             date: Date.now(),
-            inputs: [
-              { regularMarketPrice, fiftyDayAverage, twoHundredDayAverage },
-            ],
+            inputs: currentInputs,
           },
         ],
       };
