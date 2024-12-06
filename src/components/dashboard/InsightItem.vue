@@ -32,7 +32,8 @@
           dense
           outline
           square
-          color="orange">
+          color="orange"
+        >
           <q-tooltip v-if="getInsightDateBadge(insight).tooltip">
             {{ getInsightDateBadge(insight).tooltip }}
           </q-tooltip>
@@ -128,14 +129,16 @@ export default defineComponent({
       if (inactive) {
         return {
           text: 'Expired Today',
-          tooltip: `This insight is not active since ${formatNotificationDate(expiredAt ?? 0)}`,
+          tooltip: `This insight is not active since ${formatNotificationDate(
+            expiredAt ?? 0
+          )}`,
         };
       }
 
       if (isToday(createdAt)) {
         return {
           text: 'New',
-          tooltip: 'Insight created today'
+          tooltip: 'Insight created today',
         };
       }
 

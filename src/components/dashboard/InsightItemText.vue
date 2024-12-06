@@ -1,5 +1,10 @@
 <template>
-  <span v-if="insight.type === 'near200DaysMovingAverages' || insight.type === 'near50DaysMovingAverages'">
+  <span
+    v-if="
+      insight.type === 'near200DaysMovingAverages' ||
+      insight.type === 'near50DaysMovingAverages'
+    "
+  >
     {{ inputs.name }} is <b>{{ inputs.deltaPercent }}</b>
     <b>{{ inputs.direction }}</b> it's
     <b>{{ inputs.movingAverageDays }}</b> day's moving average.

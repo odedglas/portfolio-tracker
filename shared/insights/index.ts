@@ -1,9 +1,5 @@
 import { INSIGHT_TYPE } from '../constants';
-import {
-  Holding,
-  Quote,
-  PortfolioInsight,
-} from '../types';
+import { Holding, Quote, PortfolioInsight } from '../types';
 
 const MOVING_AVERAGE_THRESHOLD = 0.025;
 
@@ -62,23 +58,20 @@ const fiftyTwoWeekHighInsightCalculator: InsightCalculator = {
     }
 
     const inputs = fiftyTwoWeekHighInsightCalculator.getInputs(options);
-    const { deltaPercent = 0} = inputs;
+    const { deltaPercent = 0 } = inputs;
 
     if (deltaPercent < 0.15 || deltaPercent >= 0.35) {
       return undefined;
     }
 
     return {
-      inputs
+      inputs,
     };
   },
 
   getInputs({ quote }) {
-    const {
-      fiftyTwoWeekHigh,
-      regularMarketPrice,
-      twoHundredDayAverage,
-    } = quote;
+    const { fiftyTwoWeekHigh, regularMarketPrice, twoHundredDayAverage } =
+      quote;
 
     const fiftyTwoWeekHighDelta = fiftyTwoWeekHigh - regularMarketPrice;
     const deltaPercent = fiftyTwoWeekHighDelta / fiftyTwoWeekHigh;
@@ -114,7 +107,7 @@ const fiftyTwoWeekLowInsightCalculator: InsightCalculator = {
     }
 
     return {
-      inputs
+      inputs,
     };
   },
 
@@ -143,9 +136,7 @@ const fiftyTwoWeekLowInsightCalculator: InsightCalculator = {
 const moving200AveragesInsightCalculator: InsightCalculator = {
   type: INSIGHT_TYPE.NEAR_MOVING_200_AVERAGES,
 
-  getInsight: (
-    options
-  )=> {
+  getInsight: (options) => {
     const inputs = moving200AveragesInsightCalculator.getInputs(options);
 
     const { deltaPercent = 0 } = inputs;
@@ -173,7 +164,7 @@ const moving200AveragesInsightCalculator: InsightCalculator = {
       deltaPercent: twoHundredDayDeltaPercent,
       isAbove: twoHundredDayDelta > 0,
       movingAverageDays: 200,
-    }
+    };
   },
 
   getTags: ({ quote }) => {
@@ -188,9 +179,7 @@ const moving200AveragesInsightCalculator: InsightCalculator = {
 const moving50AveragesInsightCalculator: InsightCalculator = {
   type: INSIGHT_TYPE.NEAR_MOVING_50_AVERAGES,
 
-  getInsight: (
-    options
-  )=> {
+  getInsight: (options) => {
     const inputs = moving200AveragesInsightCalculator.getInputs(options);
 
     const { deltaPercent = 0 } = inputs;
@@ -218,10 +207,10 @@ const moving50AveragesInsightCalculator: InsightCalculator = {
       deltaPercent: fiftyDayDeltaPercent,
       isAbove: fiftyDayDeltaPercent > 0,
       movingAverageDays: 50,
-    }
+    };
   },
 
-  getTags: moving200AveragesInsightCalculator.getTags
+  getTags: moving200AveragesInsightCalculator.getTags,
 };
 
 const insightsCalculators: InsightCalculator[] = [
