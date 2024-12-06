@@ -1,3 +1,4 @@
+import groupBy from 'lodash/groupBy';
 import { defineStore } from 'pinia';
 import { PortfolioInsight, ViewPortfolioInsight } from 'app/shared/types';
 import insightsAPI from 'src/service/insights';
@@ -57,6 +58,12 @@ export const useInsightsStore = defineStore('insights', {
         (insight) => insight.identifier
       );
 
+      console.log(
+        'All stores insights',
+        groupBy(state.storedInsights, 'portfolioId'),
+        this.dailyInsights
+      );
+
       return state.storedInsights
         .filter(
           (insight) => !dailyInsightsIdentifiers.includes(insight.identifier)
@@ -81,7 +88,7 @@ export const useInsightsStore = defineStore('insights', {
           return {
             ...insight,
             holding,
-            // Override tags with latest value calculations
+            // Override tags with latest quote calculations
             tags,
           };
         })

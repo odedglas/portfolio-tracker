@@ -22,7 +22,6 @@
 import { defineComponent, PropType } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
 import { ViewPortfolioInsight } from 'app/shared/types';
-import { buildDateRangeFromToday } from 'src/service/stocks/dates';
 import { useNumberFormatter } from 'components/composables/useNumberFormatter';
 import { insightSparklineChartData } from 'src/service/charts/insightSparkline';
 
@@ -45,21 +44,8 @@ export default defineComponent({
   setup(props) {
     const formatter = useNumberFormatter();
 
-    const triggerPrice = 135.26;
-
-    // TODO - Migrate this truly to insight inputs once data is gathered.
-    const dates = buildDateRangeFromToday(11);
-    const values = [100, 179, 168.32, 156, 133, 105, 131, 133, 157, 144, 187];
-
     const chartData = insightSparklineChartData({
-      insight: {
-        ...props.insight,
-        historyInputs: values.map((value, index) => ({
-          date: dates[index],
-          inputs: { regularMarketPrice: value },
-        })),
-      },
-      triggerPrice,
+      insight: props.insight,
       formatter,
     });
 

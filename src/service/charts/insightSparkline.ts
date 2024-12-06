@@ -4,13 +4,14 @@ import { Formatter } from 'src/service/charts/base';
 
 type InsightSparklineOptions = {
   insight: ViewPortfolioInsight;
-  triggerPrice: number;
   formatter: Formatter;
 };
 
 export const insightSparklineChartData = (options: InsightSparklineOptions) => {
-  const { insight, triggerPrice, formatter } = options;
+  const { insight, formatter } = options;
   const inputs = insight.historyInputs ?? [];
+
+  const triggerPrice = insight.inputs.regularMarketPrice ?? 0;
 
   return {
     series: [

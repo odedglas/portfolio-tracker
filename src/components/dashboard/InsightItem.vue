@@ -86,7 +86,7 @@ import { useInsightsStore } from 'stores/insights';
 import { useAreYouSure } from 'components/composables/useAreYouSureDialog';
 import InsightMenu from 'components/dashboard/InsightMenu.vue';
 
-const MIN_GRAPH_INPUTS = 0;
+const MIN_GRAPH_INPUTS = 3;
 
 export default defineComponent({
   name: 'InsightItem',
