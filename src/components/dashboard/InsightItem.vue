@@ -155,14 +155,6 @@ export default defineComponent({
       });
     };
 
-    const removeInsight = () => {
-      showAreYouSure({
-        title: 'Delete insight',
-        message: `Are you sure you want to delete this insight for "${props.insight.holding.ticker}"?`,
-        callback: () => insightsStore.removeInsight(props.insight.id),
-      });
-    };
-
     return {
       closeMenuOpen,
       insightMenuOpen,

@@ -14,12 +14,12 @@ import { PortfolioInsight } from '../../shared/types';
 
 const ONE_DAY_MS = 1000 * 60 * 60 * 24;
 
-const isInsightExpired = ({ expiredAt }: PortfolioInsight) => {
+const isInsightActive = ({ expiredAt }: PortfolioInsight) => {
   if (!expiredAt) {
-    return false;
+    return true;
   }
 
-  return Date.now() - expiredAt > ONE_DAY_MS; // Rather insight was expired more than 24 hours ago.
+  return Date.now() - expiredAt <= ONE_DAY_MS; // Rather insight was expired less than 24 hours ago.
 };
 
 const classifyInsights = (
@@ -70,7 +70,7 @@ export const insightsGenerator = async (
   });
 
   const persistedInsights = (await getCollection<PortfolioInsight>('insights'))
-    .filter(isInsightExpired)
+    .filter(isInsightActive)
     .map((insight) => ({
       ...insight,
       holding: portfolioHoldings[insight.holdingId],
