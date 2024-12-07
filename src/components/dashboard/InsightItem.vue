@@ -29,6 +29,7 @@
         <q-chip
           class="text-caption text-grey-8"
           :label="getInsightDateBadge(insight).text"
+          v-if="$q.platform.is.desktop"
           dense
           outline
           square
@@ -63,10 +64,10 @@
       </span>
     </div>
     <q-separator />
-    <div class="flex chips-container q-px-md q-pb-xs">
+    <div class="flex chips-container q-px-none q-px-md-md q-pb-xs">
       <q-chip
         v-for="(tag, tagIndex) in insight?.tags"
-        size="sm"
+        :size="$q.platform.is.mobile ? 'xs' : 'sm'"
         outline
         class="text-weight-bold"
         color="primary"
@@ -89,6 +90,7 @@ import InsightItemText from 'components/dashboard/InsightItemText.vue';
 import { useInsightsStore } from 'stores/insights';
 import { useAreYouSure } from 'components/composables/useAreYouSureDialog';
 import InsightMenu from 'components/dashboard/InsightMenu.vue';
+import { useQuasar } from 'quasar';
 
 const MIN_GRAPH_INPUTS = 3;
 
@@ -106,6 +108,7 @@ export default defineComponent({
     TickerLogo,
   },
   setup(props) {
+    const $q = useQuasar();
     const closeMenuOpen = ref(false);
     const insightMenuOpen = ref(false);
 
@@ -113,7 +116,9 @@ export default defineComponent({
     const { showAreYouSure } = useAreYouSure();
 
     const showInsightHistoryGraph = computed(
-      () => (props.insight?.historyInputs?.length ?? 0) >= MIN_GRAPH_INPUTS
+      () =>
+        (props.insight?.historyInputs?.length ?? 0) >= MIN_GRAPH_INPUTS &&
+        $q.platform.is.desktop
     );
 
     const getInsightDateBadge = (insight: ViewPortfolioInsight) => {

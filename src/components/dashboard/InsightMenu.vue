@@ -1,7 +1,7 @@
 <template>
   <q-menu
     auto-close
-    class="q-py-md flex column q-gap-lg"
+    class="q-py-md flex column q-gap-lg overflow-hidden"
     @hide="$emit('close')"
     :value="show"
   >

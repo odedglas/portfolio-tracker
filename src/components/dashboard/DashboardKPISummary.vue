@@ -7,7 +7,7 @@
     </q-card-section>
     <q-card-section>
       <div class="flex justify-between items-center">
-        <span class="text-caption text-grey-6">Total Profit</span>
+        <span class="text-subtitle2 text-grey-6">Total Profit</span>
         <profit-indicator
           :value="profits?.value ?? 0"
           :percentage="profits?.valuePercentage ?? 0"
@@ -18,7 +18,7 @@
       </div>
       <q-separator class="q-my-md" />
       <div class="flex justify-between items-center">
-        <span class="text-caption text-grey-6">Daily</span>
+        <span class="text-subtitle2 text-grey-6">Daily</span>
         <profit-indicator
           :value="profits?.subtitle.value ?? 0"
           :percentage="profits?.subtitle.percentage ?? 0"
@@ -29,9 +29,9 @@
       </div>
     </q-card-section>
     <q-separator />
-    <q-card-section class="row items-center q-px-md">
+    <q-card-section class="row items-center q-px-xs">
       <div
-        class="col"
+        class="col flex q-gap-xs justify-center"
         v-for="indicator in summaryIndicators"
         :key="indicator.title"
       >
@@ -39,7 +39,7 @@
           <span class="flex q-mr-xs icon-wrapper">
             <q-icon :name="indicator.icon" size="small" class="text-white" />
           </span>
-          <span class="text-caption text-grey-6">{{ indicator.title }}</span>
+          <span class="text-subtitle2 text-grey-6">{{ indicator.title }}</span>
         </div>
         <span class="text-subtitle1 text-weight-medium">{{
           $n(indicator.value ?? 0, 'decimal')

@@ -23,7 +23,7 @@
         :slides-per-view="hasPagination ? insightsPerPage : insights.length"
         :vertical="true"
         class="insights-swiper-wrapper"
-        wrapper-class="q-pb-xl"
+        :wrapper-class="hasPagination ? 'q-pb-xl' : 'q-pb-sm'"
         :space-between="16"
       >
         <swiper-slide

@@ -30,7 +30,7 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
       },
       chart: {
         type: 'treemap',
-        width: Platform.is.desktop ? 445 : 375,
+        width: Platform.is.desktop ? 445 : '100%',
         height: 400,
         toolbar: {
           show: false,
