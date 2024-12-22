@@ -58,12 +58,6 @@ export const useInsightsStore = defineStore('insights', {
         (insight) => insight.identifier
       );
 
-      console.log(
-        'All stores insights',
-        groupBy(state.storedInsights, 'portfolioId'),
-        this.dailyInsights
-      );
-
       return state.storedInsights
         .filter(
           (insight) => !dailyInsightsIdentifiers.includes(insight.identifier)

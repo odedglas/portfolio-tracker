@@ -168,6 +168,7 @@ export type Holding = Entity &
     fees?: number;
     invested: number;
     realizedProfits?: number;
+    deleted?: boolean;
   };
 
 export type HoldingsSummary = Profitable & {

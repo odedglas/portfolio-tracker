@@ -33,7 +33,16 @@ export const useHoldingsStore = defineStore('holdings', {
 
       return state.holdings
         .filter((holding) => holding.portfolioId === selectedPortfolio?.id)
+        .filter((holding) => !holding?.deleted) // Realized holdings won't have shares.
         .map(calculateHoldingValue);
+    },
+    deletedHoldings(state) {
+      const portfoliosStore = usePortfolioStore();
+      const selectedPortfolio = portfoliosStore.selectedPortfolio;
+
+      return state.holdings
+        .filter((holding) => holding.portfolioId === selectedPortfolio?.id)
+        .filter((holding) => holding?.deleted);
     },
     portfoliosHoldingsMap(state) {
       // Portfolio to holdings map with summary attached
@@ -80,8 +89,8 @@ export const useHoldingsStore = defineStore('holdings', {
           }
 
           if (holding.shares <= 0) {
-            // TODO - Removing holding is fine, as long as we can manual balance record / update portfolio for paid fees.
-            return await this.remove(holding.id);
+            // Marking holding as deleted.
+            await this.remove(holding.id);
           }
 
           // Calculate after action AVG price
@@ -117,9 +126,19 @@ export const useHoldingsStore = defineStore('holdings', {
     },
     async remove(holdingId: string) {
       await holdingsAPI.delete(holdingId);
-      this.holdings = this.holdings.filter(
+
+      const deletedHolding = this.holdings.find(
         (holding) => holding.id !== holdingId
       );
+
+      if (!deletedHolding) {
+        throw new Error('Cannot mark holding as deleted, Holding not found');
+      }
+
+      this.holdings = [
+        ...this.holdings.filter((holding) => holding.id !== holdingId),
+        { ...deletedHolding, deleted: true },
+      ];
     },
   },
 });

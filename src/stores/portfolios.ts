@@ -47,11 +47,12 @@ export const usePortfolioStore = defineStore('portfolios', {
       if (!selected) return undefined;
 
       const holdings = holdingsStore.portfolioHoldings;
+      const deletedHoldings = holdingsStore.deletedHoldings;
 
       return {
         ...selected,
         ...holdingsDefaults,
-        ...holdingsTransformer.summary(holdings),
+        ...holdingsTransformer.summary([...holdings, ...deletedHoldings]),
       };
     },
     portfoliosWithHoldings(state): Portfolio[] {

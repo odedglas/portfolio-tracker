@@ -36,8 +36,11 @@ const api = {
 
     return await api.get(holdingId);
   },
-  delete: async (holdingId: string) =>
-    firestoreAPI.deleteDocument(holdingId, holdingsCollection()),
+  delete: async (holdingId: string) => {
+    await firestoreAPI.updateDocument(holdingId, holdingsCollection(), {
+      deleted: true,
+    });
+  },
 
   syncHoldingWithTransactions: async (
     holding: Holding,
