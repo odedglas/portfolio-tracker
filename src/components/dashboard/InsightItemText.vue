@@ -1,5 +1,10 @@
 <template>
-  <span v-if="insight.type === 'nearMovingAverages'">
+  <span
+    v-if="
+      insight.type === 'near200DaysMovingAverages' ||
+      insight.type === 'near50DaysMovingAverages'
+    "
+  >
     {{ inputs.name }} is <b>{{ inputs.deltaPercent }}</b>
     <b>{{ inputs.direction }}</b> it's
     <b>{{ inputs.movingAverageDays }}</b> day's moving average.
@@ -9,7 +14,6 @@
     <b>{{ inputs.deltaPercent }}</b> above expected.
   </span>
   <span v-if="insight.type === 'near52WeekLow'">
-    {name} is near its 52 week low.
     {{ inputs.name }} is near it's 52 weeks low.
   </span>
   <span v-if="insight.type === 'below52WeekHigh'">

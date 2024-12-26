@@ -1,16 +1,16 @@
 export const dailyMoversBenchmarks = [
   {
-    label: 'S&P 500',
+    label: 'S&P',
     ticker: 'SPY',
     logoImage: 'https://s3-symbol-logo.tradingview.com/indices/s-and-p-500.svg',
   },
   {
-    label: 'Nasdaq 100',
+    label: 'Nasdaq',
     ticker: 'QQQ',
     logoImage: 'https://s3-symbol-logo.tradingview.com/indices/nasdaq-100.svg',
   },
   {
-    label: 'Russel 2000',
+    label: 'Russel',
     ticker: 'IWM',
     logoImage: 'https://s3-symbol-logo.tradingview.com/ishares.svg',
   },

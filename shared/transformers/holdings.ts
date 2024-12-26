@@ -46,9 +46,20 @@ export const holdingsTransformer = {
       dailyChange,
     };
   },
-  summary: (holdings: HoldingWithProfits[]): HoldingsSummary =>
+  summary: (holdings: (HoldingWithProfits | Holding)[]): HoldingsSummary =>
     holdings.reduce(
       (acc, holding) => {
+        if (!('currentValue' in holding)) {
+          const realizedProfit = holding.realizedProfits ?? 0;
+
+          acc.shares += holding.shares;
+          acc.profit += realizedProfit;
+          acc.realized += realizedProfit;
+          acc.fees += holding?.fees ?? 0;
+
+          return acc;
+        }
+
         acc.shares += holding.shares;
         acc.profit += holding.profit.value;
         acc.currentValue += holding.currentValue;

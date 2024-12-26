@@ -30,7 +30,8 @@ export const INSIGHT_TYPE = {
   BELOW_52_WEEK_HIGH: 'below52WeekHigh',
   NEAR_52_WEEK_LOW: 'near52WeekLow',
   HIGH_SHORT_INTEREST: 'highShortInterest',
-  NEAR_MOVING_AVERAGES: 'nearMovingAverages',
+  NEAR_MOVING_50_AVERAGES: 'near50DaysMovingAverages',
+  NEAR_MOVING_200_AVERAGES: 'near200DaysMovingAverages',
 } as const;
 
 export const NOTIFICATION_TYPE = {

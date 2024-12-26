@@ -78,7 +78,7 @@ export const notificationsScheduler = onSchedule(
   },
   async () => {
     if (!isTradingDay()) {
-      logger.info('Skipping insights generation, not a trading day');
+      logger.info('Skipping notifications generation, not a trading day');
       return;
     }
 

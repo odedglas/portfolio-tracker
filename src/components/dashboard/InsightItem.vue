@@ -28,12 +28,17 @@
         </div>
         <q-chip
           class="text-caption text-grey-8"
-          :label="getInsightDateBadge(insight)"
+          :label="getInsightDateBadge(insight).text"
+          v-if="$q.platform.is.desktop"
           dense
           outline
           square
           color="orange"
-        />
+        >
+          <q-tooltip v-if="getInsightDateBadge(insight).tooltip">
+            {{ getInsightDateBadge(insight).tooltip }}
+          </q-tooltip>
+        </q-chip>
       </div>
       <insight-item-text :insight="insight" />
     </div>
@@ -59,10 +64,10 @@
       </span>
     </div>
     <q-separator />
-    <div class="flex chips-container q-px-md q-pb-xs">
+    <div class="flex chips-container q-px-none q-px-md-md q-pb-xs">
       <q-chip
         v-for="(tag, tagIndex) in insight?.tags"
-        size="sm"
+        :size="$q.platform.is.mobile ? 'xs' : 'sm'"
         outline
         class="text-weight-bold"
         color="primary"
@@ -85,6 +90,7 @@ import InsightItemText from 'components/dashboard/InsightItemText.vue';
 import { useInsightsStore } from 'stores/insights';
 import { useAreYouSure } from 'components/composables/useAreYouSureDialog';
 import InsightMenu from 'components/dashboard/InsightMenu.vue';
+import { useQuasar } from 'quasar';
 
 const MIN_GRAPH_INPUTS = 3;
 
@@ -102,6 +108,7 @@ export default defineComponent({
     TickerLogo,
   },
   setup(props) {
+    const $q = useQuasar();
     const closeMenuOpen = ref(false);
     const insightMenuOpen = ref(false);
 
@@ -109,25 +116,40 @@ export default defineComponent({
     const { showAreYouSure } = useAreYouSure();
 
     const showInsightHistoryGraph = computed(
-      () => (props.insight?.historyInputs?.length ?? 0) >= MIN_GRAPH_INPUTS
+      () =>
+        (props.insight?.historyInputs?.length ?? 0) >= MIN_GRAPH_INPUTS &&
+        $q.platform.is.desktop
     );
 
     const getInsightDateBadge = (insight: ViewPortfolioInsight) => {
       const { createdAt = Date.now(), expiredAt, inactive } = insight;
 
       if (expiredAt) {
-        return `Expired ${daysAgo(expiredAt)}`;
+        return {
+          text: `Expired ${daysAgo(expiredAt)}`,
+          tooltip: `Expired at ${formatNotificationDate(expiredAt)}`,
+        };
       }
 
       if (inactive) {
-        return 'Expired Today';
+        return {
+          text: 'Expired Today',
+          tooltip: `This insight is not active since ${formatNotificationDate(
+            expiredAt ?? 0
+          )}`,
+        };
       }
 
       if (isToday(createdAt)) {
-        return 'New';
+        return {
+          text: 'New',
+          tooltip: 'Insight created today',
+        };
       }
 
-      return daysAgo(createdAt);
+      return {
+        text: daysAgo(createdAt),
+      };
     };
 
     const removeInsight = () => {

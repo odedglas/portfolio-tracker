@@ -23,7 +23,7 @@
         :slides-per-view="hasPagination ? insightsPerPage : insights.length"
         :vertical="true"
         class="insights-swiper-wrapper"
-        wrapper-class="q-pb-xl"
+        :wrapper-class="hasPagination ? 'q-pb-xl' : 'q-pb-sm'"
         :space-between="16"
       >
         <swiper-slide
@@ -59,16 +59,9 @@ export default defineComponent({
     const insightsStore = useInsightsStore();
     const appearanceStore = useAppearanceStore();
 
-    const inactiveInsights = computed(() =>
-      [...insightsStore.inactiveInsights].map((insight) => ({
-        ...insight,
-        inactive: true,
-      }))
-    );
-
     const insights = computed(() => [
       ...insightsStore.dailyInsights,
-      ...inactiveInsights.value,
+      ...insightsStore.inactiveInsights,
     ]);
 
     const insightsPerPage = computed(() => ($q.platform.is.desktop ? 3 : 1));
@@ -93,6 +86,7 @@ export default defineComponent({
 .insight-content {
   .inner {
     position: relative;
+    max-width: 500px;
     border: 1px solid $grey-5;
   }
 
