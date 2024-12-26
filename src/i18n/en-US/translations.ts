@@ -105,11 +105,11 @@ export const enUsMessages = {
     title: 'Insights',
     types: {
       title: {
-        near50DaysMovingAverages: 'Near 50days moving averages',
-        near200DaysMovingAverages: 'Near 200days moving averages',
+        near50DaysMovingAverages: 'Near 50d moving averages',
+        near200DaysMovingAverages: 'Near 200d moving averages',
         highShortInterest: 'High short interest',
-        near52WeekLow: 'Near 52 week low',
-        below52WeekHigh: 'Below 52 weeks high',
+        near52WeekLow: 'Near 52w low',
+        below52WeekHigh: 'Below 52w high',
       },
       description: {
         near50DaysMovingAverages:

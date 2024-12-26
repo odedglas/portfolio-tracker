@@ -14,7 +14,6 @@
     <b>{{ inputs.deltaPercent }}</b> above expected.
   </span>
   <span v-if="insight.type === 'near52WeekLow'">
-    {name} is near its 52 week low.
     {{ inputs.name }} is near it's 52 weeks low.
   </span>
   <span v-if="insight.type === 'below52WeekHigh'">
