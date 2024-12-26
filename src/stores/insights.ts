@@ -1,4 +1,3 @@
-import groupBy from 'lodash/groupBy';
 import { defineStore } from 'pinia';
 import { PortfolioInsight, ViewPortfolioInsight } from 'app/shared/types';
 import insightsAPI from 'src/service/insights';
