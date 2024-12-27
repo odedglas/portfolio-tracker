@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { FearAndGreedResponse } from '../types';
 
 const yahooFinanceInstance = axios.create({
-  baseURL: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com',
+  baseURL: 'https://yahoo-finance127.p.rapidapi.com',
 });
 
 const featAndGreedInstance = axios.create({
@@ -17,8 +17,8 @@ const featAndGreedInstance = axios.create({
  * Sets the headers for the Yahoo Finance API.
  */
 const buildHeaders = () => ({
-  'X-RapidAPI-Key': process.env.RAPID_YAHOO_API_KEY,
-  'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com',
+  'X-RapidAPI-Key': 'b755b7ef07msh350b7776c07b300p112a41jsn7fc145707dc8',
+  'X-RapidAPI-Host': 'yahoo-finance127.p.rapidapi.com',
 });
 
 const getRequest = async <Resolved>(

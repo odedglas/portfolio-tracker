@@ -3,7 +3,6 @@
     flat
     :bordered="appearanceStore.borderedCards"
     class="dashboard-kpi-card"
-    @mouseleave="delayTooltipHide"
   >
     <q-card-section>
       <div class="row items-center no-wrap">
@@ -43,7 +42,8 @@
         anchor="bottom left"
         class="text-caption"
         v-if="tooltipRef && !!tooltip"
-        @mouseenter.capture="() => {}"
+        @mouseenter="showKPITooltip = true"
+        @mouseleave="delayTooltipHide"
         :target="tooltipRef"
         v-model="showKPITooltip"
       >

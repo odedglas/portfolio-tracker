@@ -1,6 +1,6 @@
 import * as https from 'https';
 import { stocksClient } from '../../../shared/api';
-import { GetQuotesResponse } from '../../../shared/types';
+import { GetQuotesResponse, GetSearchResponse } from '../../../shared/types';
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
@@ -17,4 +17,14 @@ export const getTickersQuotes = async (tickers: string[]) => {
   );
 
   return tickerQuotesResponse.quoteResponse.result;
+};
+
+export const searchTicker = async (ticker: string) => {
+  const searchResponse = await stocksClient.getRequest<GetSearchResponse>(
+    `search/${ticker}`,
+    {},
+    httpsAgent
+  );
+
+  return searchResponse.quotes;
 };

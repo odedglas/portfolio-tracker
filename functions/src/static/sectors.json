@@ -1,0 +1,62 @@
+{
+  "MSFT": {
+    "sector": "Technology",
+    "industry": "Software Infrastructure"
+  },
+  "KRE": {},
+  "MU": {
+    "sector": "Technology",
+    "industry": "Semiconductors"
+  },
+  "IBIT": {},
+  "MDB": {
+    "sector": "Technology",
+    "industry": "Software Infrastructure"
+  },
+  "KKR": {
+    "sector": "Financial Services",
+    "industry": "Asset Management"
+  },
+  "NVDA": {
+    "sector": "Technology",
+    "industry": "Semiconductors"
+  },
+  "QQQ": {},
+  "FVRR": {
+    "sector": "Communication Services",
+    "industry": "Internet Content & Information"
+  },
+  "AMZN": {
+    "sector": "Consumer Cyclical",
+    "industry": "Internet Retail"
+  },
+  "LMND": {
+    "sector": "Financial Services",
+    "industry": "Insurance Property & Casualty"
+  },
+  "SHOP": {
+    "sector": "Technology",
+    "industry": "Software Application"
+  },
+  "PLTR": {
+    "sector": "Technology",
+    "industry": "Software Infrastructure"
+  },
+  "TSLA": {
+    "sector": "Consumer Cyclical",
+    "industry": "Auto Manufacturers"
+  },
+  "SOFI": {
+    "sector": "Financial Services",
+    "industry": "Credit Services"
+  },
+  "ARKK": {},
+  "AMD": {
+    "sector": "Technology",
+    "industry": "Semiconductors"
+  },
+  "PANW": {
+    "sector": "Technology",
+    "industry": "Software Infrastructure"
+  }
+}
