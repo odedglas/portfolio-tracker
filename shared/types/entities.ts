@@ -155,6 +155,7 @@ export type Transaction = Entity &
     paidPrice?: number;
     portfolioId: string;
     realizedProfit?: number;
+    sector?: string;
   };
 
 export type Holding = Entity &
@@ -163,8 +164,9 @@ export type Holding = Entity &
     ticker: string;
     avgPrice: number;
     name: string;
-    logoImage?: string;
     portfolioId: string;
+    logoImage?: string;
+    sector?: string;
     fees?: number;
     invested: number;
     realizedProfits?: number;

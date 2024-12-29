@@ -23,13 +23,17 @@ export const getTickerData = async (ticker: string) => {
     searchResults.map((quote) => quote.symbol)
   );
 
-  return searchResults.map((result, index) => ({
-    ...result,
-    logoImage: logos[index],
-    lastPrice: tickerPrices.quoteResponse.result.find(
+  return searchResults.map((result, index) => {
+    const tickerQuotes = tickerPrices.quoteResponse.result.find(
       (quote) => quote.symbol === result.symbol
-    )?.regularMarketPrice,
-  }));
+    );
+
+    return {
+      ...result,
+      logoImage: logos[index],
+      lastPrice: tickerQuotes?.regularMarketPrice,
+    };
+  });
 };
 
 export { getQuotes, getQuotesChartData, getFearAndGreedIndex };

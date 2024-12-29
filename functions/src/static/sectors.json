@@ -1,62 +1,56 @@
 {
   "MSFT": {
-    "sector": "Technology",
-    "industry": "Software Infrastructure"
+    "sector": "Software Infrastructure"
   },
-  "KRE": {},
+  "KRE": {
+    "sector": "Funds"
+  },
   "MU": {
-    "sector": "Technology",
-    "industry": "Semiconductors"
+    "sector": "Semiconductors"
   },
-  "IBIT": {},
+  "IBIT": {
+    "sector": "Commodities"
+  },
   "MDB": {
-    "sector": "Technology",
-    "industry": "Software Infrastructure"
+    "sector": "Software Application"
   },
   "KKR": {
-    "sector": "Financial Services",
-    "industry": "Asset Management"
+    "sector": "Financial Services"
   },
   "NVDA": {
-    "sector": "Technology",
-    "industry": "Semiconductors"
+    "sector": "Semiconductors"
   },
-  "QQQ": {},
+  "QQQ": {
+    "sector": "Funds"
+  },
   "FVRR": {
-    "sector": "Communication Services",
-    "industry": "Internet Content & Information"
+    "sector": "Communication Services"
   },
   "AMZN": {
-    "sector": "Consumer Cyclical",
-    "industry": "Internet Retail"
+    "sector": "Consumer Cyclical"
   },
   "LMND": {
-    "sector": "Financial Services",
-    "industry": "Insurance Property & Casualty"
+    "sector": "Financial Services"
   },
   "SHOP": {
-    "sector": "Technology",
-    "industry": "Software Application"
+    "sector": "Software Application"
   },
   "PLTR": {
-    "sector": "Technology",
-    "industry": "Software Infrastructure"
+    "sector": "AI Software"
   },
   "TSLA": {
-    "sector": "Consumer Cyclical",
-    "industry": "Auto Manufacturers"
+    "sector": "Consumer Cyclical"
   },
   "SOFI": {
-    "sector": "Financial Services",
-    "industry": "Credit Services"
+    "sector": "Financial Services"
   },
-  "ARKK": {},
+  "ARKK": {
+    "sector": "Funds"
+  },
   "AMD": {
-    "sector": "Technology",
-    "industry": "Semiconductors"
+    "sector": "Semiconductors"
   },
   "PANW": {
-    "sector": "Technology",
-    "industry": "Software Infrastructure"
+    "sector": "Cyber Security"
   }
 }

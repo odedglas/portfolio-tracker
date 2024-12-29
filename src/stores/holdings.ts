@@ -57,6 +57,13 @@ export const useHoldingsStore = defineStore('holdings', {
     summary(): HoldingsSummary {
       return holdingsTransformer.summary(this.portfolioHoldings);
     },
+    holdingsSectors(): string[] {
+      const holdings = this.portfolioHoldings;
+
+      return [...new Set(holdings.map((holding) => holding.sector))].filter(
+        Boolean
+      ) as string[];
+    },
   },
   actions: {
     setPortfoliosHoldings(holdings: Holding[]) {
@@ -106,7 +113,8 @@ export const useHoldingsStore = defineStore('holdings', {
       );
     },
     create(transaction: Transaction): Holding {
-      const { portfolioId, ticker, name, logoImage, price } = transaction;
+      const { portfolioId, ticker, name, logoImage, price, sector } =
+        transaction;
 
       const holding = {
         id: '',
@@ -116,6 +124,7 @@ export const useHoldingsStore = defineStore('holdings', {
         ticker,
         name,
         logoImage,
+        sector,
         avgPrice: price,
         invested: price * transaction.actualShares,
       };

@@ -3,6 +3,7 @@ import * as pMap from 'p-map';
 import { Holding, Transaction } from '../../shared/types';
 import { getCollection, updateDocuments } from './utils/getCollection';
 import { searchTicker } from './utils/quotes';
+import * as sectorsStub from './static/sectors.json';
 
 type MigrationRunner = (dryRun: boolean) => Promise<void>;
 
@@ -56,29 +57,31 @@ const setHoldingsSectors = async (dryRun = true) => {
     ...new Set(holdings.map((holding) => holding.ticker)),
   ];
 
-  let sectorsMap: Record<string, { sector: string; industry: string }> = {};
+  let sectorsMap: Record<string, { sector: string }> = sectorsStub;
 
-  await pMap(
-    holdingsTickers,
-    async (ticker) => {
-      const search = await searchTicker(ticker);
+  if (!Object.keys(sectorsMap)) {
+    // TODO - Remove if fresh data is needed.
+    await pMap(
+      holdingsTickers,
+      async (ticker) => {
+        const search = await searchTicker(ticker);
 
-      const tickerMatch = search.find((t) => t.symbol === ticker);
+        const tickerMatch = search.find((t) => t.symbol === ticker);
 
-      if (!tickerMatch) {
-        logger.warn('No ticker found', { ticker });
-        return;
-      }
+        if (!tickerMatch) {
+          logger.warn('No ticker found', { ticker });
+          return;
+        }
 
-      sectorsMap[ticker] = {
-        sector: tickerMatch.sector?.replace('-', ' '),
-        industry: tickerMatch.industry?.replace('-', ' '),
-      };
+        sectorsMap[ticker] = {
+          sector: tickerMatch.industry?.replace('-', ' '),
+        };
 
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-    },
-    { concurrency: 3 }
-  );
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      },
+      { concurrency: 3 }
+    );
+  }
 
   const updatedHoldings = holdings.map((holding) => {
     return {

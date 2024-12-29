@@ -54,6 +54,7 @@ export interface TickerOption {
   label: string;
   logoImage?: string;
   lastPrice?: number;
+  sector?: string;
 }
 
 interface TickerMeta {
@@ -100,6 +101,7 @@ export default defineComponent({
         noResults.value = search.length === 0;
         options.value = search.map((result) => ({
           ...result,
+          sector: result.industry ?? 'Unknown', // Sets industry as sector by default.
           label: result.shortname,
           value: result.symbol,
         }));

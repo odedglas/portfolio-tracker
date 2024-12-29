@@ -26,6 +26,7 @@ import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
 import PortfolioInsights from 'components/dashboard/PortfolioInsights.vue';
 import DailyMovers from 'components/dashboard/DailyMovers.vue';
 import StickyQuickAdd from 'components/dashboard/StickyQuickAdd.vue';
+import { useHoldingsStore } from 'stores/holdings';
 
 export default defineComponent({
   name: 'DashboardPage',
@@ -39,11 +40,14 @@ export default defineComponent({
   },
   setup() {
     const portfolioStore = usePortfolioStore();
+    const holdingsStore = useHoldingsStore();
     const { kpis } = usePortfolioKpis();
 
     const viewPortfolio = computed(
       () => portfolioStore.selectedPortfolioWithHoldings
     );
+
+    console.log(holdingsStore.holdings);
 
     return {
       viewPortfolio,

@@ -157,6 +157,7 @@ export default defineComponent({
       localTransaction.value.name = tickerOption?.label;
       localTransaction.value.logoImage = tickerOption?.logoImage;
       localTransaction.value.price = tickerOption?.lastPrice ?? 0;
+      localTransaction.value.sector = tickerOption?.sector ?? '';
     };
 
     const submitForm = async () => {
