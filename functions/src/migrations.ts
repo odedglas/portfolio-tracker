@@ -57,7 +57,7 @@ const setHoldingsSectors = async (dryRun = true) => {
     ...new Set(holdings.map((holding) => holding.ticker)),
   ];
 
-  let sectorsMap: Record<string, { sector: string }> = sectorsStub;
+  const sectorsMap: Record<string, { sector: string }> = sectorsStub;
 
   if (!Object.keys(sectorsMap)) {
     // TODO - Remove if fresh data is needed.

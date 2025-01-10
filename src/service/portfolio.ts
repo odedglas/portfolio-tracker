@@ -1,4 +1,4 @@
-import { Portfolio, PortfolioHistory } from 'app/shared/types';
+import { Entity, Portfolio, PortfolioHistory } from 'app/shared/types';
 import {
   getCollections,
   firestoreAPI,
@@ -44,11 +44,21 @@ const api = {
   // TODO - Deletion should clean all portfolio related entities such as Transactions / Holdings.
   delete: async (portfolioId: string) =>
     firestoreAPI.deleteDocument(portfolioId, portfolioCollection()),
-  addHistoryRecords: async (records: PortfolioHistory[]) => {
+  updateHistoryRecords: async (
+    records: Partial<PortfolioHistory & Entity>[]
+  ) => {
     await Promise.all(
-      records.map((record) =>
-        firestoreAPI.addDocument(portfolioHistoryCollection(), record)
-      )
+      records.map((record) => {
+        if (!record.id) {
+          throw new Error('Cannot update a history record without an ID');
+        }
+
+        firestoreAPI.updateDocument(
+          record.id,
+          portfolioHistoryCollection(),
+          record
+        );
+      })
     );
   },
 };

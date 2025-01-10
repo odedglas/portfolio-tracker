@@ -12,16 +12,11 @@
 
           <p
             v-if="showSectors"
-            class="text-subtitle2 text-grey-7 q-mb-none q-mx-sm flex items-center q-gap-xs"
+            class="text-subtitle1 text-grey-7 q-mb-none q-mx-sm flex items-center q-gap-xs"
           >
-            <q-icon name="arrow_forward_ios" class="" size="xs" />
+            <q-icon name="arrow_forward_ios" size="xs" />
             <span class="clickable" @click="selectedSector = ''">Sectors</span>
-            <q-icon
-              v-if="selectedSector"
-              name="arrow_forward_ios"
-              class=""
-              size="xs"
-            />
+            <q-icon v-if="selectedSector" name="arrow_forward_ios" size="xs" />
             <span v-if="selectedSector">{{ selectedSector }}</span>
           </p>
         </div>
