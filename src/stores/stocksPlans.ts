@@ -23,71 +23,73 @@ export const useStocksPlansStore = defineStore('stocksPlans', {
         plans.map((plan) => plan.ticker)
       );
 
-      this.stocksPlans = plans.map((plan) => {
-        const planQuote = quoteResponse.result.find(
-          (quote) => quote.symbol === plan.ticker
-        );
+      this.stocksPlans = plans
+        .map((plan) => {
+          const planQuote = quoteResponse.result.find(
+            (quote) => quote.symbol === plan.ticker
+          );
 
-        const vestingPeriods = calculateStocksPlanVestingPeriods(plan);
-        const vestedPeriods = calculateStocksPlanVestedPeriods(
-          plan,
-          vestingPeriods
-        );
+          const vestingPeriods = calculateStocksPlanVestingPeriods(plan);
+          const vestedPeriods = calculateStocksPlanVestedPeriods(
+            plan,
+            vestingPeriods
+          );
 
-        const lastVested =
-          vestedPeriods > 0 ? vestingPeriods[vestedPeriods - 1] : undefined;
-        const nextVesting = findNextVestingPeriod(
-          plan,
-          vestingPeriods,
-          vestedPeriods
-        );
+          const lastVested =
+            vestedPeriods > 0 ? vestingPeriods[vestedPeriods - 1] : undefined;
+          const nextVesting = findNextVestingPeriod(
+            plan,
+            vestingPeriods,
+            vestedPeriods
+          );
 
-        const vestedShares = calculateVestedShares(
-          plan,
-          vestingPeriods,
-          vestedPeriods
-        );
+          const vestedShares = calculateVestedShares(
+            plan,
+            vestingPeriods,
+            vestedPeriods
+          );
 
-        const entitlement102Date = DateAPI.addToDate(plan.grantDate, {
-          years: 2,
-          days: 1,
-        }).getTime();
-        const planOrders = computePlanOrders(plan, entitlement102Date);
+          const entitlement102Date = DateAPI.addToDate(plan.grantDate, {
+            years: 2,
+            days: 1,
+          }).getTime();
+          const planOrders = computePlanOrders(plan, entitlement102Date);
 
-        const soldShares = planOrders.reduce(
-          (acc, order) => acc + order.shares,
-          0
-        );
+          const soldShares = planOrders.reduce(
+            (acc, order) => acc + order.shares,
+            0
+          );
 
-        const maxPlanShares = plan.amount - soldShares;
-        const sellableShares = vestedShares - soldShares;
+          const maxPlanShares = plan.amount - soldShares;
+          const sellableShares = vestedShares - soldShares;
 
-        const availableShares = plan.terminationDate
-          ? sellableShares
-          : maxPlanShares;
+          const availableShares = plan.terminationDate
+            ? sellableShares
+            : maxPlanShares;
 
-        const holdingMarketPrice = planQuote?.regularMarketPrice ?? 0;
+          const holdingMarketPrice = planQuote?.regularMarketPrice ?? 0;
 
-        const potentialValue = holdingMarketPrice * availableShares;
-        const sellableValue = holdingMarketPrice * sellableShares;
+          const potentialValue = holdingMarketPrice * availableShares;
+          const sellableValue = holdingMarketPrice * sellableShares;
 
-        return {
-          ...plan,
-          vestingPeriods,
-          vestedPeriods,
-          nextVesting,
-          lastVested,
-          vested: vestedShares,
-          potentialValue,
-          sellableValue,
-          soldShares,
-          availableShares,
-          entitlement102Date,
-          is102Entitled: Date.now() >= entitlement102Date,
-          orders: planOrders,
-          marketPrice: holdingMarketPrice,
-        };
-      });
+          return {
+            ...plan,
+            vestingPeriods,
+            vestedPeriods,
+            nextVesting,
+            lastVested,
+            vested: vestedShares,
+            potentialValue,
+            sellableValue,
+            soldShares,
+            availableShares,
+            entitlement102Date,
+            is102Entitled: Date.now() >= entitlement102Date,
+            orders: planOrders,
+            marketPrice: holdingMarketPrice,
+          };
+        })
+        .sort((a, b) => a.grantDate - b.grantDate);
     },
     async updateStocksPlan(plan: StocksPlan, remove = false) {
       const rawPlan = omit(plan, [

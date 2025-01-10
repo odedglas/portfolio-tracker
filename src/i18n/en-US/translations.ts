@@ -18,6 +18,8 @@ export const enUsMessages = {
   fees: 'Fees',
   realized: 'Realized gains',
   capital: 'Capital gains',
+  by_invested: 'By Invested',
+  by_sector: 'By Sector',
   portfolios: {
     title: "Manage portfolio's",
     create: 'New Portfolio',

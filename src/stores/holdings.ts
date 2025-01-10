@@ -1,11 +1,16 @@
-import { groupBy, mapValues } from 'lodash';
+import { Dictionary, groupBy, mapValues } from 'lodash';
 import { defineStore } from 'pinia';
 import { holdingsTransformer } from 'app/shared/transformers';
 import holdingsAPI from 'src/service/holdings';
 import { usePortfolioStore } from 'stores/portfolios';
 import { useTransactionsStore } from 'stores/transactions';
 import { useQuotesStore } from 'stores/quotes';
-import { Holding, Transaction, HoldingsSummary } from 'app/shared/types';
+import {
+  Holding,
+  Transaction,
+  HoldingsSummary,
+  HoldingWithProfits,
+} from 'app/shared/types';
 
 interface HoldingsStoreState {
   holdings: Holding[];
@@ -63,6 +68,25 @@ export const useHoldingsStore = defineStore('holdings', {
       return [...new Set(holdings.map((holding) => holding.sector))].filter(
         Boolean
       ) as string[];
+    },
+    holdingsBySectors() {
+      const holdings: Dictionary<HoldingWithProfits[]> = groupBy(
+        this.portfolioHoldings,
+        'sector'
+      );
+
+      return Object.entries(holdings).map(([sector, sectorHoldings]) => ({
+        name: sector,
+        holdings: sectorHoldings,
+        currentValue: sectorHoldings.reduce(
+          (acc, holding) => acc + holding.currentValue,
+          0
+        ),
+        invested: sectorHoldings.reduce(
+          (acc, holding) => acc + holding.invested,
+          0
+        ),
+      }));
     },
   },
   actions: {

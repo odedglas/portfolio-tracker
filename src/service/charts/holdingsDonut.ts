@@ -1,31 +1,34 @@
 import { Platform } from 'quasar';
-import { useHoldingsStore } from 'stores/holdings';
-import { HoldingWithProfits } from 'app/shared/types';
 import { Formatter } from './base';
 import { COLOR_PALLET, FONT_FAMILY } from './constants';
 
 type HoldingDataProperty = 'currentValue' | 'invested';
 
+type HoldingSeriesItem = {
+  name: string;
+  currentValue: number;
+  invested: number;
+  title?: string;
+};
+
 export const getHoldingsDonutChatOptions = (
+  holdings: HoldingSeriesItem[],
   property: HoldingDataProperty = 'currentValue',
   formatter: Formatter,
+  onSeriesClick: (name: string) => void,
   legendPosition = Platform.is.desktop ? 'right' : 'bottom'
 ) => {
-  const holdingsStore = useHoldingsStore();
+  const sortedHoldings = holdings.sort((a, b) => b[property] - a[property]);
 
-  const holdings: HoldingWithProfits[] = holdingsStore.portfolioHoldings.sort(
-    (a, b) => b[property] - a[property]
-  );
-
-  const totalValue = holdings.reduce(
+  const totalValue = sortedHoldings.reduce(
     (acc, holding) => acc + holding[property],
     0
   );
 
   return {
-    series: holdings.map((holding) => holding[property]),
+    series: sortedHoldings.map((holding) => holding[property]),
     options: {
-      labels: holdings.map(({ name }) => name),
+      labels: sortedHoldings.map(({ name }) => name),
       legend: {
         show: true,
         position: legendPosition,
@@ -45,6 +48,17 @@ export const getHoldingsDonutChatOptions = (
         },
         onItemHover: {
           highlightDataSeries: false,
+        },
+      },
+      chart: {
+        events: {
+          dataPointSelection: (
+            _event: unknown,
+            _ctx: unknown,
+            dataPointContext: { dataPointIndex: number }
+          ) => {
+            onSeriesClick(sortedHoldings[dataPointContext.dataPointIndex].name);
+          },
         },
       },
       colors: COLOR_PALLET,
@@ -72,7 +86,7 @@ export const getHoldingsDonutChatOptions = (
       tooltip: {
         y: {
           show: true,
-          formatter: (value: number) => formatter(value, 'decimal'),
+          formatter: (value: number) => `${formatter(value, 'decimal')}`,
         },
       },
     },
