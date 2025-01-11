@@ -75,6 +75,7 @@ export const enUsMessages = {
     portfolio_performance: 'Portfolio investment growth',
     portfolio_value: 'Portfolio value',
     benchmarks: 'Benchmarks',
+    monthly_yield: 'Monthly Yield',
   },
   dashboard: {
     kpis: {

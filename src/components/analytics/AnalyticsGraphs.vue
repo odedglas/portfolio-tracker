@@ -12,6 +12,8 @@
     mode="percentage"
     :benchmarkData="benchmarkData"
   />
+
+  <portfolio-monthly-yield :benchmark-data="benchmarkData" />
 </template>
 
 <script lang="ts">
@@ -22,10 +24,15 @@ import { StockCharData } from 'app/shared/types';
 import { useLoadingStore } from 'stores/loading';
 import { getQuotesChartData } from 'src/service/stocks';
 import { benchmarkOptions } from './constants';
+import PortfolioMonthlyYield from 'components/analytics/PortfolioMonthlyYield.vue';
 
 export default defineComponent({
   name: 'AnalyticsGraphs',
-  components: { BenchmarksSelector, PortfolioPerformance },
+  components: {
+    PortfolioMonthlyYield,
+    BenchmarksSelector,
+    PortfolioPerformance,
+  },
   setup() {
     const benchmarkData = ref<StockCharData[]>([]);
 

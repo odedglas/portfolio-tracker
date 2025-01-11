@@ -28,10 +28,7 @@
                   <span>{{ $t('by_invested') }}</span>
                 </q-item-section>
                 <q-item-section side>
-                  <q-toggle
-                    v-if="$q.platform.is.desktop"
-                    v-model="showInvested"
-                  />
+                  <q-toggle v-model="showInvested" />
                 </q-item-section>
               </q-item>
               <q-item>
@@ -39,10 +36,7 @@
                   <span>{{ $t('by_sector') }}</span>
                 </q-item-section>
                 <q-item-section side>
-                  <q-toggle
-                    v-if="$q.platform.is.desktop"
-                    v-model="showSectors"
-                  />
+                  <q-toggle v-model="showSectors" />
                 </q-item-section>
               </q-item>
             </q-list>
