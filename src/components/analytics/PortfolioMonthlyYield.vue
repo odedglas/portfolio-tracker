@@ -33,13 +33,11 @@
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
-import { groupBy } from 'lodash';
 import { StockCharData } from 'app/shared/types';
 import { usePortfolioStore } from 'stores/portfolios';
 import { timeRangeOptions } from './constants';
 import { useNumberFormatter } from 'components/composables/useNumberFormatter';
 import { useAppearanceStore } from 'stores/appearance';
-import { getDateYearMonthKey } from 'src/service/date';
 import { getPortfolioMonthlyYieldChartData } from 'src/service/charts';
 
 export default defineComponent({
@@ -58,15 +56,9 @@ export default defineComponent({
     const portfolioStore = usePortfolioStore();
     const appearanceStore = useAppearanceStore();
 
-    const groupedHistory = computed(() => {
-      return groupBy(portfolioStore.history, (historyItem) =>
-        getDateYearMonthKey(historyItem.date)
-      );
-    });
-
     const chartData = computed(() =>
       getPortfolioMonthlyYieldChartData(
-        groupedHistory.value,
+        portfolioStore.history,
         props.benchmarkData,
         numberFormatter
       )
@@ -76,7 +68,6 @@ export default defineComponent({
       timeRangeOptions,
       chartData,
       appearanceStore,
-      groupedHistory,
     };
   },
 });

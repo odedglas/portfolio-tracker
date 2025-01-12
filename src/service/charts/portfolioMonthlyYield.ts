@@ -1,30 +1,106 @@
+import { groupBy } from 'lodash';
 import { PortfolioHistory, StockCharData } from 'app/shared/types';
 import { Formatter } from './base';
-import { formatShortDate, getMonthYear } from 'src/service/date';
+import { getDateYearMonthKey } from 'src/service/date';
+import { midDay } from 'src/service/stocks/dates';
 
 const Y_AXIS_BUFFER = 0.1;
+const COLORS = {
+  success: '#26A69A',
+  danger: 'rgb(197, 69, 56)',
+};
+
+const getPortfolioMonthlySeries = (portfolioHistory: PortfolioHistory[]) => {
+  const groupedHistory = groupBy(portfolioHistory, (historyItem) =>
+    getDateYearMonthKey(historyItem.date)
+  );
+
+  return Object.entries(groupedHistory).map(([dateKey, historyRecords]) => {
+    const lastItem = historyRecords[historyRecords.length - 1];
+    const gainOrLoss = lastItem.currentValue - historyRecords[0].currentValue;
+
+    return { x: dateKey, y: gainOrLoss / lastItem.invested };
+  });
+};
+
+const getBenchmarksMonthlySeries = (
+  benchmarks: StockCharData[],
+  minDate: number
+) => {
+  return benchmarks.map((benchmark) => {
+    const data = benchmark.close
+      .map((close: number, index: number) => {
+        return {
+          x: midDay(new Date(benchmark.timestamp[index])),
+          y: close,
+        };
+      })
+      .filter((dataItem) => dataItem.x.getTime() >= minDate);
+
+    const groupedData = groupBy(data, (dataItem) =>
+      getDateYearMonthKey(dataItem.x.getTime())
+    );
+
+    return {
+      name: benchmark.symbol,
+      data: Object.entries(groupedData).map(([dateKey, dataItems]) => {
+        const lastItem = dataItems[dataItems.length - 1];
+        const gainOrLoss = lastItem.y - dataItems[0].y;
+
+        return { x: dateKey, y: gainOrLoss / lastItem.y };
+      }),
+    };
+  });
+};
 
 export const getPortfolioMonthlyYieldChartData = (
-  portfolioHistory: Record<string, PortfolioHistory[]>,
+  portfolioHistory: PortfolioHistory[],
   benchmarks: StockCharData[],
   formatter: Formatter
 ) => {
-  const seriesValues = Object.entries(portfolioHistory).map(
-    ([dateKey, historyRecords]) => {
-      const lastItem = historyRecords[historyRecords.length - 1];
-      const gainOrLoss = lastItem.currentValue - historyRecords[0].currentValue;
-
-      return { x: dateKey, y: gainOrLoss / lastItem.invested };
-    }
+  const historySeriesValues = getPortfolioMonthlySeries(portfolioHistory);
+  const benchmarksSeries = getBenchmarksMonthlySeries(
+    benchmarks,
+    portfolioHistory[0]?.date
   );
 
-  const minValues = seriesValues.map((item) => item.y).sort((a, b) => a - b);
+  const minValues = historySeriesValues
+    .map((item) => item.y)
+    .sort((a, b) => a - b);
+
+  const benchmarksAnnotations = benchmarksSeries
+    .map((series) => {
+      return series.data.map((dataItem) => {
+        return {
+          x: new Date(dataItem.x).getTime(),
+          y: dataItem.y,
+          marker: {
+            size: 6,
+            fillColor: '#fff',
+            strokeColor: '#26A69A',
+            radius: 4,
+            shape: 'circle',
+          },
+          label: {
+            borderColor: '#26A69A',
+            offsetY: 0,
+            style: {
+              color: '#000',
+            },
+            text: `${series.name}: ${formatter(dataItem.y, 'percent')}`,
+          },
+        };
+      });
+    })
+    .flat();
+
+  console.log(benchmarksAnnotations);
 
   return {
     series: [
       {
         name: 'Portfolio Monthly Return',
-        data: seriesValues,
+        data: historySeriesValues,
       },
     ],
     options: {
@@ -42,6 +118,9 @@ export const getPortfolioMonthlyYieldChartData = (
           speed: 100,
         },
       },
+      annotations: {
+        points: benchmarksAnnotations,
+      },
       plotOptions: {
         bar: {
           colors: {
@@ -49,15 +128,17 @@ export const getPortfolioMonthlyYieldChartData = (
               {
                 from: -100,
                 to: 0,
-                color: 'rgb(197, 69, 56)',
+                color: COLORS.danger,
               },
               {
                 from: 0,
                 to: 100,
-                color: '#26A69A',
+                color: COLORS.success,
               },
             ],
           },
+          borderRadius: 5,
+          borderRadiusApplication: 'end',
           columnWidth: '80%',
           dataLabels: {
             position: 'top',
@@ -73,9 +154,9 @@ export const getPortfolioMonthlyYieldChartData = (
           fontSize: '12px',
           colors: [
             (opt: { dataPointIndex: number }) => {
-              const item = seriesValues[opt.dataPointIndex];
+              const item = historySeriesValues[opt.dataPointIndex];
 
-              return item.y >= 0 ? '#26A69A' : 'rgb(197, 69, 56)';
+              return item.y >= 0 ? COLORS.success : COLORS.danger;
             },
           ],
         },
@@ -100,11 +181,7 @@ export const getPortfolioMonthlyYieldChartData = (
         tooltip: {
           enabled: false,
         },
-        labels: {
-          formatter: (y: string) => getMonthYear(y),
-        },
         type: 'datetime',
-        convertedCatToNumeric: false,
       },
     },
   };

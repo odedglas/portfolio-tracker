@@ -224,13 +224,6 @@ const buildTransactionsAnnotations = (
             },
             text: displayText,
           },
-          tooltip: {
-            enabled: true,
-            offsetY: 0,
-            style: {
-              fontSize: '12px',
-            },
-          },
         };
       }),
   };
