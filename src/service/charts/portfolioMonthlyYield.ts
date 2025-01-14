@@ -1,3 +1,4 @@
+import { ApexOptions } from 'apexcharts';
 import { groupBy } from 'lodash';
 import { PortfolioHistory, StockCharData } from 'app/shared/types';
 import { Formatter } from './base';
@@ -8,6 +9,7 @@ const Y_AXIS_BUFFER = 0.1;
 const COLORS = {
   success: '#26A69A',
   danger: 'rgb(197, 69, 56)',
+  benchmark: '#d6c2c2',
 };
 
 const getPortfolioMonthlySeries = (portfolioHistory: PortfolioHistory[]) => {
@@ -57,12 +59,24 @@ export const getPortfolioMonthlyYieldChartData = (
   portfolioHistory: PortfolioHistory[],
   benchmarks: StockCharData[],
   formatter: Formatter
-) => {
+): { series: unknown[]; options: ApexOptions } => {
   const historySeriesValues = getPortfolioMonthlySeries(portfolioHistory);
   const benchmarksSeries = getBenchmarksMonthlySeries(
     benchmarks,
     portfolioHistory[0]?.date
   );
+
+  const barMainSeries = historySeriesValues.map((item, index) => ({
+    ...item,
+    goals: [
+      {
+        name: 'SPY',
+        value: benchmarksSeries[0]?.data?.[index]?.y ?? 0,
+        strokeHeight: 0,
+        strokeWidth: 0,
+      },
+    ],
+  }));
 
   const minValues = historySeriesValues
     .map((item) => item.y)
@@ -75,19 +89,12 @@ export const getPortfolioMonthlyYieldChartData = (
           x: new Date(dataItem.x).getTime(),
           y: dataItem.y,
           marker: {
-            size: 6,
+            size: 4,
             fillColor: '#fff',
-            strokeColor: '#26A69A',
-            radius: 4,
+            strokeColor: '#d6c2c2',
+            strokeWidth: 2,
+            radius: 2,
             shape: 'circle',
-          },
-          label: {
-            borderColor: '#26A69A',
-            offsetY: 0,
-            style: {
-              color: '#000',
-            },
-            text: `${series.name}: ${formatter(dataItem.y, 'percent')}`,
           },
         };
       });
@@ -100,7 +107,7 @@ export const getPortfolioMonthlyYieldChartData = (
     series: [
       {
         name: 'Portfolio Monthly Return',
-        data: historySeriesValues,
+        data: barMainSeries,
       },
     ],
     options: {
@@ -118,8 +125,20 @@ export const getPortfolioMonthlyYieldChartData = (
           speed: 100,
         },
       },
+      colors: [COLORS.success, COLORS.benchmark],
       annotations: {
         points: benchmarksAnnotations,
+      },
+      legend: {
+        show: true,
+        showForSingleSeries: true,
+        customLegendItems: [
+          'Portfolio',
+          ...benchmarksSeries.map((series) => series.name),
+        ],
+        markers: {
+          fillColors: [COLORS.success, COLORS.benchmark],
+        },
       },
       plotOptions: {
         bar: {
@@ -182,6 +201,13 @@ export const getPortfolioMonthlyYieldChartData = (
           enabled: false,
         },
         type: 'datetime',
+      },
+      tooltip: {
+        shared: true,
+        intersect: false,
+        marker: {
+          show: true,
+        },
       },
     },
   };

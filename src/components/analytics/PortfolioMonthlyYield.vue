@@ -21,8 +21,8 @@
     <q-card-section class="q-pt-none q-px-none q-px-md-md">
       <apexchart
         ref="chartRef"
-        :type="chartData.options.chart.type"
-        :height="chartData.options.chart.height"
+        :type="chartData.options.chart?.type"
+        :height="chartData.options.chart?.height"
         :options="chartData.options"
         :series="chartData.series"
       ></apexchart>
