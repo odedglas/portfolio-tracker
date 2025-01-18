@@ -100,7 +100,10 @@ export const queries = {
       where('portfolioId', 'in', portfoliosIds)
     );
 
-    return firestoreAPI.getAll(insightsQuery);
+    debugger;
+    const all = await firestoreAPI.getAll(insightsQuery);
+
+    return all;
   },
   getPortfolioHistory: async (portfolioId: string) => {
     const historyCollection = getCollections().portfolioHistory;

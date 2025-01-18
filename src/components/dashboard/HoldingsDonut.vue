@@ -8,8 +8,12 @@
       <div class="flex col justify-between">
         <div class="flex items-center q-mr-sm">
           <q-icon name="scale" class="dashboard-icon q-mr-sm" size="sm" />
-          <p class="text-h6 text-grey-7 q-mb-none">Holdings allocation</p>
-
+          <p
+            class="text-h6 text-grey-7 q-mb-none clickable"
+            @click="showSectors = false"
+          >
+            Holdings allocation
+          </p>
           <p
             v-if="showSectors"
             class="text-subtitle1 text-grey-7 q-mb-none q-mx-sm flex items-center q-gap-xs"
