@@ -20,3 +20,9 @@ export const daysAgo = (date: number) => {
 
   return `${daysFromNow(date)} day${daysPlural} ago`;
 };
+
+export const getDateYearMonthKey = (date: number) =>
+  DateAPI.formatDate(date, 'YYYY-MM');
+
+export const getMonthYear = (date: string) =>
+  DateAPI.formatDate(date, 'MMM YYYY');

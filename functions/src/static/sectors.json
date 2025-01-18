@@ -1,0 +1,56 @@
+{
+  "MSFT": {
+    "sector": "Software Infrastructure"
+  },
+  "KRE": {
+    "sector": "Funds"
+  },
+  "MU": {
+    "sector": "Semiconductors"
+  },
+  "IBIT": {
+    "sector": "Commodities"
+  },
+  "MDB": {
+    "sector": "Software Application"
+  },
+  "KKR": {
+    "sector": "Financial Services"
+  },
+  "NVDA": {
+    "sector": "Semiconductors"
+  },
+  "QQQ": {
+    "sector": "Funds"
+  },
+  "FVRR": {
+    "sector": "Communication Services"
+  },
+  "AMZN": {
+    "sector": "Consumer Cyclical"
+  },
+  "LMND": {
+    "sector": "Financial Services"
+  },
+  "SHOP": {
+    "sector": "Software Application"
+  },
+  "PLTR": {
+    "sector": "Software Application"
+  },
+  "TSLA": {
+    "sector": "Consumer Discretionary"
+  },
+  "SOFI": {
+    "sector": "Financial Services"
+  },
+  "ARKK": {
+    "sector": "Funds"
+  },
+  "AMD": {
+    "sector": "Semiconductors"
+  },
+  "PANW": {
+    "sector": "Cyber Security"
+  }
+}

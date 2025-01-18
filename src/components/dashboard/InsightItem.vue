@@ -178,6 +178,7 @@ export default defineComponent({
   position: absolute;
   transition: all 0.2s;
   right: 4px;
+  top: 10px;
   cursor: pointer;
   z-index: 9999;
 

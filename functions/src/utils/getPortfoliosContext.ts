@@ -6,7 +6,7 @@ import {
   Quote,
 } from '../../../shared/types';
 import { holdingsTransformer } from '../../../shared/transformers';
-import { getTickersQuotes } from './getTickersQuotes';
+import { getTickersQuotes } from './quotes';
 import { getCollection } from './getCollection';
 
 export type PortfoliosContext = {

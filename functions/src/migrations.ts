@@ -1,6 +1,9 @@
 import * as logger from 'firebase-functions/logger';
+import * as pMap from 'p-map';
 import { Holding, Transaction } from '../../shared/types';
 import { getCollection, updateDocuments } from './utils/getCollection';
+import { searchTicker } from './utils/quotes';
+import * as sectorsStub from './static/sectors.json';
 
 type MigrationRunner = (dryRun: boolean) => Promise<void>;
 
@@ -47,8 +50,60 @@ const alignTransactionsWithHoldingImages = async (dryRun = true) => {
   }
 };
 
+const setHoldingsSectors = async (dryRun = true) => {
+  const holdings = await getCollection<Holding>('holdings');
+
+  const holdingsTickers = [
+    ...new Set(holdings.map((holding) => holding.ticker)),
+  ];
+
+  const sectorsMap: Record<string, { sector: string }> = sectorsStub;
+
+  if (!Object.keys(sectorsMap)) {
+    // TODO - Remove if fresh data is needed.
+    await pMap(
+      holdingsTickers,
+      async (ticker) => {
+        const search = await searchTicker(ticker);
+
+        const tickerMatch = search.find((t) => t.symbol === ticker);
+
+        if (!tickerMatch) {
+          logger.warn('No ticker found', { ticker });
+          return;
+        }
+
+        sectorsMap[ticker] = {
+          sector: tickerMatch.industry?.replace('-', ' '),
+        };
+
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+      },
+      { concurrency: 3 }
+    );
+  }
+
+  const updatedHoldings = holdings.map((holding) => {
+    return {
+      ...holding,
+      ...sectorsMap[holding.ticker],
+    };
+  });
+
+  if (!dryRun) {
+    logger.info('Saving updated holdings', {
+      count: updatedHoldings.length,
+      ids: updatedHoldings.map((t) => t.id),
+    });
+    await updateDocuments('holdings', updatedHoldings);
+  } else {
+    logger.info('Dry run mode, skipping save', { sectorsMap });
+  }
+};
+
 const migrationsMap: Record<string, MigrationRunner> = {
   transactionImages: alignTransactionsWithHoldingImages,
+  holdingsSectors: setHoldingsSectors,
 };
 
 /**
@@ -69,6 +124,7 @@ export const migrations = async (name: string, dryRUn = true) => {
     const migrationResult = await migrationRunner(dryRUn);
     logger.info(`Migration ${name} completed`, { migrationResult });
   } catch (error: unknown) {
+    console.log(error);
     logger.error('Migration failed', { name, error });
     return;
   }

@@ -262,11 +262,7 @@ export default defineComponent({
     };
 
     watch(
-      [
-        showResetZoom.value,
-        periodTimeRange,
-        chartData.value.options.annotations.points,
-      ],
+      [showResetZoom, periodTimeRange],
       () => {
         setTimeout(() => {
           const chartRoot: HTMLElement = chartRef.value?.chart?.el;

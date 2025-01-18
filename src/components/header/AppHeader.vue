@@ -12,6 +12,8 @@
         <app-navigation />
       </q-toolbar-title>
 
+      <refresh-finance-data-button />
+
       <stealth-mode-button />
 
       <notifications-button />
@@ -30,10 +32,12 @@ import AppNavigation from './Navigation.vue';
 import UserProfileDropDown from './UserProfileDropDown.vue';
 import StealthModeButton from 'components/common/StealthModeButton.vue';
 import NotificationsButton from 'components/common/NotificationsButton.vue';
+import RefreshFinanceDataButton from 'components/common/RefreshFinanceDataButton.vue';
 
 export default defineComponent({
   name: 'AppHeader',
   components: {
+    RefreshFinanceDataButton,
     NotificationsButton,
     StealthModeButton,
     AppNavigation,

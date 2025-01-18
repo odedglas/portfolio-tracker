@@ -18,6 +18,8 @@ export const enUsMessages = {
   fees: 'Fees',
   realized: 'Realized gains',
   capital: 'Capital gains',
+  by_invested: 'By Invested',
+  by_sector: 'By Sector',
   portfolios: {
     title: "Manage portfolio's",
     create: 'New Portfolio',
@@ -73,6 +75,7 @@ export const enUsMessages = {
     portfolio_performance: 'Portfolio investment growth',
     portfolio_value: 'Portfolio value',
     benchmarks: 'Benchmarks',
+    monthly_yield: 'Monthly Yield',
   },
   dashboard: {
     kpis: {

@@ -71,8 +71,7 @@ const normalizeBenchmarkValue = (
   const [benchmarkStartingPoint] = series.data;
 
   let lastInvested = historyStartingPoint.invested,
-    currentShares =
-      historyStartingPoint.currentValue / benchmarkStartingPoint.y; // Takes currentValue to ensure a "pure" comparison.
+    currentShares = historyStartingPoint.invested / benchmarkStartingPoint.y; // Takes currentValue to ensure a "pure" comparison.
 
   let avgPrice = benchmarkStartingPoint.y;
 
@@ -224,13 +223,6 @@ const buildTransactionsAnnotations = (
               borderRadius: 2,
             },
             text: displayText,
-          },
-          tooltip: {
-            enabled: true,
-            offsetY: 0,
-            style: {
-              fontSize: '12px',
-            },
           },
         };
       }),

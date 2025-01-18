@@ -36,6 +36,7 @@ export const useInsightsStore = defineStore('insights', {
             return {
               ...insight,
               ...(storedInsight && {
+                id: storedInsight.id,
                 expiredAt: storedInsight.expiredAt,
                 createdAt: storedInsight.createdAt,
                 historyInputs: storedInsight.historyInputs,

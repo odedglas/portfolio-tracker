@@ -18,7 +18,7 @@ import { PortfoliosSchedulerContext } from './types';
 export const portfolioHistoryTracker = async (
   context: PortfoliosSchedulerContext
 ) => {
-  const { portfolioHoldings, portfolios, dryRun } = context;
+  const { portfolioHoldings, portfolios, holdings, dryRun } = context;
   const now = Date.now();
 
   logger.info('Portfolio History Tracker Start', {
@@ -28,9 +28,19 @@ export const portfolioHistoryTracker = async (
 
   // Calculate each portfolio its own KPI's.
   const historyRecords: PortfolioHistory[] = portfolios.map((portfolio) => {
-    const portfolioSummary = holdingsTransformer.summary(
-      portfolioHoldings[portfolio.id] || []
+    const activeHoldings = (portfolioHoldings[portfolio.id] || []).filter(
+      (holding) => !holding.deleted
     );
+
+    // Deleted holdings won't include `currentValue` computed property and will be excluded from the summary.
+    const deletedHoldings = holdings.filter(
+      (holding) => holding.portfolioId === portfolio.id && holding.deleted
+    );
+
+    const allHoldings = [...activeHoldings, ...deletedHoldings];
+
+    const portfolioSummary = holdingsTransformer.summary(allHoldings);
+
     const portfolioWithHoldings = {
       ...portfolio,
       ...portfolioSummary,

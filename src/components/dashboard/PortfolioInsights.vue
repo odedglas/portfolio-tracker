@@ -59,10 +59,14 @@ export default defineComponent({
     const insightsStore = useInsightsStore();
     const appearanceStore = useAppearanceStore();
 
-    const insights = computed(() => [
-      ...insightsStore.dailyInsights,
-      ...insightsStore.inactiveInsights,
-    ]);
+    const insights = computed(() => {
+      const res = [
+        ...insightsStore.dailyInsights,
+        ...insightsStore.inactiveInsights,
+      ];
+
+      return res;
+    });
 
     const insightsPerPage = computed(() => ($q.platform.is.desktop ? 3 : 1));
 
