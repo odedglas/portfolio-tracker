@@ -101,8 +101,6 @@ export const getPortfolioMonthlyYieldChartData = (
     })
     .flat();
 
-  console.log(benchmarksAnnotations);
-
   return {
     series: [
       {

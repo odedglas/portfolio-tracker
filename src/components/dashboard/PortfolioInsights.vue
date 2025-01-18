@@ -65,8 +65,6 @@ export default defineComponent({
         ...insightsStore.inactiveInsights,
       ];
 
-      console.log('UI ', res);
-
       return res;
     });
 
