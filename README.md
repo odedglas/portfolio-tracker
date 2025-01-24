@@ -8,6 +8,15 @@
 - https://rapidapi.com/apidojo/api/yahoo-finance1/playground/apiendpoint_2c81ebb5-60ab-41e4-8cd2-2056b26e93c2
 - https://rapidapi.com/rpi4gx/api/fear-and-greed-index/playground/apiendpoint_042f2700-015a-41a9-aa6b-6c87dd95da0c
 
+**Note**
+
+- It's better to create multiple API keys for `yahoo-finance` API for different environments:
+  - Local development
+  - Production deployments via `Github` actions.
+  - Firebase cloud functions
+
+This will enable you to trigger more calls and have more robust environment without leakage of API usages between the environments.
+
 3. Create a `.env` file in the root of the project and add the following variables:
 
 ```bash
@@ -64,9 +73,11 @@ flowchart TB
 
 %% Portfolio Tracker Element
   PortfolioTracker[Portfolio Tracker Scheduled task that closes portfolio daily movement]
+  NotificationScheduler[Portfolio Alerts and Insights Scheduler]
 
 %% Connections with labels as env variables
   QuasarWebApp -->|"firebase config\n(env variable)"| Firebase
   QuasarWebApp -->|"rapid API key\n(env variable)"| RapidAPI
   cloudFunctions --> PortfolioTracker
+  cloudFunctions --> NotificationScheduler
 ```
