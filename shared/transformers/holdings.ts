@@ -49,9 +49,9 @@ export const holdingsTransformer = {
   summary: (holdings: (HoldingWithProfits | Holding)[]): HoldingsSummary =>
     holdings.reduce(
       (acc, holding) => {
-        if (!('currentValue' in holding)) {
-          const realizedProfit = holding.realizedProfits ?? 0;
+        const realizedProfit = holding.realizedProfits ?? 0;
 
+        if (!('currentValue' in holding)) {
           acc.shares += holding.shares;
           acc.profit += realizedProfit;
           acc.realized += realizedProfit;
@@ -64,9 +64,8 @@ export const holdingsTransformer = {
         acc.profit += holding.profit.value;
         acc.currentValue += holding.currentValue;
         acc.invested += holding.invested;
-        acc.realized += holding.realizedProfits ?? 0;
-        acc.capitalGains +=
-          holding.profit.value - (holding.realizedProfits ?? 0);
+        acc.realized += realizedProfit;
+        acc.capitalGains += holding.profit.value - realizedProfit;
         acc.dailyChange += holding.dailyChange.value;
         acc.fees += holding?.fees ?? 0;
 
