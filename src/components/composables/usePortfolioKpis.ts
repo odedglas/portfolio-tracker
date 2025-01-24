@@ -13,7 +13,6 @@ export const usePortfolioKpis = () => {
       return [];
     }
 
-    debugger;
     const portfolioKpis = portfoliosTransformer.portfolioKPIS(portfolio);
 
     return [
