@@ -30,6 +30,7 @@ import { useViewHoldings } from 'components/composables/useViewHoldings';
 import { useEditableEntityPage } from 'components/composables/useEditableEntityPage';
 import TransactionsDialog from 'components/transactions/TransactionDialog.vue';
 import { useNumberFormatter } from 'components/composables/useNumberFormatter';
+import { transactionsTransformer } from 'app/shared/transformers';
 
 export default defineComponent({
   name: 'MobilePortfolio',
@@ -73,7 +74,9 @@ export default defineComponent({
           transaction.shares
         } shares at $${transaction.price}`,
         date: transaction.date,
-        value: transaction.totalValue.value * -1,
+        value:
+          transaction.totalValue.value *
+          (transactionsTransformer.isBuy(transaction) ? -1 : 1),
         ticker: {
           symbol: transaction.ticker,
           logoImage: transaction.logoImage,

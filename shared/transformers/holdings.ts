@@ -7,8 +7,7 @@ export const holdingsTransformer = {
   profit: (holding: Holding, quote: Quote) => {
     const profitValue =
       holdingsTransformer.currentValue(holding, quote) -
-      holdingsTransformer.totalValue(holding) +
-      (holding?.realizedProfits ?? 0);
+      holdingsTransformer.totalValue(holding);
 
     return {
       value: profitValue,

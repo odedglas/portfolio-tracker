@@ -20,6 +20,7 @@ export const enUsMessages = {
   capital: 'Capital gains',
   by_invested: 'By Invested',
   by_sector: 'By Sector',
+  realized_gains_tooltip: 'Realized gains from sold shares: +{realized}',
   portfolios: {
     title: "Manage portfolio's",
     create: 'New Portfolio',
@@ -64,7 +65,7 @@ export const enUsMessages = {
     add_your_first: 'Add your first transaction',
     no_transactions_found:
       "There aren't any transactions yet found within your portfolio.",
-    all_profit_is_realized: 'All profit is realized',
+    all_profit_is_realized: 'All shares were realized from this transaction.',
   },
   holdings: {
     header: 'Holdings',

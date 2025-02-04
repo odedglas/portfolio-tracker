@@ -3,6 +3,16 @@
     <span v-if="value !== undefined">
       <span v-if="showValueSign"> {{ valueSign }} </span>
       {{ $n(Math.abs(value), 'decimal') }}
+      <span v-if="realizedValue">
+        <span style="font-size: 16px; text-shadow: 0 0 black">🇷</span>
+        <q-tooltip class="text-caption">
+          {{
+            $t('realized_gains_tooltip', {
+              realized: $n(realizedValue, 'decimal'),
+            })
+          }}
+        </q-tooltip>
+      </span>
     </span>
     <q-separator v-if="showSeparator" vertical />
     <span class="flex items-center" v-if="percentage !== undefined"
@@ -20,6 +30,7 @@ export default defineComponent({
   name: 'ProfitIndicator',
   props: {
     value: { type: Number, required: false },
+    realizedValue: { type: Number, required: false },
     percentage: { type: Number, required: false },
     displayAsRow: { type: Boolean, default: true },
     showValueSign: { type: Boolean, default: false },

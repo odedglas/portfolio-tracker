@@ -75,7 +75,19 @@
           {{ props.row.formattedDate }}
         </q-td>
         <q-td key="shares" :props="props">
-          {{ props.row.shares }}
+          <span class="flex align-center q-gap-xs">
+            <span>{{ props.row.shares }}</span>
+            <span v-if="props.row.actualShares !== props.row.shares">
+              |
+              <span class="text-caption text-grey-7"
+                >{{ props.row.actualShares }}A</span
+              >
+              <q-tooltip class="text-caption">
+                <b>{{ props.row.shares - props.row.actualShares }} Shares</b>
+                were sold from this transaction.
+              </q-tooltip>
+            </span>
+          </span>
         </q-td>
         <q-td key="price" :props="props">
           {{ $n(props.row.price, 'decimal') }}
@@ -99,7 +111,12 @@
             :display-as-row="false"
           />
           <span v-else>
-            <span>{{ $t('transactions.all_profit_is_realized') }}</span>
+            <span>
+              ---
+              <q-tooltip class="text-caption">{{
+                $t('transactions.all_profit_is_realized')
+              }}</q-tooltip>
+            </span>
           </span>
         </q-td>
         <q-td key="item_actions" :props="props" class="text-grey-6">

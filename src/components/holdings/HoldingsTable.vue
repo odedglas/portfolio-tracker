@@ -38,6 +38,7 @@
         <q-td key="total_profit" :props="props">
           <profit-indicator
             :percentage="props.row.profit.percent"
+            :realized-value="props.row.realizedProfits"
             :value="props.row.profit.value"
             :display-as-row="false"
           />
@@ -123,6 +124,7 @@ export default defineComponent({
 
     const { viewHoldings } = useViewHoldings();
 
+    console.log('View Holdings', viewHoldings);
     return {
       filter,
       columns,
