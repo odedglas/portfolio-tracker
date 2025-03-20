@@ -11,6 +11,7 @@ export const ROUTE_PATHS = {
   ALLOCATION_PLANNER: '/allocation-planner',
   ANALYTICS: '/analytics',
   STOCK_PLANS: '/stock-plans',
+  BALANCE_HISTORY: '/balance-history',
 };
 
 const routes: RouteRecordRaw[] = [
@@ -67,6 +68,10 @@ const routes: RouteRecordRaw[] = [
       {
         path: ROUTE_PATHS.ALLOCATION_PLANNER,
         component: () => import('pages/AllocationPlanner.vue'),
+      },
+      {
+        path: ROUTE_PATHS.BALANCE_HISTORY,
+        component: () => import('pages/Balance.vue'),
       },
     ],
   },

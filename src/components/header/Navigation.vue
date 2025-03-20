@@ -63,6 +63,7 @@ export default defineComponent({
           ROUTE_PATHS.HOLDINGS,
           ROUTE_PATHS.CASH,
           ROUTE_PATHS.ALLOCATION_PLANNER,
+          ROUTE_PATHS.BALANCE_HISTORY,
         ],
         menuOptions: [
           {
@@ -88,6 +89,12 @@ export default defineComponent({
             text: 'Allocation Planner',
             icon: 'list_alt',
             route: ROUTE_PATHS.ALLOCATION_PLANNER,
+          },
+          {
+            id: 'balance_history',
+            text: 'Balance History',
+            icon: 'history',
+            route: ROUTE_PATHS.BALANCE_HISTORY,
           },
         ],
       },

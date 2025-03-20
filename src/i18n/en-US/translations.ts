@@ -72,6 +72,9 @@ export const enUsMessages = {
     no_holdings:
       'No holding are there yet, You can start by creating a Transaction',
   },
+  balance_history: {
+    title: 'Balance History',
+  },
   charts: {
     portfolio_performance: 'Portfolio investment growth',
     portfolio_value: 'Portfolio value',
