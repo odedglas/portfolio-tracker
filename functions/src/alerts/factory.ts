@@ -16,7 +16,7 @@ const formatCurrency = (value: number) => {
 };
 
 const alertConditionTitle = (alert: Alert) =>
-  alert.condition === 'gt' ? 'Crossing over' : 'Crossing below';
+  alert.condition === 'gt' ? 'Crossing above' : 'Crossing below';
 
 export default {
   priceAlert: (alert: Alert, quoteValue: number): Partial<Notification> => ({
