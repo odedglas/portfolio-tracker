@@ -12,10 +12,13 @@ export const useNotificationsStore = defineStore('notifications', {
     portfolioNotifications(state) {
       const portfolioStore = usePortfolioStore();
 
-      return state.notifications.filter(
-        (notification) =>
-          notification.data.portfolioId === portfolioStore.selectedPortfolio?.id
-      ).sort((a, b) => b.createdAt - a.createdAt);
+      return state.notifications
+        .filter(
+          (notification) =>
+            notification.data.portfolioId ===
+            portfolioStore.selectedPortfolio?.id
+        )
+        .sort((a, b) => b.createdAt - a.createdAt);
     },
     unreadNotifications(): Notification[] {
       return this.portfolioNotifications.filter(
