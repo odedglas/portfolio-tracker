@@ -15,10 +15,12 @@ const formatCurrency = (value: number) => {
   return formatter.format(value);
 };
 
+const alertConditionTitle = (alert: Alert) => alert.condition === 'gt' ? 'Crossing over' : 'Crossing below';
+
 export default {
   priceAlert: (alert: Alert, quoteValue: number): Partial<Notification> => ({
     ...notificationDefaults,
-    title: `${alert.ticker} is ${alert.condition} ${formatCurrency(
+    title: `${alert.ticker} is ${alertConditionTitle(alert)} ${formatCurrency(
       alert.value
     )}`,
     type: 'priceAlert',

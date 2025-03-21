@@ -34,63 +34,71 @@ export const alertsHandler = async (tickerQuotes: Quote[]) => {
 
   logger.info(`Alerts Handler Start, processing ${alerts.length} alerts`);
 
-  const updatedAlerts = alerts
-    .map((alert) => {
-      const quote = tickerQuotes.find((quote) => quote.symbol === alert.ticker);
-
-      if (!quote) {
-        logger.error(`Quote not found for ticker ${alert.ticker}`);
-        return;
-      }
-
-      const quoteValue = quote[alert.valueProperty];
-      if (
-        isConditionMatched(alert.condition, alert.value, quoteValue) &&
-        !alert.lastTriggeredDate
-      ) {
-        logger.info('Found alert matching condition', { alert, quoteValue });
-
-        if (alert.once) {
-          alert.active = false;
-        }
-
-        alert.lastTriggeredDate = Date.now();
-        alert.lastTriggeredPrice = quoteValue;
-
-        sendNotification(
-          alert.owner,
-          notificationsFactory.priceAlert(alert, quoteValue)
+  const updatedAlerts = (
+    await Promise.all(
+      alerts.map(async (alert) => {
+        const quote = tickerQuotes.find(
+          (quote) => quote.symbol === alert.ticker
         );
 
-        return alert;
-      } else {
-        logger.info('Alert condition skipped', { alert, quoteValue });
-      }
+        if (!quote) {
+          logger.error(`Quote not found for ticker ${alert.ticker}`);
+          return;
+        }
 
-      // Check if alert should be reactivated - Rather last trigger price is opposite of the condition
-      if (
-        alert.lastTriggeredPrice &&
-        !alert.once &&
-        isConditionMatched(
-          conditionOpposite(alert.condition),
-          alert.value,
-          quoteValue
-        )
-      ) {
-        logger.info('Re-triggering alert, opposite condition matched', {
-          alert,
-          quoteValue,
-        });
-        alert.lastTriggeredPrice = 0;
-        alert.lastTriggeredDate = 0;
-        alert.active = true;
+        const quoteValue = quote[alert.valueProperty];
+        if (
+          isConditionMatched(alert.condition, alert.value, quoteValue) &&
+          !alert.lastTriggeredDate
+        ) {
+          logger.info('Found alert matching condition', { alert, quoteValue });
 
-        return alert;
-      }
+          if (alert.once) {
+            alert.active = false;
+          }
 
-      return;
-    })
-    .filter(Boolean) as Alert[];
+          alert.lastTriggeredDate = Date.now();
+          alert.lastTriggeredPrice = quoteValue;
+
+          await sendNotification(
+            alert.owner,
+            notificationsFactory.priceAlert(alert, quoteValue)
+          );
+
+          return alert;
+        } else {
+          logger.info('Alert condition skipped', { alert, quoteValue });
+        }
+
+        // Check if alert should be reactivated - Rather last trigger price is opposite of the condition
+        if (
+          alert.lastTriggeredPrice &&
+          !alert.once &&
+          isConditionMatched(
+            conditionOpposite(alert.condition),
+            alert.value,
+            quoteValue
+          )
+        ) {
+          logger.info('Re-triggering alert, opposite condition matched', {
+            alert,
+            quoteValue,
+          });
+          alert.lastTriggeredPrice = 0;
+          alert.lastTriggeredDate = 0;
+          alert.active = true;
+
+          return alert;
+        }
+
+        return;
+      })
+    )
+  ).filter(Boolean) as Alert[];
+
+  logger.info('Updating alerts', {
+    alerts: updatedAlerts.map((alert) => alert.id),
+  });
 
   await updateDocuments('alerts', updatedAlerts);
 
