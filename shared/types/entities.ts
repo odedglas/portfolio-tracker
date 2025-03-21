@@ -258,6 +258,7 @@ type AlertValueProperty =
 
 export type Alert = Entity & {
   value: number;
+  createdAt: number;
   owner: string;
   valueProperty: AlertValueProperty;
   once: boolean;

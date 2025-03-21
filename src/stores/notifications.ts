@@ -15,7 +15,7 @@ export const useNotificationsStore = defineStore('notifications', {
       return state.notifications.filter(
         (notification) =>
           notification.data.portfolioId === portfolioStore.selectedPortfolio?.id
-      );
+      ).sort((a, b) => b.createdAt - a.createdAt);
     },
     unreadNotifications(): Notification[] {
       return this.portfolioNotifications.filter(
