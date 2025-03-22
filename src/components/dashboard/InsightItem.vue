@@ -3,7 +3,7 @@
     :class="[
       'inner',
       { 'q-pt-md q-pb-sm': !compact, 'q-pa-sm': compact },
-      'flex q-gap-md column justify-between'
+      'flex q-gap-md column justify-between',
     ]"
     @mouseenter="closeMenuOpen = true"
     @mouseleave="closeMenuOpen = false"
