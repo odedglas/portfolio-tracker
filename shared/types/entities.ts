@@ -219,11 +219,11 @@ export type PortfolioInsight = Entity & {
   createdAt?: number;
   expiredAt?: number;
   historyInputs?: { date: number; inputs: Partial<InsightInputs> }[];
+  deleted?: boolean;
 };
 
 export type ViewPortfolioInsight = PortfolioInsight & {
   holding: Holding;
-  inactive?: boolean;
 };
 
 export type NotificationType =

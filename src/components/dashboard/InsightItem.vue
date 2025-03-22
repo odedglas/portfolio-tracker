@@ -122,21 +122,12 @@ export default defineComponent({
     );
 
     const getInsightDateBadge = (insight: ViewPortfolioInsight) => {
-      const { createdAt = Date.now(), expiredAt, inactive } = insight;
+      const { createdAt = Date.now(), expiredAt } = insight;
 
       if (expiredAt) {
         return {
           text: `Expired ${daysAgo(expiredAt)}`,
           tooltip: `Expired at ${formatNotificationDate(expiredAt)}`,
-        };
-      }
-
-      if (inactive) {
-        return {
-          text: 'Expired Today',
-          tooltip: `This insight is not active since ${formatNotificationDate(
-            expiredAt ?? 0
-          )}`,
         };
       }
 

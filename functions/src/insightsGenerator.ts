@@ -11,18 +11,42 @@ import {
   updateDocuments,
 } from './utils/getCollection';
 import { PortfolioInsight } from '../../shared/types';
-import { ONE_DAY_MS } from './constants';
+import { INSIGHTS_RETENTION, ONE_DAY_MS } from './constants';
 
 /**
  * Determines if an insight is still active based on its expiration date
  * @param insight - The insight to check
  */
-const isInsightActive = ({ expiredAt }: PortfolioInsight) => {
+const isInsightActive = ({ expiredAt, deleted }: PortfolioInsight) => {
   if (!expiredAt) {
     return true;
   }
 
+  if (deleted) {
+    return false;
+  }
+
   return Date.now() - expiredAt <= ONE_DAY_MS; // Rather insight was expired less than 24 hours ago.
+};
+
+/**
+ * Returns insights to deleted if they're expired and older than the retention period
+ * @param allInsights - All insights from the database
+ * @return Array of insights to be marked as deleted
+ */
+const getInsightsToDelete = (allInsights: PortfolioInsight[]) => {
+  const now = Date.now();
+
+  return allInsights
+    .filter(
+      (insight) =>
+        !insight.deleted &&
+        insight.expiredAt &&
+        now - insight.expiredAt > INSIGHTS_RETENTION
+    )
+    .map((insight) => ({
+      id: insight.id,
+    }));
 };
 
 /**
@@ -159,6 +183,7 @@ export const insightsGenerator = async (
       'insights',
       newInsights.map((insight) => ({
         ...insight,
+        deleted: false,
         historyInputs: [{ date: Date.now(), inputs: insight.inputs }],
       }))
     );
@@ -219,6 +244,19 @@ export const insightsGenerator = async (
     }));
 
     await updateDocuments('insights', updatedRecurringInsights);
+  }
+
+  const insightsToDelete = getInsightsToDelete(persistedInsights);
+  logger.info('Deleting old insights by retention period', {
+    insightsToDelete: insightsToDelete.map((insight) => insight.id),
+  });
+  if (!dryRun) {
+    const updatedDeletedInsights = insightsToDelete.map((insight) => ({
+      id: insight.id,
+      deleted: true,
+    }));
+
+    await updateDocuments('insights', updatedDeletedInsights);
   }
 
   logger.info('Insights Generator Done', {
