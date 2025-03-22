@@ -1,6 +1,10 @@
 <template>
   <div
-    class="inner q-pt-md q-pb-sm flex q-gap-md column justify-between"
+    :class="[
+      'inner',
+      { 'q-pt-md q-pb-sm': !compact, 'q-pa-sm': compact },
+      'flex q-gap-md column justify-between'
+    ]"
     @mouseenter="closeMenuOpen = true"
     @mouseleave="closeMenuOpen = false"
   >
@@ -13,16 +17,16 @@
         <q-tooltip>Hide insight</q-tooltip>
       </q-icon>
     </div>
-    <div class="flex q-gap-md q-px-md">
+    <div class="flex q-gap-md" :class="{ 'q-px-md': !compact }">
       <div class="flex justify-between items-center full-width">
         <div class="flex items-center q-gap-sm">
           <ticker-logo
             :ticker="insight.holding.ticker"
             :logo-image="insight.holding.logoImage"
-            :size="36"
+            :size="compact ? 24 : 36"
             class="q-mr-xs"
           />
-          <span class="text-h6 text-capitalize">{{
+          <span :class="compact ? 'text-subtitle1' : 'text-h6'">{{
             $t(`insights.types.title.${insight.type}`)
           }}</span>
         </div>
@@ -40,7 +44,9 @@
           </q-tooltip>
         </q-chip>
       </div>
-      <insight-item-text :insight="insight" />
+      <span class="insight-text">
+        <insight-item-text :insight="insight" />
+      </span>
     </div>
     <div class="flex justify-between">
       <i class="text-subtitle2 text-grey-8 q-px-md flex items-center">
@@ -100,6 +106,10 @@ export default defineComponent({
     insight: {
       type: Object as PropType<ViewPortfolioInsight>,
       required: true,
+    },
+    compact: {
+      type: Boolean,
+      default: false,
     },
   },
   components: {
@@ -177,6 +187,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.insight-text {
+  min-height: 42px;
+}
+
 .floating-close-menu {
   position: absolute;
   transition: all 0.2s;

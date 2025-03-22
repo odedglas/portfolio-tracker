@@ -48,7 +48,7 @@ export const insightSparklineChartData = (options: InsightSparklineOptions) => {
           opacity: 0.3,
           label: {
             borderColor: 'transparent',
-            offsetY: 30,
+            offsetY: 14,
             text: `Triggered: ${formatter(triggerPrice, 'decimal')}`,
             style: {
               background: 'transparent',
