@@ -14,12 +14,15 @@ admin.initializeApp();
 export const manualPortfolioTracker = onRequest(
   { secrets: ['RAPID_YAHOO_API_KEY'] },
   async (request, response) => {
+    const dryRun = request.query.dryRun
+      ? request.query.dryRun === 'true'
+      : true;
+
     const schedulerContext = {
-      ...(await getPortfoliosContext()),
-      dryRun: request.query.dryRun ? request.query.dryRun === 'true' : true,
+      ...(await getPortfoliosContext(dryRun)),
     };
 
-    await portfolioHistoryTracker(schedulerContext);
+    // await portfolioHistoryTracker(schedulerContext);
     await insightsGenerator(schedulerContext);
 
     response.send({ success: true });

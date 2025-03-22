@@ -6,6 +6,11 @@ import { useQuotesStore } from 'stores/quotes';
 import { calculateInsights, calculateInsightTags } from 'app/shared/insights';
 import { usePortfolioStore } from 'stores/portfolios';
 
+/**
+ * Time constants for insight processing
+ */
+export const ONE_DAY_MS = 1000 * 60 * 60 * 24;
+
 type InsightsState = {
   storedInsights: PortfolioInsight[];
   loading: boolean;
@@ -29,9 +34,16 @@ export const useInsightsStore = defineStore('insights', {
           const quote = useQuotesStore().tickerQuotes[holding.ticker];
 
           return calculateInsights(holding, quote).map((insight) => {
-            const storedInsight = state.storedInsights.find(
-              (storedInsight) => storedInsight.holdingId === holding.id
-            );
+            const storedInsight = state.storedInsights
+              .filter(
+                (insight) =>
+                  !insight.expiredAt ||
+                  Date.now() - insight.expiredAt <= ONE_DAY_MS
+              )
+              .find(
+                (storedInsight) =>
+                  storedInsight.identifier === insight.identifier
+              );
 
             return {
               ...insight,
@@ -47,6 +59,7 @@ export const useInsightsStore = defineStore('insights', {
         })
         .flat();
     },
+    // Insights that were persisted but not yet expired
     inactiveInsights(state): ViewPortfolioInsight[] {
       const selectedPortfolioId = usePortfolioStore().selectedPortfolio?.id;
       const holdings = useHoldingsStore().portfolioHoldings;
@@ -70,7 +83,7 @@ export const useInsightsStore = defineStore('insights', {
 
           if (!holding) {
             console.warn(
-              'Insights generator - Cannot match to holding id',
+              'Insights generator - Cannot match to holding id. probably holding was removed',
               insight.id
             );
             return;

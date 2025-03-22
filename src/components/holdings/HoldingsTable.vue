@@ -5,7 +5,7 @@
     :columns="columns"
     row-key="name"
     :filter="filter"
-    :rows-per-page-options="[10, 15, 25, 0]"
+    :rows-per-page-options="[0]"
   >
     <template v-slot:body="props">
       <q-tr :props="props">
@@ -124,7 +124,6 @@ export default defineComponent({
 
     const { viewHoldings } = useViewHoldings();
 
-    console.log('View Holdings', viewHoldings);
     return {
       filter,
       columns,

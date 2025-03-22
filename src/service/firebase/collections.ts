@@ -97,7 +97,8 @@ export const queries = {
 
     const insightsQuery = query(
       insightsCollection,
-      where('portfolioId', 'in', portfoliosIds)
+      where('portfolioId', 'in', portfoliosIds),
+      where('deleted', '!=', true)
     );
 
     return await firestoreAPI.getAll(insightsQuery);

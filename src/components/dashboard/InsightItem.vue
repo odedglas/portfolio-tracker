@@ -1,6 +1,10 @@
 <template>
   <div
-    class="inner q-pt-md q-pb-sm flex q-gap-md column justify-between"
+    :class="[
+      'inner',
+      { 'q-pt-md q-pb-sm': !compact, 'q-pa-sm': compact },
+      'flex q-gap-md column justify-between',
+    ]"
     @mouseenter="closeMenuOpen = true"
     @mouseleave="closeMenuOpen = false"
   >
@@ -13,16 +17,16 @@
         <q-tooltip>Hide insight</q-tooltip>
       </q-icon>
     </div>
-    <div class="flex q-gap-md q-px-md">
+    <div class="flex q-gap-md" :class="{ 'q-px-md': !compact }">
       <div class="flex justify-between items-center full-width">
         <div class="flex items-center q-gap-sm">
           <ticker-logo
             :ticker="insight.holding.ticker"
             :logo-image="insight.holding.logoImage"
-            :size="36"
+            :size="compact ? 24 : 36"
             class="q-mr-xs"
           />
-          <span class="text-h6 text-capitalize">{{
+          <span :class="compact ? 'text-subtitle1' : 'text-h6'">{{
             $t(`insights.types.title.${insight.type}`)
           }}</span>
         </div>
@@ -40,13 +44,15 @@
           </q-tooltip>
         </q-chip>
       </div>
-      <insight-item-text :insight="insight" />
+      <span class="insight-text">
+        <insight-item-text :insight="insight" />
+      </span>
     </div>
     <div class="flex justify-between">
       <i class="text-subtitle2 text-grey-8 q-px-md flex items-center">
         <q-icon name="schedule" class="q-mr-xs" />
         Created at {{ formatNotificationDate(insight.createdAt ?? 0) }} | Price:
-        {{ $n(insight.inputs.regularMarketPrice ?? 0, 'noneSensitiveDecimal') }}
+        {{ $n(getInsightsTriggerPrice(), 'noneSensitiveDecimal') }}
       </i>
       <span class="q-px-md cursor-pointer" v-if="showInsightHistoryGraph">
         <q-icon
@@ -101,6 +107,10 @@ export default defineComponent({
       type: Object as PropType<ViewPortfolioInsight>,
       required: true,
     },
+    compact: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: {
     InsightMenu,
@@ -122,21 +132,12 @@ export default defineComponent({
     );
 
     const getInsightDateBadge = (insight: ViewPortfolioInsight) => {
-      const { createdAt = Date.now(), expiredAt, inactive } = insight;
+      const { createdAt = Date.now(), expiredAt } = insight;
 
       if (expiredAt) {
         return {
           text: `Expired ${daysAgo(expiredAt)}`,
           tooltip: `Expired at ${formatNotificationDate(expiredAt)}`,
-        };
-      }
-
-      if (inactive) {
-        return {
-          text: 'Expired Today',
-          tooltip: `This insight is not active since ${formatNotificationDate(
-            expiredAt ?? 0
-          )}`,
         };
       }
 
@@ -160,6 +161,17 @@ export default defineComponent({
       });
     };
 
+    const getInsightsTriggerPrice = () => {
+      const { inputs, historyInputs } = props.insight;
+      const [firstHistoryInput] = historyInputs ?? [];
+
+      return (
+        firstHistoryInput?.inputs?.regularMarketPrice ??
+        inputs.regularMarketPrice ??
+        0
+      );
+    };
+
     return {
       closeMenuOpen,
       insightMenuOpen,
@@ -168,12 +180,17 @@ export default defineComponent({
       shortHoldingName,
       formatNotificationDate,
       removeInsight,
+      getInsightsTriggerPrice,
     };
   },
 });
 </script>
 
 <style lang="scss">
+.insight-text {
+  min-height: 42px;
+}
+
 .floating-close-menu {
   position: absolute;
   transition: all 0.2s;

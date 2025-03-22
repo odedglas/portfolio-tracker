@@ -81,6 +81,7 @@ const emptyAlert = (): Alert => {
 
   return {
     id: '',
+    createdAt: Date.now(),
     ticker: '',
     value: 0,
     active: true,
