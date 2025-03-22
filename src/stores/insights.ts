@@ -30,7 +30,7 @@ export const useInsightsStore = defineStore('insights', {
 
           return calculateInsights(holding, quote).map((insight) => {
             const storedInsight = state.storedInsights.find(
-              (storedInsight) => storedInsight.holdingId === holding.id
+              (storedInsight) => storedInsight.identifier === insight.identifier
             );
 
             return {

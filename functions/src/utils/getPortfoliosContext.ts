@@ -16,9 +16,12 @@ export type PortfoliosContext = {
   tickerQuotesMap: Record<string, Quote>;
   portfolioHoldings: Record<string, HoldingWithProfits[]>;
   holdingsWithProfits: HoldingWithProfits[];
+  dryRun: boolean;
 };
 
-export const getPortfoliosContext = async (): Promise<PortfoliosContext> => {
+export const getPortfoliosContext = async (
+  dryRun = false
+): Promise<PortfoliosContext> => {
   const now = Date.now();
   logger.info('Calculating portfolios context start', {
     timestamp: now,
@@ -63,5 +66,6 @@ export const getPortfoliosContext = async (): Promise<PortfoliosContext> => {
     tickerQuotesMap,
     portfolioHoldings,
     holdingsWithProfits,
+    dryRun,
   };
 };
