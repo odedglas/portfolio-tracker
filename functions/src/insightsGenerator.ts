@@ -135,13 +135,15 @@ export const insightsGenerator = async (
   // Calculate new insights for all holdings
   const dailyInsights = Object.values(portfolioHoldings)
     .map((holdingsGroup) =>
-      holdingsGroup.map((holding) => {
-        const quote = tickerQuotesMap[holding.ticker];
-        return calculateInsights(holding, quote).map((insight) => ({
-          ...insight,
-          holding,
-        }));
-      })
+      holdingsGroup
+        .filter((holding) => !holding.deleted)
+        .map((holding) => {
+          const quote = tickerQuotesMap[holding.ticker];
+          return calculateInsights(holding, quote).map((insight) => ({
+            ...insight,
+            holding,
+          }));
+        })
     )
     .flat()
     .flat();

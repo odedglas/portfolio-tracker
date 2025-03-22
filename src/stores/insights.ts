@@ -70,7 +70,7 @@ export const useInsightsStore = defineStore('insights', {
 
           if (!holding) {
             console.warn(
-              'Insights generator - Cannot match to holding id',
+              'Insights generator - Cannot match to holding id. probably holding was removed',
               insight.id
             );
             return;
