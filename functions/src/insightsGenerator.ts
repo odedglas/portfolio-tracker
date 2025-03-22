@@ -215,6 +215,7 @@ export const insightsGenerator = async (
           inputs: insight.inputs,
         },
       ],
+      expiredAt: 0,
     }));
 
     await updateDocuments('insights', updatedRecurringInsights);

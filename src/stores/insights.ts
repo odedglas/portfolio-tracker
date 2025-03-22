@@ -47,6 +47,7 @@ export const useInsightsStore = defineStore('insights', {
         })
         .flat();
     },
+    // Insights that were persisted but not yet expired
     inactiveInsights(state): ViewPortfolioInsight[] {
       const selectedPortfolioId = usePortfolioStore().selectedPortfolio?.id;
       const holdings = useHoldingsStore().portfolioHoldings;

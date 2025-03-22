@@ -9,15 +9,18 @@ type InsightSparklineOptions = {
 
 export const insightSparklineChartData = (options: InsightSparklineOptions) => {
   const { insight, formatter } = options;
-  const inputs = insight.historyInputs ?? [];
+  const historyInputs = insight.historyInputs ?? [];
 
-  const triggerPrice = insight.inputs.regularMarketPrice ?? 0;
+  const triggerPrice =
+    historyInputs[0]?.inputs?.regularMarketPrice ??
+    insight.inputs.regularMarketPrice ??
+    0;
 
   return {
     series: [
       {
         name: insight.holding.name,
-        data: inputs.map(({ date, inputs: insightInputs }) => ({
+        data: historyInputs.map(({ date, inputs: insightInputs }) => ({
           y: insightInputs.regularMarketPrice,
           x: date,
         })),
@@ -72,7 +75,9 @@ export const insightSparklineChartData = (options: InsightSparklineOptions) => {
           formatter: (_: unknown, data: { dataPointIndex: number }) => {
             const { dataPointIndex } = data;
 
-            return `${formatNotificationDate(inputs[dataPointIndex].date)}: `;
+            return `${formatNotificationDate(
+              historyInputs[dataPointIndex].date
+            )}: `;
           },
         },
       },

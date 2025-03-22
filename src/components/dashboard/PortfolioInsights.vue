@@ -59,14 +59,11 @@ export default defineComponent({
     const insightsStore = useInsightsStore();
     const appearanceStore = useAppearanceStore();
 
-    const insights = computed(() => {
-      const res = [
-        ...insightsStore.dailyInsights,
-        ...insightsStore.inactiveInsights,
-      ];
-
-      return res;
-    });
+    const insights = computed(() =>
+      [...insightsStore.dailyInsights, ...insightsStore.inactiveInsights].sort(
+        (a, b) => ((b.expiredAt ?? 0) > (a.expiredAt ?? 0) ? -1 : 1)
+      )
+    );
 
     const insightsPerPage = computed(() => ($q.platform.is.desktop ? 3 : 1));
 

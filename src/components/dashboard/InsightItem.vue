@@ -46,7 +46,7 @@
       <i class="text-subtitle2 text-grey-8 q-px-md flex items-center">
         <q-icon name="schedule" class="q-mr-xs" />
         Created at {{ formatNotificationDate(insight.createdAt ?? 0) }} | Price:
-        {{ $n(insight.inputs.regularMarketPrice ?? 0, 'noneSensitiveDecimal') }}
+        {{ $n(getInsightsTriggerPrice(), 'noneSensitiveDecimal') }}
       </i>
       <span class="q-px-md cursor-pointer" v-if="showInsightHistoryGraph">
         <q-icon
@@ -160,6 +160,17 @@ export default defineComponent({
       });
     };
 
+    const getInsightsTriggerPrice = () => {
+      const { inputs, historyInputs } = props.insight;
+      const [firstHistoryInput] = historyInputs ?? [];
+
+      return (
+        firstHistoryInput?.inputs?.regularMarketPrice ??
+        inputs.regularMarketPrice ??
+        0
+      );
+    };
+
     return {
       closeMenuOpen,
       insightMenuOpen,
@@ -168,6 +179,7 @@ export default defineComponent({
       shortHoldingName,
       formatNotificationDate,
       removeInsight,
+      getInsightsTriggerPrice,
     };
   },
 });
