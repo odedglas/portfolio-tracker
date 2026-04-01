@@ -17,7 +17,7 @@ jobs:
     env:
       RUN_ID:  ${{ github.event.workflow_run.id }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Test run it
         run: echo "Test run it  $RUN_ID"
