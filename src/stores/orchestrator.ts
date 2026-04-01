@@ -30,6 +30,8 @@ export const useOrchestratorStore = defineStore('orchestrator', {
           new Set(holdings.map((holding) => holding.ticker))
         );
 
+        debugger;
+
         await Promise.all([
           quotesStore.getTickersQuotes(holdingsTickers),
           quotesStore.setFearAndGreed(),

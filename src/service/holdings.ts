@@ -47,7 +47,9 @@ const api = {
     transactions: Transaction[]
   ) => {
     const holdingTransactions = transactions.filter(
-      (t) => t.ticker === holding.ticker
+      (t) =>
+        t.ticker === holding.ticker &&
+        (!t.holdingId || t.holdingId === holding.id)
     );
 
     const buyTransactions = holdingTransactions.filter(

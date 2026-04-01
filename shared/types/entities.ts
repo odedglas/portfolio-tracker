@@ -156,6 +156,7 @@ export type Transaction = Entity &
     portfolioId: string;
     realizedProfit?: number;
     sector?: string;
+    holdingId?: string;
   };
 
 export type Holding = Entity &

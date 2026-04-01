@@ -34,9 +34,9 @@ export const migrationsRunner = onRequest(async (request, response) => {
 
   logger.info('Running migration', { name, dryRun });
 
-  await migrations(name as string, dryRun === 'true');
+  const result = await migrations(name as string, dryRun === 'true');
 
-  response.send({ success: true });
+  response.send({ success: true, result });
 });
 
 export const portfolioScheduler = onSchedule(

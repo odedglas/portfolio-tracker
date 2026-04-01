@@ -5,7 +5,7 @@ import { getCollection, updateDocuments } from './utils/getCollection';
 import { searchTicker } from './utils/quotes';
 import * as sectorsStub from './static/sectors.json';
 
-type MigrationRunner = (dryRun: boolean) => Promise<void>;
+type MigrationRunner = (dryRun: boolean) => Promise<unknown>;
 
 const alignTransactionsWithHoldingImages = async (dryRun = true) => {
   const holdings = await getCollection<Holding>('holdings');
@@ -101,9 +101,97 @@ const setHoldingsSectors = async (dryRun = true) => {
   }
 };
 
+const backfillTransactionHoldingIds = async (dryRun = true) => {
+  const holdings = await getCollection<Holding>('holdings');
+  const transactions = await getCollection<Transaction>('transactions');
+
+  // Group holdings and transactions by portfolioId + ticker
+  const holdingsByKey = holdings.reduce((acc, holding) => {
+    const key = `${holding.portfolioId}__${holding.ticker}`;
+    acc[key] = acc[key] || [];
+    acc[key].push(holding);
+    return acc;
+  }, {} as Record<string, Holding[]>);
+
+  const transactionsByKey = transactions.reduce((acc, transaction) => {
+    const key = `${transaction.portfolioId}__${transaction.ticker}`;
+    acc[key] = acc[key] || [];
+    acc[key].push(transaction);
+    return acc;
+  }, {} as Record<string, Transaction[]>);
+
+  const updatedTransactions: Transaction[] = [];
+
+  for (const key of Object.keys(transactionsByKey)) {
+    const keyHoldings = (holdingsByKey[key] || []).sort(
+      (a, b) => a.createdAt - b.createdAt
+    );
+    const keyTransactions = transactionsByKey[key].sort(
+      (a, b) => a.date - b.date
+    );
+
+    if (!keyHoldings.length) {
+      logger.warn('No holdings found for transactions', { key });
+      continue;
+    }
+
+    let holdingIndex = 0;
+    let runningShares = 0;
+
+    for (const transaction of keyTransactions) {
+      const holding = keyHoldings[holdingIndex];
+
+      if (!holding) {
+        logger.warn('Ran out of holdings for transactions', {
+          key,
+          transaction,
+        });
+        break;
+      }
+
+      const isBuy = transaction.action === 'buy';
+      runningShares += isBuy ? transaction.shares : -transaction.shares;
+
+      updatedTransactions.push({ ...transaction, holdingId: holding.id });
+
+      // When shares hit 0, the holding was fully sold — advance to next holding
+      if (runningShares <= 0) {
+        runningShares = 0;
+        holdingIndex++;
+      }
+    }
+  }
+
+  logger.info('Backfilling holdingId on transactions', {
+    total: transactions.length,
+    toUpdate: updatedTransactions.length,
+  });
+
+  if (!dryRun) {
+    await updateDocuments('transactions', updatedTransactions);
+    logger.info('Saved updated transactions');
+    return { total: transactions.length, updated: updatedTransactions.length };
+  } else {
+    const result = {
+      dryRun: true,
+      total: transactions.length,
+      toUpdate: updatedTransactions.length,
+      transactions: updatedTransactions.map((t) => ({
+        id: t.id,
+        ticker: t.ticker,
+        action: t.action,
+        holdingId: t.holdingId,
+      })),
+    };
+    logger.info('Dry run mode, skipping save', result);
+    return result;
+  }
+};
+
 const migrationsMap: Record<string, MigrationRunner> = {
   transactionImages: alignTransactionsWithHoldingImages,
   holdingsSectors: setHoldingsSectors,
+  backfillTransactionHoldingIds,
 };
 
 /**
@@ -123,6 +211,7 @@ export const migrations = async (name: string, dryRUn = true) => {
   try {
     const migrationResult = await migrationRunner(dryRUn);
     logger.info(`Migration ${name} completed`, { migrationResult });
+    return migrationResult;
   } catch (error: unknown) {
     console.log(error);
     logger.error('Migration failed', { name, error });
