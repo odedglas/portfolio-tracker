@@ -70,4 +70,23 @@ There is also a **bottom-right FAB** (`+` button) for adding entries, and a **si
 ## Known Issues / Edge Cases
 
 - `LoadingLayout.vue` has no `<template>` block — Vue warns "Component is missing template or render function" in the console. This is intentional; the component is renderless and uses Quasar's loading plugin. Not a bug.
-- The login form shows a "Wrong email or password" toast even on successful login — this is a **known UI bug**. Credentials `oded@claw.com` / `Aa123456` are correct; the toast is a false error. Auth succeeds and the app navigates to dashboard regardless.
+- ~~Login toast on successful auth~~ — **FIXED in PR #66**. Root cause: `createAppUser` used `addDoc` (random doc ID) instead of `setDoc` at `users/{uid}`, failing Firestore security rules. Fix: pass `user.uid` to `api.update`.
+
+## Auth Architecture
+
+- **Login flow:** `LoginForm.vue` → `authentication.signInWithPassword` → `authenticationWithLoading` → `emitLoadingTask` → Firebase `signInWithEmailAndPassword` + `createAppUser`
+- **Social login flow:** `SocialMediaLoginBar.vue` → `authentication.signInWithProvider` → same `authenticationWithLoading` path
+- **`createAppUser`** (`src/service/user.ts`): checks if user doc exists at `users/{uid}` first; skips creation if found; creates via `api.update(data, user.uid)` — the `userId` argument is required to use `setDoc` at the correct path
+- **`emitLoadingTask`** (`src/stores/loading.ts`): runs `Promise.all([task(), wait(1000)])` — any throw inside propagates to the caller
+- **Firestore security rules:** user docs must be written to `users/{uid}` where `uid == request.auth.uid` — `addDoc` with auto-generated IDs will always be rejected
+- **Sign out:** `authentication.signOut()` → Firebase `signOut(auth)`
+
+## File → Auth Mappings
+
+| File | Role |
+| ---- | ---- |
+| `src/components/login/LoginForm.vue` | Email/password login + signup form |
+| `src/components/login/SocialMediaLoginBar.vue` | Google/Facebook/Twitter login buttons |
+| `src/service/firebase/authentication.ts` | `authenticationWithLoading`, `signInWithPassword`, `signInWithProvider`, `signUp`, `signOut` |
+| `src/service/user.ts` | `createAppUser` — idempotent user doc creation |
+| `src/stores/loading.ts` | `emitLoadingTask` — wraps async tasks with loading spinner |
