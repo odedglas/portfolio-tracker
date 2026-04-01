@@ -31,7 +31,7 @@ const api = {
       return;
     }
 
-    await api.update({ uid: user.uid, settings: defaultSettings() });
+    await api.update({ uid: user.uid, settings: defaultSettings() }, user.uid);
   },
 };
 
