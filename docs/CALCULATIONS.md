@@ -17,6 +17,7 @@ This document is the canonical reference for all financial calculations in the a
 ## 1. Transaction-Level Calculations
 
 ### `totalValue`
+
 > `shared/transformers/transactions.ts`
 
 ```
@@ -28,6 +29,7 @@ Original gross cost of the transaction including fees. Uses original `shares` (n
 ---
 
 ### `actualValue`
+
 > `shared/transformers/transactions.ts`
 
 ```
@@ -39,6 +41,7 @@ Cost of remaining/allocated shares after FIFO allocation. Used to compute `avgPr
 ---
 
 ### `fundsValue`
+
 > `shared/transformers/transactions.ts`
 
 ```
@@ -52,6 +55,7 @@ Used in `invested` calculation.
 ---
 
 ### FIFO Sell Allocation — `allocateSellTransaction`
+
 > `src/service/transactions.ts`
 
 When a sell transaction is added, shares are allocated against buy transactions in **reverse chronological order** (newest buys first):
@@ -66,6 +70,7 @@ for each buyTransaction (newest → oldest):
 ```
 
 This sets on the sell transaction:
+
 - `realizedProfit` = total realized gain/loss from this sale
 - `paidPrice` = original cost basis of the sold shares (used in `fundsValue`)
 
@@ -176,16 +181,16 @@ dailyChange.percent = quote.regularMarketChangePercent / 100
 
 Aggregates metrics across **all holdings — both active and deleted**. This is intentional: deleted holdings still carry `realizedProfits` and `fees` that belong in the portfolio picture.
 
-| Field | Active Holdings | Deleted Holdings |
-|---|---|---|
-| `shares` | ✅ | ✅ |
-| `currentValue` | ✅ | ❌ (no market value) |
-| `profit` | `profit.value` | `realizedProfits` only |
-| `invested` | ✅ | ❌ |
-| `realized` | ✅ | ✅ |
-| `capitalGains` | `profit.value - realizedProfits` | ❌ |
-| `dailyChange` | ✅ | ❌ |
-| `fees` | ✅ | ✅ |
+| Field          | Active Holdings                  | Deleted Holdings       |
+| -------------- | -------------------------------- | ---------------------- |
+| `shares`       | ✅                               | ✅                     |
+| `currentValue` | ✅                               | ❌ (no market value)   |
+| `profit`       | `profit.value`                   | `realizedProfits` only |
+| `invested`     | ✅                               | ❌                     |
+| `realized`     | ✅                               | ✅                     |
+| `capitalGains` | `profit.value - realizedProfits` | ❌                     |
+| `dailyChange`  | ✅                               | ❌                     |
+| `fees`         | ✅                               | ✅                     |
 
 **`capitalGains`** represents the unrealized portion of profit — what you'd gain if you sold now, excluding what has already been realized from prior sales on the same holding.
 
@@ -264,15 +269,16 @@ dailyChange.percentage = dailyChange.value / depositsValue
 
 The profit KPI tooltip breaks down total profit into three components:
 
-| Line | Value | Meaning |
-|---|---|---|
-| `capital` | `portfolio.capitalGains` | Unrealized gains (active holdings only) |
-| `realized` | `portfolio.realized` | Gains locked in from sold positions |
-| `fees` | `portfolio.fees * -1` | Total fees paid across all holdings (shown as negative cost) |
+| Line       | Value                    | Meaning                                                      |
+| ---------- | ------------------------ | ------------------------------------------------------------ |
+| `capital`  | `portfolio.capitalGains` | Unrealized gains (active holdings only)                      |
+| `realized` | `portfolio.realized`     | Gains locked in from sold positions                          |
+| `fees`     | `portfolio.fees * -1`    | Total fees paid across all holdings (shown as negative cost) |
 
 **Important:** `fees` is shown as a **negative number** in the tooltip as a visual signal that it is a cost. This is purely for display clarity — fees are **not** an additional deduction against profit. They are already embedded in `profit.value` via `avgPrice` (fees raise cost basis, reducing unrealized profit). The `* -1` is intentional UI convention, not a calculation.
 
 The three lines do **not** necessarily sum to `profit.value` exactly, because:
+
 - `capitalGains` already has fees embedded via cost basis
 - `realized` is gross realized P&L before fees
 - `fees` is shown for cost awareness only, not as an additional deduction
@@ -282,13 +288,17 @@ The three lines do **not** necessarily sum to `profit.value` exactly, because:
 ## 7. Known Design Decisions & Edge Cases
 
 ### Re-purchase of a sold ticker
+
 When all shares of a holding are sold (`shares <= 0`), the holding is marked `deleted: true`. A subsequent re-purchase creates a **new** holding. The old deleted holding retains its `realizedProfits` and `fees`, which continue to contribute to portfolio-level totals.
 
 ### Legacy transactions without `holdingId`
+
 The `holdingId` field on transactions was backfilled via migration. Transactions without a `holdingId` fall back to ticker-only matching in `syncHoldingWithTransactions`. This is safe for single-cycle holdings.
 
 ### `avgPrice` returns 0 when fully sold
+
 When `actualShares` across all buys reaches 0, `totalShares = 0` and `avgPrice = 0`. This is expected for deleted holdings — their market value contribution is zero.
 
 ### `profit.percent` is signed
+
 `profit.percent` carries its sign (positive = gain, negative = loss). The UI uses the sign directly to determine color and arrow direction in `ProfitIndicator`. Do not apply `Math.abs()` here.
