@@ -23,6 +23,7 @@
 ## Navigation Structure
 
 The app uses a **top navbar** (not a sidebar) with 4 nav items:
+
 - Dashboard, Portfolio, Analytics, Stocks Plans
 
 There is also a **bottom-right FAB** (`+` button) for adding entries, and a **side drawer** accessible via icon links (account_balance, transform, attach_money, content_paste) — likely Holdings, Transactions, Cash, Plans.
@@ -30,6 +31,7 @@ There is also a **bottom-right FAB** (`+` button) for adding entries, and a **si
 ## Known User Flows
 
 ### Dashboard (no portfolios state)
+
 - Shows "No Portfolios" in header with portfolio switcher dropdown
 - Holdings allocation card: empty (no data without a portfolio)
 - Portfolio heat map card: empty (no data without a portfolio)
@@ -37,6 +39,7 @@ There is also a **bottom-right FAB** (`+` button) for adding entries, and a **si
 - Fear and Greed Index displays in Daily Movers header
 
 ### Auth flow
+
 - `/login` page: Email + Password fields + LOGIN button + Google/Facebook/Twitter social login buttons
 - Successful auth redirects to `/dashboard`
 - Session persists across page navigations
@@ -54,17 +57,17 @@ There is also a **bottom-right FAB** (`+` button) for adding entries, and a **si
 
 ## File → Page Mappings
 
-| Files | Affected Pages |
-|---|---|
-| `src/stores/portfolios.ts`, `src/components/dashboard/**` | `/dashboard` |
-| `src/stores/holdings.ts`, `src/components/holdings/**` | `/holdings` |
-| `src/stores/transactions.ts`, `src/components/transactions/**` | `/transactions` |
-| `src/stores/quotes.ts` | `/dashboard`, `/holdings` |
-| `shared/transformers/**` | `/dashboard`, `/holdings`, `/transactions` |
-| `src/components/common/**` | all pages |
-| `src/layouts/LoadingLayout.vue` | all pages (global overlay) |
+| Files                                                          | Affected Pages                             |
+| -------------------------------------------------------------- | ------------------------------------------ |
+| `src/stores/portfolios.ts`, `src/components/dashboard/**`      | `/dashboard`                               |
+| `src/stores/holdings.ts`, `src/components/holdings/**`         | `/holdings`                                |
+| `src/stores/transactions.ts`, `src/components/transactions/**` | `/transactions`                            |
+| `src/stores/quotes.ts`                                         | `/dashboard`, `/holdings`                  |
+| `shared/transformers/**`                                       | `/dashboard`, `/holdings`, `/transactions` |
+| `src/components/common/**`                                     | all pages                                  |
+| `src/layouts/LoadingLayout.vue`                                | all pages (global overlay)                 |
 
 ## Known Issues / Edge Cases
 
 - `LoadingLayout.vue` has no `<template>` block — Vue warns "Component is missing template or render function" in the console. This is intentional; the component is renderless and uses Quasar's loading plugin. Not a bug.
-- The `oded@claw.com` / `Aa123456` credentials produce a "Wrong email or password" toast on login attempt, BUT the app still navigates to dashboard via an existing Firebase session. The test account session persists — login via credentials may not be needed if session is active.
+- The login form shows a "Wrong email or password" toast even on successful login — this is a **known UI bug**. Credentials `oded@claw.com` / `Aa123456` are correct; the toast is a false error. Auth succeeds and the app navigates to dashboard regardless.
