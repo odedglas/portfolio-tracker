@@ -110,7 +110,8 @@ export const useHoldingsStore = defineStore('holdings', {
             this.holdings.find(
               (holding) =>
                 holding.ticker === transaction.ticker &&
-                holding.portfolioId === selectedPortfolioId
+                holding.portfolioId === selectedPortfolioId &&
+                !holding.deleted
             ) ?? this.create(transaction);
 
           if (name === 'remove') {
@@ -126,6 +127,7 @@ export const useHoldingsStore = defineStore('holdings', {
 
           // Calculate after action AVG price
           context.after(async () => {
+            transaction.holdingId = holding.id;
             holding.id = (
               await holdingsAPI.syncHoldingWithTransactions(
                 holding,
@@ -161,7 +163,7 @@ export const useHoldingsStore = defineStore('holdings', {
       await holdingsAPI.delete(holdingId);
 
       const deletedHolding = this.holdings.find(
-        (holding) => holding.id !== holdingId
+        (holding) => holding.id === holdingId
       );
 
       if (!deletedHolding) {

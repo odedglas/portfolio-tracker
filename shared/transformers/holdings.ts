@@ -11,7 +11,7 @@ export const holdingsTransformer = {
 
     return {
       value: profitValue,
-      percent: Math.abs(profitValue / holding.invested),
+      percent: profitValue / holding.invested,
     };
   },
   dailyChange: (holding: Holding, quote: Quote) => {

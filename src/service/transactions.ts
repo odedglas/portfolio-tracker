@@ -53,7 +53,9 @@ const api = {
       .reverse()
       .filter(
         (t) =>
-          transactionsTransformer.isBuy(t) && t.ticker === transaction.ticker
+          transactionsTransformer.isBuy(t) &&
+          t.ticker === transaction.ticker &&
+          (!t.holdingId || t.holdingId === transaction.holdingId)
       );
 
     let remainingShares = transaction.actualShares;
