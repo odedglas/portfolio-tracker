@@ -1,11 +1,11 @@
 ---
 name: visual-validate
-description: Scope-aware visual validation of the portfolio-tracker app after code changes. Navigates affected pages, screenshots, analyzes, self-heals, and reports.
+description: Scope-aware visual validation of the portfolio-tracker app after code changes. Navigates affected pages, screenshots, analyzes, and self-heals. Agent-internal — no external reporting.
 ---
 
 # Visual Validate
 
-Run after any code change to visually validate that the affected pages look and behave correctly.
+Run after any code change to visually validate that the affected pages look and behave correctly. This skill is for the agent to validate itself — results stay in-session and in `docs/app-context.md`, not shared externally.
 
 ## Trigger
 
@@ -18,7 +18,7 @@ Run after any code change to visually validate that the affected pages look and 
 1. Dev server must be running at `http://localhost:9200`
    - If not reachable, tell the user: "Please run `npm run dev` from the project root, then re-invoke"
    - Do not proceed until reachable
-2. Must be logged in as `oded@claw.com` / `Aa123456`
+2. Must be logged in — check by looking for a tab already past `/login`
 
 ## Step 1: Scope Resolution
 
@@ -29,72 +29,84 @@ Determine which pages to validate:
 **If called with `--all`**: validate all known routes in order (see route table in `docs/app-context.md` and `CLAUDE.md`).
 
 **If called after a change (default)**: infer affected pages from recently modified files using this mapping:
-- `src/stores/portfolios.ts`, `src/components/dashboard/**` → `/dashboard`
-- `src/stores/holdings.ts`, `src/components/holdings/**` → `/holdings`
-- `src/stores/transactions.ts`, `src/components/transactions/**` → `/transactions`
-- `src/stores/quotes.ts` → `/dashboard`, `/holdings`
-- `shared/transformers/**` → `/dashboard`, `/holdings`, `/transactions`
-- `src/components/common/**` → all pages
-- Unknown files → validate `/dashboard` as a baseline
+
+| Files | Affected Pages |
+|---|---|
+| `src/stores/portfolios.ts`, `src/components/dashboard/**` | `/dashboard` |
+| `src/stores/holdings.ts`, `src/components/holdings/**` | `/holdings` |
+| `src/stores/transactions.ts`, `src/components/transactions/**` | `/transactions` |
+| `src/stores/quotes.ts` | `/dashboard`, `/holdings` |
+| `shared/transformers/**` | `/dashboard`, `/holdings`, `/transactions` |
+| `src/components/common/**` | all pages |
+| `src/layouts/LoadingLayout.vue` | all pages |
+| Unknown files | `/dashboard` (baseline) |
 
 Update this mapping in `docs/app-context.md` as you discover new file→page relationships.
 
 ## Step 2: Auth Check
 
-Run:
-```
+```bash
 axcli chrome tabs
 ```
 
-Look for a tab at `localhost:9200`. If none:
-```
+Look for a tab at `localhost:9200` that is NOT on `/login`. If one exists, use it — auth is active.
+
+If no tab exists at `localhost:9200`:
+```bash
 axcli chrome open "http://localhost:9200/login"
+# Note the new tabId from the response
 ```
 
-Then snapshot the tab and check for a login form. If present, log in:
-```
+If the tab is on `/login`, log in:
+```bash
 axcli chrome snapshot <tabId>
-# Find email/password fields and sign-in button in the snapshot
-axcli chrome click <tabId> <email-field-ref>
-# Enter: oded@claw.com
-axcli chrome click <tabId> <password-field-ref>
-# Enter: Aa123456
-axcli chrome click <tabId> <signin-button-ref>
+# Snapshot returns refs. Expect: @1 = Email field, @2 = Password field, @3 = LOGIN button
+axcli chrome type <tabId> @1 "oded@claw.com"
+axcli chrome type <tabId> @2 "Aa123456"
+axcli chrome click <tabId> @3
+axcli chrome wait <tabId> load --timeout 5000
 ```
 
-If already on a dashboard page (not `/login`), auth is active — skip login.
+**Known bug:** A "Wrong email or password" toast appears even on successful login — ignore it. Auth succeeds if the app navigates away from `/login`.
 
 ## Step 3: Validate Each Page in Scope
 
-For each page in scope, run this sequence:
+For each page, run this sequence:
 
 ### 3a. Navigate
-```
+```bash
 axcli chrome navigate <tabId> "http://localhost:9200<route>"
+# Wait a moment for the page to settle
 ```
 
-### 3b. Screenshot
-```
+### 3b. Screenshot + analyze
+```bash
 axcli chrome screenshot <tabId>
-# Read the resulting file path to view the image
+# Read the returned file path to view the image
 ```
 
-### 3c. Analyze
 Look for:
-- Broken layout (elements overflowing, misaligned, invisible)
+- Broken layout (overflowing, misaligned, invisible elements)
 - Missing data where data is expected (empty KPI cards, blank charts)
-- Error indicators visible in the snapshot
-- Loading states stuck indefinitely
+- Loading spinners stuck indefinitely
+
+**Known false positive:** `LoadingLayout.vue` triggers a Vue "missing template" warning in the console — ignore it, it's intentional.
+
+### 3c. Snapshot for interactions
+```bash
+axcli chrome snapshot <tabId>
+# Use refs from snapshot to click interactive elements
+```
 
 ### 3d. Simulate user flows
 
-Perform realistic interactions — don't just look at the static page:
+Interact realistically per page — always snapshot first to get current refs:
 
 | Page | Flow to simulate |
 |---|---|
-| `/dashboard` | Switch portfolio (if switcher visible), expand profit tooltip |
-| `/holdings` | Click a holding row to see details |
-| `/transactions` | Open add-transaction drawer |
+| `/dashboard` | Click portfolio switcher dropdown (`Expand "No Portfolios"` or similar) |
+| `/holdings` | Click a holding row if any exist |
+| `/transactions` | Click the FAB `+` button to open add-transaction drawer |
 | `/manage-portfolios` | Verify portfolio list loads |
 | `/cash` | Verify deposits list loads |
 | `/analytics` | Verify charts render |
@@ -104,73 +116,38 @@ Perform realistic interactions — don't just look at the static page:
 
 After each interaction, take another screenshot.
 
-Update `docs/app-context.md` → "Known User Flows" with any flows you discover or confirm.
-
 ### 3e. Self-heal
 
 If you spot a visual issue:
-- **Obvious/minor** (wrong color, misaligned element, missing CSS class, broken import): fix it automatically, re-screenshot to confirm, note what was fixed in the report
-- **Requires judgment** (data logic wrong, architectural change needed, unclear root cause): describe what you see and ask the user: "I see [X] on [page]. Shall I investigate and fix it?"
+- **Obvious/minor** (wrong color, misaligned element, missing CSS class, broken import): fix it automatically, re-screenshot to confirm
+- **Requires judgment** (data logic wrong, architectural change needed, unclear root cause): ask the user: "I see [X] on [page]. Shall I investigate and fix it?"
 
 ## Step 4: Update `docs/app-context.md`
 
-After validation, append any new discoveries:
-- New components found on pages
+Append any new discoveries after validation:
+- New components or UI patterns found
 - New user flows confirmed
-- New file→page mappings discovered
-- Any edge cases or known issues
+- New file→page mappings
+- New edge cases or known issues
 
-Update the `## Last Updated` line with today's date (format: YYYY-MM-DD).
+Update the `## Last Updated` line with today's date (YYYY-MM-DD), then commit:
 
-Commit the update:
 ```bash
 git add docs/app-context.md
-git commit -m "docs: update app-context from visual-validate run [date]"
+git commit -m "docs: update app-context from visual-validate run $(date +%Y-%m-%d)"
 ```
 
-## Step 5: Report
+## Step 5: In-session Summary
 
-Generate a markdown report and share it using the `share-markdown` skill:
+Report findings inline in chat — no external sharing needed. Format:
 
-```markdown
-# Visual Validation Report — [date]
-
-## Scope
-Pages validated: [list]
-Triggered by: [change description or "manual"]
-
-## Results
-
-### /dashboard
-- Status: ✅ Pass / ⚠️ Issues found / 🔧 Auto-fixed
-- Observations: [what was seen in screenshots]
-- Flows tested: [list]
-- Notes: [anything notable]
-
-[repeat per page validated]
-
-## Auto-fixes Applied
-[list any code changes made, or "None"]
-
-## Issues Requiring Review
-[list anything that needs user decision, or "None"]
-
-## Context Updates
-[list what was added to docs/app-context.md, or "None"]
 ```
+Visual validation complete.
 
-To share the report, use the share-markdown skill:
-```bash
-CONTENT="[report markdown here]"
-rtk proxy curl -s -X POST https://md-secure-viewer.vercel.app/api/generate \
-  -H "Content-Type: application/json" \
-  --data-raw "{\"content\": $(echo "$CONTENT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))'), \"emails\": \"odedgo@monday.com\", \"owner\": \"claude\"}"
+Pages checked: [list]
+✅ Pass: [list]
+⚠️ Issues found: [describe]
+🔧 Auto-fixed: [describe or "None"]
+❓ Needs your input: [describe or "None"]
+Context updates: [what was added to app-context.md or "None"]
 ```
-
-Post the returned `url` in chat.
-
-## Completion
-
-Report back with:
-- DONE — skill created and committed
-- BLOCKED — explain what's wrong
