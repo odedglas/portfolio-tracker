@@ -83,10 +83,10 @@ There is also a **bottom-right FAB** (`+` button) for adding entries, and a **si
 
 ## File → Auth Mappings
 
-| File | Role |
-| ---- | ---- |
-| `src/components/login/LoginForm.vue` | Email/password login + signup form |
-| `src/components/login/SocialMediaLoginBar.vue` | Google/Facebook/Twitter login buttons |
-| `src/service/firebase/authentication.ts` | `authenticationWithLoading`, `signInWithPassword`, `signInWithProvider`, `signUp`, `signOut` |
-| `src/service/user.ts` | `createAppUser` — idempotent user doc creation |
-| `src/stores/loading.ts` | `emitLoadingTask` — wraps async tasks with loading spinner |
+| File                                           | Role                                                                                         |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `src/components/login/LoginForm.vue`           | Email/password login + signup form                                                           |
+| `src/components/login/SocialMediaLoginBar.vue` | Google/Facebook/Twitter login buttons                                                        |
+| `src/service/firebase/authentication.ts`       | `authenticationWithLoading`, `signInWithPassword`, `signInWithProvider`, `signUp`, `signOut` |
+| `src/service/user.ts`                          | `createAppUser` — idempotent user doc creation                                               |
+| `src/stores/loading.ts`                        | `emitLoadingTask` — wraps async tasks with loading spinner                                   |
