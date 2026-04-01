@@ -25,6 +25,12 @@ const api = {
     return await api.get(data.uid);
   },
   createAppUser: async (user: FirebaseUser) => {
+    const existing = await api.get(user.uid).catch(() => null);
+
+    if (existing) {
+      return;
+    }
+
     await api.update({ uid: user.uid, settings: defaultSettings() });
   },
 };
