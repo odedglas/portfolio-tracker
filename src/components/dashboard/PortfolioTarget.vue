@@ -1,10 +1,13 @@
 <template>
-  <q-card flat class="portfolio-target">
+  <q-card flat :bordered="appearanceStore.borderedCards" class="portfolio-target q-mt-lg">
     <q-card-section>
       <div class="flex items-center justify-between q-mb-md">
-        <span class="text-subtitle1 text-grey-7">
-          Goal: {{ $n(targetAmount, 'decimal') }}
-        </span>
+        <div class="flex items-center">
+          <q-icon name="flag" class="dashboard-icon q-mr-sm" size="sm" />
+          <span class="text-h6 text-grey-7">
+            {{ year }} Goal: {{ $n(targetAmount, 'decimal') }}
+          </span>
+        </div>
         <span
           v-if="isReached"
           class="text-positive text-subtitle2 flex items-center q-gap-xs"
@@ -54,6 +57,7 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
+import { useAppearanceStore } from 'stores/appearance';
 
 export default defineComponent({
   name: 'PortfolioTarget',
@@ -67,9 +71,14 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    year: {
+      type: Number,
+      required: true,
+    },
   },
 
   setup(props) {
+    const appearanceStore = useAppearanceStore();
     const isReached = computed(() => props.percentage >= 1);
     const fillWidth = computed(() => `${Math.min(props.percentage, 1) * 100}%`);
     const displayValue = computed(
@@ -93,6 +102,7 @@ export default defineComponent({
     };
 
     return {
+      appearanceStore,
       isReached,
       fillWidth,
       displayValue,

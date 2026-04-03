@@ -12,6 +12,7 @@
         class="dashboard-portfolio-target"
         :target-amount="target.targetAmount"
         :percentage="target.percentage"
+        :year="target.year"
       />
       <holdings-donut class="col-8 dashboard-holdings-donut q-mt-lg" />
       <portfolio-heat-map class="dashboard-portfolio-heat-map" />
@@ -71,9 +72,9 @@ export default defineComponent({
   grid-template-areas:
     'title title title'
     'kpi kpi kpi'
-    'target target target'
     'donut donut heatmap'
     'daily_movers daily_movers daily_movers'
+    'target target target'
     'insights insights insights';
 }
 

@@ -29,10 +29,13 @@ export const portfoliosTransformer = {
     const depositsValue = portfoliosTransformer.depositsValue(portfolio);
     const cashFlow = portfoliosTransformer.cashFlow(portfolio);
 
+    const currentYear = new Date().getFullYear();
+    const currentYearTarget = portfolio.targets?.[currentYear] ?? 0;
     const target = {
-      value: portfolio.target,
-      percentage: portfolio.target
-        ? (portfolio.currentValue + cashFlow) / portfolio.target
+      year: currentYear,
+      value: currentYearTarget,
+      percentage: currentYearTarget
+        ? (portfolio.currentValue + cashFlow) / currentYearTarget
         : 0,
     };
 
