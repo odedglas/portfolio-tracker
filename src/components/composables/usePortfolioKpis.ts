@@ -61,5 +61,19 @@ export const usePortfolioKpis = () => {
     ];
   });
 
-  return { kpis };
+  const target = computed(() => {
+    const portfolio = portfolioStore.selectedPortfolioWithHoldings;
+    if (!portfolio?.target) return null;
+
+    const portfolioKpis = portfoliosTransformer.portfolioKPIS(portfolio);
+    const cashFlow = portfoliosTransformer.cashFlow(portfolio);
+
+    return {
+      targetAmount: portfolio.target,
+      currentValue: portfolio.currentValue + cashFlow,
+      percentage: portfolioKpis.target.percentage,
+    };
+  });
+
+  return { kpis, target };
 };
