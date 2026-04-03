@@ -31,7 +31,9 @@ export const portfoliosTransformer = {
 
     const target = {
       value: portfolio.target,
-      percentage: (portfolio.currentValue + cashFlow) / portfolio.target,
+      percentage: portfolio.target
+        ? (portfolio.currentValue + cashFlow) / portfolio.target
+        : 0,
     };
 
     const profit = {
