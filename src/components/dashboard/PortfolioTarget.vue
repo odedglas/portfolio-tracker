@@ -1,49 +1,54 @@
 <template>
-  <q-card flat class="portfolio-target q-pa-md">
-    <div class="flex items-center justify-between q-mb-md">
-      <span class="text-subtitle1 text-grey-7">
-        Goal: {{ $n(targetAmount, 'decimal') }}
-      </span>
-      <span v-if="isReached" class="text-positive text-subtitle2 flex items-center q-gap-xs">
-        <q-icon name="emoji_events" size="sm" />
-        Target reached!
-      </span>
-      <span v-else class="text-subtitle2 text-grey-6">
-        {{ $n(displayValue, 'decimal') }} &middot; {{ displayPercentage }}%
-      </span>
-    </div>
-
-    <div class="target-track-wrapper">
-      <div class="target-track">
-        <div
-          class="target-track__fill bg-primary"
-          :style="{ width: fillWidth }"
-        />
-      </div>
-
-      <div
-        v-for="milestone in milestones"
-        :key="milestone.percentage"
-        class="target-milestone"
-        :style="{ left: milestone.percentage * 100 + '%' }"
-      >
-        <div
-          class="target-milestone__dot"
-          :class="milestone.reached ? 'bg-primary' : 'bg-grey-4'"
-        />
-        <span class="target-milestone__label text-caption text-grey-6">
-          {{ abbreviate(milestone.value) }}
+  <q-card flat class="portfolio-target">
+    <q-card-section>
+      <div class="flex items-center justify-between q-mb-md">
+        <span class="text-subtitle1 text-grey-7">
+          Goal: {{ $n(targetAmount, 'decimal') }}
+        </span>
+        <span
+          v-if="isReached"
+          class="text-positive text-subtitle2 flex items-center q-gap-xs"
+        >
+          <q-icon name="emoji_events" size="sm" />
+          Target reached!
+        </span>
+        <span v-else class="text-subtitle2 text-grey-6">
+          {{ $n(displayValue, 'decimal') }} &middot; {{ displayPercentage }}%
         </span>
       </div>
 
-      <div
-        v-if="!isReached"
-        class="target-position"
-        :style="{ left: fillWidth }"
-      >
-        <div class="target-position__dot bg-primary" />
+      <div class="target-track-wrapper">
+        <div class="target-track">
+          <div
+            class="target-track__fill bg-primary"
+            :style="{ width: fillWidth }"
+          />
+        </div>
+
+        <div
+          v-for="milestone in milestones"
+          :key="milestone.percentage"
+          class="target-milestone"
+          :style="{ left: milestone.percentage * 100 + '%' }"
+        >
+          <div
+            class="target-milestone__dot"
+            :class="milestone.reached ? 'bg-primary' : 'bg-grey-4'"
+          />
+          <span class="target-milestone__label text-caption text-grey-6">
+            {{ abbreviate(milestone.value) }}
+          </span>
+        </div>
+
+        <div
+          v-if="!isReached"
+          class="target-position"
+          :style="{ left: fillWidth }"
+        >
+          <div class="target-position__dot bg-primary" />
+        </div>
       </div>
-    </div>
+    </q-card-section>
   </q-card>
 </template>
 
@@ -67,8 +72,12 @@ export default defineComponent({
   setup(props) {
     const isReached = computed(() => props.percentage >= 1);
     const fillWidth = computed(() => `${Math.min(props.percentage, 1) * 100}%`);
-    const displayValue = computed(() => props.targetAmount * Math.min(props.percentage, 1));
-    const displayPercentage = computed(() => (Math.min(props.percentage, 1) * 100).toFixed(1));
+    const displayValue = computed(
+      () => props.targetAmount * Math.min(props.percentage, 1)
+    );
+    const displayPercentage = computed(() =>
+      (Math.min(props.percentage, 1) * 100).toFixed(1)
+    );
     const milestones = computed(() =>
       [0.25, 0.5, 0.75, 1].map((p) => ({
         percentage: p,
@@ -146,6 +155,7 @@ export default defineComponent({
   position: absolute;
   top: -6px;
   transform: translateX(-50%);
+  z-index: 1;
 }
 
 .target-position__dot {
