@@ -8,6 +8,7 @@ import { migrations } from './migrations';
 import { alertsHandler } from './alerts';
 import { getPortfoliosContext } from './utils/getPortfoliosContext';
 import { isTradingDay } from './utils/isTradingDay';
+import { onPortfolioDeleted } from './portfolioCleanup';
 
 admin.initializeApp();
 
@@ -72,6 +73,8 @@ export const portfolioScheduler = onSchedule(
     return;
   }
 );
+
+export { onPortfolioDeleted };
 
 export const notificationsScheduler = onSchedule(
   {
