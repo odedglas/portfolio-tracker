@@ -61,5 +61,20 @@ export const usePortfolioKpis = () => {
     ];
   });
 
-  return { kpis };
+  const target = computed(() => {
+    const portfolio = portfolioStore.selectedPortfolioWithHoldings;
+    const currentYear = new Date().getFullYear();
+    const currentYearTarget = portfolio?.targets?.[currentYear] ?? 0;
+    if (!portfolio || !currentYearTarget) return null;
+
+    const portfolioKpis = portfoliosTransformer.portfolioKPIS(portfolio);
+
+    return {
+      year: currentYear,
+      targetAmount: currentYearTarget,
+      percentage: portfolioKpis.target.percentage,
+    };
+  });
+
+  return { kpis, target };
 };

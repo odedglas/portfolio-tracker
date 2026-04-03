@@ -126,7 +126,7 @@ export type Portfolio = Entity &
   Profitable & {
     owner: string;
     title: string;
-    target: number;
+    targets?: Record<number, number>;
     deposits: Deposit[];
     stocksPlans?: StocksPlan[];
     allocationPlans?: AllocationPlan[];

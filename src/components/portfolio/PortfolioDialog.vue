@@ -31,15 +31,12 @@
     />
 
     <q-input
-      v-model.number="localPortfolio.target"
+      v-model.number="currentYearTarget"
       type="number"
       lazy-rules
-      :label="$t('portfolios.target')"
+      :label="`${currentYear} ${$t('portfolios.target')}`"
       :hint="$t('portfolios.target_explain')"
       suffix="$"
-      :rules="[
-        (val) => (val && val > 0) || 'Please enter your portfolio target value',
-      ]"
     />
   </base-dialog>
 </template>
@@ -57,7 +54,7 @@ const emptyPortfolioTemplate = (): Portfolio => ({
   title: '',
   currentValue: 0,
   invested: 0,
-  target: 0,
+  targets: {},
   profit: 0,
   owner: 'none',
   createdAt: Date.now(),
@@ -100,6 +97,18 @@ export default defineComponent({
 
     const isNew = computed(() => localPortfolio?.value?.id === '');
 
+    const currentYear = new Date().getFullYear();
+
+    const currentYearTarget = computed({
+      get: () => localPortfolio.value?.targets?.[currentYear] ?? 0,
+      set: (value: number) => {
+        localPortfolio.value.targets = {
+          ...(localPortfolio.value.targets ?? {}),
+          [currentYear]: value,
+        };
+      },
+    });
+
     // Local portfolio value would be set to given props.portfolio or an empty one.
     const setLocalPortfolio = () => {
       localPortfolio.value = {
@@ -131,6 +140,8 @@ export default defineComponent({
       localPortfolio,
       setLocalPortfolio,
       submitForm,
+      currentYear,
+      currentYearTarget,
     };
   },
 });

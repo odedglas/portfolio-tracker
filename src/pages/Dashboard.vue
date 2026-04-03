@@ -7,6 +7,13 @@
       <div v-for="(kpi, index) in kpis" :key="kpi.title" class="col">
         <dashboard-kpi v-bind="kpi" :class="`dashboard-kpi-${index}`" />
       </div>
+      <portfolio-target
+        v-if="target"
+        class="dashboard-portfolio-target"
+        :target-amount="target.targetAmount"
+        :percentage="target.percentage"
+        :year="target.year"
+      />
       <holdings-donut class="col-8 dashboard-holdings-donut q-mt-lg" />
       <portfolio-heat-map class="dashboard-portfolio-heat-map" />
       <daily-movers class="dashboard-daily-movers" />
@@ -26,6 +33,7 @@ import PortfolioHeatMap from 'components/dashboard/PortfolioHeatMap.vue';
 import PortfolioInsights from 'components/dashboard/PortfolioInsights.vue';
 import DailyMovers from 'components/dashboard/DailyMovers.vue';
 import StickyQuickAdd from 'components/dashboard/StickyQuickAdd.vue';
+import PortfolioTarget from 'components/dashboard/PortfolioTarget.vue';
 
 export default defineComponent({
   name: 'DashboardPage',
@@ -36,10 +44,11 @@ export default defineComponent({
     HoldingsDonut,
     DashboardKpi,
     PortfolioInsights,
+    PortfolioTarget,
   },
   setup() {
     const portfolioStore = usePortfolioStore();
-    const { kpis } = usePortfolioKpis();
+    const { kpis, target } = usePortfolioKpis();
 
     const viewPortfolio = computed(
       () => portfolioStore.selectedPortfolioWithHoldings
@@ -48,6 +57,7 @@ export default defineComponent({
     return {
       viewPortfolio,
       kpis,
+      target,
     };
   },
 });
@@ -57,13 +67,14 @@ export default defineComponent({
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(4, auto);
+  grid-template-rows: repeat(6, auto);
   grid-column-gap: 16px;
   grid-template-areas:
     'title title title'
     'kpi kpi kpi'
     'donut donut heatmap'
     'daily_movers daily_movers daily_movers'
+    'target target target'
     'insights insights insights';
 }
 
@@ -73,6 +84,9 @@ export default defineComponent({
 
 .dashboard-title {
   grid-area: title;
+}
+.dashboard-portfolio-target {
+  grid-area: target;
 }
 .dashboard-holdings-donut {
   grid-area: donut;
