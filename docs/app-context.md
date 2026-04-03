@@ -4,7 +4,7 @@
 
 ## Last Updated
 
-2026-04-01
+2026-04-03
 
 ## Known Routes
 
@@ -66,6 +66,23 @@ There is also a **bottom-right FAB** (`+` button) for adding entries, and a **si
 | `shared/transformers/**`                                       | `/dashboard`, `/holdings`, `/transactions` |
 | `src/components/common/**`                                     | all pages                                  |
 | `src/layouts/LoadingLayout.vue`                                | all pages (global overlay)                 |
+
+## Portfolio Target Feature (PR #67)
+
+- `PortfolioTarget.vue` — milestone strip component rendered on `/dashboard` between KPI cards and Holdings allocation card
+- Visible only when `portfolio.target > 0`; hidden entirely when no target is set
+- Shows: "Goal: $X" header, filled progress bar, 4 milestone dots at 25/50/75/100%, current position dot, "$X · Y%" label
+- "Target reached!" state (trophy icon) when `percentage >= 1`
+- Progress value = `(currentValue + cashFlow) / target` — cash-flow-adjusted, not raw market value
+- Milestone labels use abbreviated format: `$13k`, `$25k`, `$38k`, `$50k` for a $50k target
+- Creating a portfolio via the portfolio switcher dropdown → "+ Create" opens the New Portfolio dialog which includes the Target field
+
+### File → Page Mapping (new)
+
+| Files | Affected Pages |
+|---|---|
+| `src/components/dashboard/PortfolioTarget.vue` | `/dashboard` |
+| `src/components/composables/usePortfolioKpis.ts` | `/dashboard` |
 
 ## Known Issues / Edge Cases
 
