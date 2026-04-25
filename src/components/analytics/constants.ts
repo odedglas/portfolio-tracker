@@ -21,5 +21,5 @@ export const timeRangeOptions: Option[] = [
   { label: '6m', value: '6m', days: 180 },
   { label: 'YTD', value: 'ytd', days: yearToDateDays() },
   { label: '1y', value: '1y', days: 365 },
-  { label: '5y', value: '5y', days: 365 * 5 },
+  { label: '5y', value: '5y', days: 365 * 5, apiRange: '5y' },
 ];
