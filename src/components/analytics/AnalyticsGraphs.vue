@@ -5,12 +5,14 @@
     :title="$t('charts.portfolio_value')"
     :show-transactions-markers="true"
     :benchmarkData="benchmarkData"
+    @update:apiRange="onApiRangeChange"
   />
 
   <portfolio-performance
     :title="$t('charts.portfolio_performance')"
     mode="percentage"
     :benchmarkData="benchmarkData"
+    @update:apiRange="onApiRangeChange"
   />
 
   <portfolio-monthly-yield :benchmark-data="benchmarkData" />
@@ -35,12 +37,21 @@ export default defineComponent({
   },
   setup() {
     const benchmarkData = ref<StockCharData[]>([]);
+    const selectedTickers = ref<string[]>([]);
+    const currentApiRange = ref<string | undefined>(undefined);
 
     const { emitLoadingTask } = useLoadingStore();
 
-    const setBenchmarkData = async (tickers: string[]) => {
+    const fetchBenchmarkData = async (
+      tickers: string[],
+      range?: string
+    ) => {
       await emitLoadingTask(async () => {
-        const chartQuotesResponse = await getQuotesChartData(tickers);
+        const chartQuotesResponse = await getQuotesChartData(
+          tickers,
+          undefined,
+          range
+        );
 
         benchmarkData.value = tickers.map(
           (ticker) => chartQuotesResponse[ticker]
@@ -48,8 +59,23 @@ export default defineComponent({
       });
     };
 
+    const setBenchmarkData = async (tickers: string[]) => {
+      selectedTickers.value = tickers;
+      await fetchBenchmarkData(tickers, currentApiRange.value);
+    };
+
+    const onApiRangeChange = async (range?: string) => {
+      if (range === currentApiRange.value) return;
+      currentApiRange.value = range;
+
+      if (selectedTickers.value.length > 0) {
+        await fetchBenchmarkData(selectedTickers.value, range);
+      }
+    };
+
     return {
       setBenchmarkData,
+      onApiRangeChange,
       benchmarkData,
       benchmarkOptions,
     };

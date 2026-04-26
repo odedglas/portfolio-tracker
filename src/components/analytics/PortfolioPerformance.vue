@@ -162,7 +162,8 @@ export default defineComponent({
       default: [] as StockCharData[],
     },
   },
-  setup(props) {
+  emits: ['update:apiRange'],
+  setup(props, { emit }) {
     const showResetZoom = ref(false);
     const chartRef: Ref = ref(undefined);
     const selectedTimeRangeOption = ref<Option>(timeRangeOptions[2]);
@@ -228,6 +229,11 @@ export default defineComponent({
       selectedTimeRangeOption.value =
         timeRangeOptions.find((option) => option.value === range.value) ??
         timeRangeOptions[0];
+
+      emit(
+        'update:apiRange',
+        (selectedTimeRangeOption.value.apiRange as string) ?? undefined
+      );
     };
 
     const timeRangeText = computed(() => {
