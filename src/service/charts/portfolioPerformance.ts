@@ -106,6 +106,31 @@ const normalizeBenchmarkValue = (
   return series;
 };
 
+/**
+ * Aligns portfolio history items to a period time range, forward-filling
+ * dates that have no matching history entry with the most recent known item.
+ * Guarantees output length === periodTimeRange.length so callers can index
+ * positionally alongside a benchmark series normalized to the same range.
+ */
+const alignHistoryToPeriod = (
+  portfolioHistory: PortfolioHistory[],
+  periodTimeRange: number[]
+): PortfolioHistory[] => {
+  const byDate = new Map<number, PortfolioHistory>();
+  portfolioHistory.forEach((history) => {
+    byDate.set(midDay(new Date(history.date)).getTime(), history);
+  });
+
+  let lastKnown = portfolioHistory[0];
+  return periodTimeRange.map((date) => {
+    const match = byDate.get(date);
+    if (match) {
+      lastKnown = match;
+    }
+    return lastKnown;
+  });
+};
+
 const normalizePerformanceData = (
   portfolioHistory: PortfolioHistory[],
   benchmarks: StockCharData[],
@@ -119,6 +144,8 @@ const normalizePerformanceData = (
   if (!periodHistoryItems.length) {
     return [];
   }
+
+  const alignedHistory = alignHistoryToPeriod(periodHistoryItems, periodTimeRange);
 
   const portfolioHistorySeries = normalizeSeriesTimePeriod(
     {
@@ -150,7 +177,7 @@ const normalizePerformanceData = (
     })
     .filter((series) => series.data.length > 1)
     .map((series) => normalizeSeriesTimePeriod(series, periodTimeRange))
-    .map((series) => normalizeBenchmarkValue(series, periodHistoryItems, mode));
+    .map((series) => normalizeBenchmarkValue(series, alignedHistory, mode));
 
   // Ensuring each series includes data point for each day in the period time.
   return [portfolioHistorySeries, ...benchmarksSeries];
