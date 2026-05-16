@@ -10,6 +10,12 @@
     </q-item-section>
     <q-item-section side>
       <q-item-label class="text-subtitle1 text-black">
+        Sold: {{ $n(plansTotal.sold, 'currency') }}
+      </q-item-label>
+    </q-item-section>
+    <q-separator vertical class="q-mx-md" />
+    <q-item-section side>
+      <q-item-label class="text-subtitle1 text-black">
         Plans value: {{ $n(plansTotal.total, 'currency') }}
       </q-item-label>
     </q-item-section>
@@ -56,17 +62,23 @@ export default defineComponent({
             grantPrice = 0,
             availableShares = 0,
             potentialValue = 0,
+            orders = [],
           } = plan;
 
           const profit = potentialValue - grantPrice * availableShares;
+          const sold = orders.reduce(
+            (sum, order) => sum + (order.totalValue ?? 0),
+            0
+          );
 
           return {
             total: acc.total + potentialValue,
             profit: acc.profit + profit,
             sellable: acc.sellable + potentialValue,
+            sold: acc.sold + sold,
           };
         },
-        { total: 0, sellable: 0, profit: 0 }
+        { total: 0, sellable: 0, profit: 0, sold: 0 }
       )
     );
 
