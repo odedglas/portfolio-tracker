@@ -11,8 +11,7 @@ export const getPortfolioHoldingsHeatMapChartOptions = (
   const series = [
     {
       data: holdingsStore.portfolioHoldings.map((holding) => {
-        const normalizedProfitPercent =
-          holding.profit.percent * (holding.profit.value >= 0 ? 1 : -1) * 100;
+        const normalizedProfitPercent = holding.profit.percent * 100;
 
         return {
           x: holding.ticker,
