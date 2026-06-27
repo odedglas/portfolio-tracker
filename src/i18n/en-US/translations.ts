@@ -20,7 +20,7 @@ export const enUsMessages = {
   capital: 'Capital gains',
   by_invested: 'By Invested',
   by_sector: 'By Sector',
-  realized_gains_tooltip: 'Realized gains from sold shares: +{realized}',
+  realized_gains_tooltip: 'Realized gains from sold shares: +{realizedValue}',
   portfolios: {
     title: "Manage portfolio's",
     create: 'New Portfolio',
