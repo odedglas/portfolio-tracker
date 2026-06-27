@@ -8,7 +8,7 @@
         <q-tooltip class="text-caption">
           {{
             $t('realized_gains_tooltip', {
-              realized: $n(realizedValue, 'decimal'),
+              realizedValue: $n(realizedValue, 'decimal'),
             })
           }}
         </q-tooltip>
