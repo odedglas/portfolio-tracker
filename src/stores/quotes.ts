@@ -41,9 +41,12 @@ export const useQuotesStore = defineStore('quotes', {
       }
     },
     async setFearAndGreed() {
-      const { data } = await stocksAPI.getFearAndGreedIndex();
-
-      this.fearAndGreed = data.fgi;
+      try {
+        const { data } = await stocksAPI.getFearAndGreedIndex();
+        this.fearAndGreed = data.fgi;
+      } catch {
+        // non-critical — dashboard still loads without it
+      }
     },
     async refreshQuotes() {
       const holdingsStore = useHoldingsStore();
